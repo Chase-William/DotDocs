@@ -16,12 +16,12 @@ namespace Docsharp
     {        
         static void Main(string[] args)
         {
-            using var docs = Docsharpener.From(
+            var docs = Docsharpener.From(
                 dllPath: @"C:\Dev\Sharpocs\test\Docsharp.Test.Data\bin\Debug\net5.0\Docsharp.Test.Data.dll",
                 xmlPath: @"C:\Dev\Sharpocs\test\Docsharp.Test.Data\bin\Debug\net5.0\Docsharp.Test.Data.xml"
             );
 
-            docs.MakeDocumentation();
+            // docs.MakeDocumentation();
 
             // ...
         }
