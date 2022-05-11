@@ -10,5 +10,15 @@ namespace Docsharp.Test.Data.Classes
     {
         public EngineSize Engine { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         public int EngineCount { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+        public override bool TryDock()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool TryUndock()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

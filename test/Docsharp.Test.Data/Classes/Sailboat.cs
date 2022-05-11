@@ -14,5 +14,15 @@ namespace Docsharp.Test.Data.Classes
         public EngineSize Engine { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int EngineCount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public double SailHeight { get; private set; }
+
+        public override bool TryDock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryUndock()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

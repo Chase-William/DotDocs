@@ -11,5 +11,14 @@ namespace Docsharp.Test.Data.Classes
     /// </summary>
     public class Canoe : Boat
     {
+        public override bool TryDock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryUndock()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

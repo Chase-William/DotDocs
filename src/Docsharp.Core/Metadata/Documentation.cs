@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Docsharp.Core.Metadata
 {
-    public enum MemberType
+    public class Documentation
     {
-        Type = 'T',
-        Field = 'F',
-        Property = 'P'
+        public string FullName { get; set; }
+        public MemberType Type { get; set; }
+        public string Summary { get; set; }
     }
 }

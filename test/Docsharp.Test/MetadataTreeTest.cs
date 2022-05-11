@@ -1,5 +1,6 @@
 using Docsharp.Core;
 using NUnit.Framework;
+using System;
 
 namespace Docsharp.Test
 {
@@ -7,13 +8,21 @@ namespace Docsharp.Test
     {
         public Docsharpener Docs;
 
-        [SetUp]
+        /// <summary>
+        /// OneTimeSetup is required because having multiple active MetadataLoadContexts 
+        /// in parallel test is forbidden.
+        /// </summary>
+        [OneTimeSetUp]
         public void Setup()
         {
             Docs = Docsharpener.From(
                 @"C:\Dev\Sharpocs\test\Docsharp.Test.Data\bin\Debug\net5.0\Docsharp.Test.Data.dll",
                 @"C:\Dev\Sharpocs\test\Docsharp.Test.Data\bin\Debug\net5.0\Docsharp.Test.Data.xml");            
         }
+
+        [OneTimeTearDown]
+        public void TearDown()
+            => Docs.Dispose();        
 
         /// <summary>
         /// Ensures models within the namespace "Docsharp.Test.Data.Models.*" are accounted for within the Metadata Tree.
@@ -22,7 +31,7 @@ namespace Docsharp.Test
         public void ClassesExist()
         {
             Assert.AreEqual(
-                "Boat", 
+                "Boat",
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
@@ -71,45 +80,45 @@ namespace Docsharp.Test
         [Test]
         public void ClassesMemberInfoNotNull()
         {
-            Assert.NotNull((
+            Assert.NotNull(((TypeNode)
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
-                .Types["Boat"] as TypeNode)
+                .Types["Boat"])
                 .Member);
-            Assert.NotNull((
+            Assert.NotNull(((TypeNode)
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
-                .Types["Canoe"] as TypeNode)
+                .Types["Canoe"])
                 .Member);
-            Assert.NotNull((
+            Assert.NotNull(((TypeNode)
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
-                .Types["Runabout"] as TypeNode)
+                .Types["Runabout"])
                 .Member);
-            Assert.NotNull((
+            Assert.NotNull(((TypeNode)
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
-                .Types["Sailboat"] as TypeNode)
+                .Types["Sailboat"])
                 .Member);
-            Assert.NotNull((
+            Assert.NotNull(((TypeNode)
                 Docs.Metadata.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
-                .Types["Yacht"] as TypeNode)
+                .Types["Yacht"])
                 .Member);
         }
 

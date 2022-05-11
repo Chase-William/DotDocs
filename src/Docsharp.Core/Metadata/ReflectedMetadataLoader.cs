@@ -9,7 +9,13 @@ namespace Docsharp.Core.Metadata
 {
     public sealed class ReflectedMetadataLoader : IDisposable
     {
+        /// <summary>
+        /// Assembly name this <see cref="ReflectedMetadataLoader"/> instance reflected on.
+        /// </summary>
         public string AssemblyName { get; private set; }
+        
+        // Stores all types via their <namespace>.<member_name>.
+        
         public Dictionary<string, ClassType> Classes { get; private set; } = new();
         public Dictionary<string, StructType> Structs { get; private set; } = new();
         public Dictionary<string, InterfaceType> Interfaces { get; private set; } = new();

@@ -8,9 +8,13 @@ namespace Docsharp.Test.Data.Structs
 {
     public struct Rectangle
     {
-        public int left;
-        public int top;
-        public int width;
-        public int height;
+        public int Top { get; set; }
+        public int Left { get; set; }
+
+        public int bottom;
+        public int right;
+
+        public int GetWidth() => right - Left;
+        public int GetHeight() => bottom - Top;
     }
 }

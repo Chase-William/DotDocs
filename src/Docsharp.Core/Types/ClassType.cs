@@ -1,67 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-/*
- * 
- * 
- * 
- * 
- * 
- * 
- *  WE NEED TYPE INFO IN OUR JSON...
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
+using Docsharp.Core.Metadata;
 
 namespace Docsharp.Core.Types
 {
-    public class ClassType : TypeMember<TypeInfo>
-    {
-        public List<PropertyMember> Properties { get; set; } = new();
-        public List<FieldMember> Fields { get; set; } = new();
-
-        public string Namespace => member.Namespace;
-        public string FullName => member.FullName;
-        public bool IsPublic => member.IsPublic;
+    public class ClassType : TypeMember<TypeInfo, Documentation>, IConstructable
+    {        
+        public string Namespace => TypeInfo.Namespace;
+        public string FullName => TypeInfo.FullName;
+        public bool IsPublic => TypeInfo.IsPublic;
 
         public override bool CanHaveInternalTypes => true;
         public override string Type => "Class";
 
+        public PropertyMember[] Properties { get; set; }
+        public FieldMember[] Fields { get; set; }
+        public MethodMember[] Methods { get; set; }
+
         public ClassType(TypeInfo member) : base(member)
         {
-            this.member = member;
-
-            PropertyMember memProp;
-            FieldMember memField;
-
-            /*
-             * Get All Properties
-             */
-            foreach (PropertyInfo prop in member.GetProperties())
-            {
-                memProp = new PropertyMember(prop);
-                Properties.Add(memProp);
-            }
-
-            /*
-             * Get All Fields (includes backing fields atm) 
-             */
-            foreach (FieldInfo field in member.GetFields())
-            {
-                memField = new FieldMember(field);
-                Fields.Add(memField);
-            }
+            IConstructable.Initialize(this, member);
         }
     }
 }

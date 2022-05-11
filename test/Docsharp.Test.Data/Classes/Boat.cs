@@ -19,5 +19,17 @@ namespace Docsharp.Test.Data.Classes
         /// Mass of the boat in tons.
         /// </summary>
         public double Weight { get; set; }
+
+        /// <summary>
+        /// Attempts to dock the ship.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool TryDock();
+
+        /// <summary>
+        /// Attempts to undock the ship.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool TryUndock();
     }
 }

@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Xml;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Docsharp.Core.Metadata
 {
-    public class WrittenMetadataLoader
+    public class WrittenDocumentationLoader
     {
         public string AssemblyName { get; private set; } = string.Empty;
 
-        public List<MemberDocs> Documentation { get; private set; } = new();
+        public List<Documentation> Documentation { get; private set; } = new();
 
-        private WrittenMetadataLoader() { }        
+        private WrittenDocumentationLoader() { }        
 
         enum XmlElements
         {
@@ -27,13 +26,13 @@ namespace Docsharp.Core.Metadata
         }
 
         /// <summary>
-        /// Retrieve a <see cref="WrittenMetadataLoader"/> instance populated with metadata from the provided param.
+        /// Retrieve a <see cref="WrittenDocumentationLoader"/> instance populated with metadata from the provided param.
         /// </summary>
         /// <param name="filePath">File path to .xml file.</param>
-        /// <returns>Instance of <see cref="WrittenMetadataLoader"/>.</returns>
-        public static WrittenMetadataLoader From(string filePath)
+        /// <returns>Instance of <see cref="WrittenDocumentationLoader"/>.</returns>
+        public static WrittenDocumentationLoader From(string filePath)
         {
-            WrittenMetadataLoader meta = new();
+            WrittenDocumentationLoader docs = new();
             
             try
             {
@@ -41,8 +40,9 @@ namespace Docsharp.Core.Metadata
 
                 // State variables for parsing
                 XmlElements current = XmlElements.Ignore;
-                MemberDocs memDocs = null;
-                Param param = null;
+                Documentation memDocs = null;
+                FunctionalDocumentation pMemDocs = null;
+                ParamDocumentation param = null;
                 string nameAttr = null;
 
                 while (reader.Read())
@@ -58,10 +58,19 @@ namespace Docsharp.Core.Metadata
                                     break;
                                 case "member":
                                     if (memDocs != null)
-                                        meta.Documentation.Add(memDocs);
+                                    {
+                                        docs.Documentation.Add(memDocs);
+                                        memDocs = null;
+                                    }
+                                    else
+                                    {
+                                        docs.Documentation.Add(pMemDocs);
+                                        pMemDocs = null;
+                                    }
+
                                     current = XmlElements.Member;
                                     nameAttr = reader.GetAttribute("name");
-                                    memDocs = new MemberDocs
+                                    memDocs = new Documentation
                                     {
                                         // Cast leading character to type
                                         Type = (MemberType)nameAttr[0],
@@ -74,13 +83,17 @@ namespace Docsharp.Core.Metadata
                                     break;
                                 case "param":
                                     current = XmlElements.Param;
-                                    param = new Param
+                                    // Upgrade type if not already to store "parameter" info
+                                    UpgradeDocType(ref memDocs, ref pMemDocs);
+                                    param = new ParamDocumentation
                                     {
                                         Name = reader.GetAttribute("name")
                                     };
-                                    memDocs.Params.Add(param);
+                                    pMemDocs.Params.Add(param);
                                     break;
                                 case "returns":
+                                    // Upgrade type if not already to store "returns" info
+                                    UpgradeDocType(ref memDocs, ref pMemDocs);
                                     current = XmlElements.Returns;
                                     break;
                                 default:
@@ -95,16 +108,16 @@ namespace Docsharp.Core.Metadata
                             switch (current)
                             {
                                 case XmlElements.Name:
-                                    meta.AssemblyName = reader.Value;
+                                    docs.AssemblyName = reader.Value;
                                     break;
                                 case XmlElements.Summary:
                                     memDocs.Summary = reader.Value;
                                     break;
                                 case XmlElements.Param:
-                                    param.Body = reader.Value; 
+                                    param.Summary = reader.Value; 
                                     break;
                                 case XmlElements.Returns:
-                                    memDocs.Returns = reader.Value;
+                                    pMemDocs.Returns = reader.Value;
                                     break;
                                 default:                                    
                                     break;
@@ -135,12 +148,32 @@ namespace Docsharp.Core.Metadata
                             //    break;
                     }
                 } // while
-                return meta;
+                return docs;
             }
             catch
             {
                 throw;
             }
-        }        
+        }
+
+        /// <summary>
+        /// Upgrades <paramref name="memDocs"/> to the type of <see cref="FunctionalDocumentation"/> and 
+        /// assigns it to <paramref name="pMemDocs"/>.
+        /// </summary>
+        /// <param name="memDocs">To be upgraded.</param>
+        /// <param name="pMemDocs">To contain upgrade.</param>
+        private static void UpgradeDocType(ref Documentation memDocs, ref FunctionalDocumentation pMemDocs)
+        {
+            if (pMemDocs == null)
+            {
+                pMemDocs = new FunctionalDocumentation
+                {
+                    Type = memDocs.Type,
+                    FullName = memDocs.FullName,
+                    Summary = memDocs.Summary
+                };
+                memDocs = null;
+            }
+        }
     }
 }

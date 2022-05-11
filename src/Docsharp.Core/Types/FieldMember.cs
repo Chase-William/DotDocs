@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
+
+using Docsharp.Core.Metadata;
 
 namespace Docsharp.Core.Types
 {
-    public class FieldMember : Member<FieldInfo>
+    public class FieldMember : Member<FieldInfo, Documentation>
     {        
         public FieldMember(FieldInfo member) : base(member) { }
 
-        public bool IsPublic => member.IsPublic;
-        public bool IsReadonly => member.IsInitOnly;
-        public bool IsConstant => member.IsLiteral;
-        public bool IsStatic => member.IsStatic;
-        public override string Type => member.FieldType.ToString();
+        public bool IsPublic => TypeInfo.IsPublic;
+        public bool IsReadonly => TypeInfo.IsInitOnly;
+        public bool IsConstant => TypeInfo.IsLiteral;
+        public bool IsStatic => TypeInfo.IsStatic;
+        public override string Type => TypeInfo.FieldType.ToString();
     }
 }

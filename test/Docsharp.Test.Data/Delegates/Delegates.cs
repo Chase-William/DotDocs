@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Docsharp.Test.Data.Structs;
 
 namespace Docsharp.Test.Data.Delegates
 {
@@ -12,7 +8,7 @@ namespace Docsharp.Test.Data.Delegates
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    public delegate int DoSomeMathWillYou(int x, int y);
+    public delegate void DoSomeMathWillYou(double x, Rectangle y);
 
     /// <summary>
     /// Class for nested delegate.

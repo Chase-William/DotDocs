@@ -1,4 +1,5 @@
-﻿using Docsharp.Core.Types;
+﻿using Docsharp.Core.Metadata;
+using Docsharp.Core.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Docsharp.Core
         /// Adds a new type under the provided namespace.
         /// </summary>
         /// <param name="fullNamespaceToType"></param>
-        public void AddType(string fullNamespaceToType, TypeMember<TypeInfo> member)
+        public void AddType(string fullNamespaceToType, TypeMember<TypeInfo, Documentation> member)
         {
             // We know the last item in this string[] is our type
             // Everything before it, a namespace            
@@ -33,30 +34,7 @@ namespace Docsharp.Core
             Root.AddType(a, member);           
         }
 
-        /// <summary>
-        /// Inserts a new type within the provided type using the namespace.
-        /// </summary>
-        /// <param name="newType">To be inserted.</param>
-        /// <param name="containingTypeWithNamespace">To contain the insertion.</param>
-        //public void InsertTypeWithinType(string newType, string containingTypeWithNamespace)
-        //{
-
-        //}
-
-        /// <summary>
-        /// Adds a new namespace to the tree.
-        /// </summary>
-        /// <param name="fullNamespace">Entire namespace including the new.</param>
-        //public void AddNamespace(string fullNamespace)
-        //{
-        //    var namespaces = fullNamespace.Split();
-
-        //    Node current = RootNamespace;
-        //    for (int i = 0; i < namespaces.Length; i++)
-        //    {
-        //        current.
-        //    }
-        //}
+        //public Node Find() { }
     }
 
     public class NamespaceNode : Node, ITypeContainable
@@ -76,7 +54,7 @@ namespace Docsharp.Core
         public override string GetName()
             => _namespace;
 
-        public void AddType(ArraySegment<string> segments, TypeMember<TypeInfo> member)
+        public void AddType(ArraySegment<string> segments, TypeMember<TypeInfo, Documentation> member)
         {
             string name = segments.First();
 
@@ -128,19 +106,6 @@ namespace Docsharp.Core
             }
             segments = segments[1..segments.Count];
             Namespaces[name].AddType(segments, member);
-
-            // Only iterate over namespaces, not types
-            // Removes the need to check for last iteration during each iteration
-            //int namespaceCount = segments.Length - 1;
-            //string key;
-            //for (int i = 0; i < namespaceCount; i++)
-            //{
-            //    key = segments[i];
-            //    if (current.Namespaces.ContainsKey(key))
-            //    {
-
-            //    }
-            //}
         }        
     }
 
@@ -148,9 +113,9 @@ namespace Docsharp.Core
     {        
         public Node Parent { get; private set; }
 
-        public TypeMember<TypeInfo> Member { get; private set; }
+        public TypeMember<TypeInfo, Documentation> Member { get; private set; }
 
-        public TypeNode(Node parent, TypeMember<TypeInfo> member)
+        public TypeNode(Node parent, TypeMember<TypeInfo, Documentation> member)
         {
             Parent = parent;
             Member = member;
@@ -158,42 +123,21 @@ namespace Docsharp.Core
 
         public override string GetName()
             => Member.Name;
-
-
-        //public override void AddType(ArraySegment<string> types, Member<TypeInfo> member)
-        //{
-        //    string typeName = types.First();
-        //    // End of nested type chain reached
-        //    if (types.Count == 1)
-        //    {
-        //        Types.Add(typeName, new TypeNode(this, member));
-        //        return;
-        //    }
-
-        //    if (!Types.ContainsKey(typeName))
-        //    {
-        //        Types.Add(typeName, new TypeNode(this, null));
-        //    }
-        //    types = types[1..types.Count];
-        //    Types[typeName].AddType(types, member);
-        //}
     }
 
     public abstract class Node
     {
         public abstract string GetName();
-        // public Dictionary<string, Node> Types { get; set; } = new();
-        // public abstract void AddType(ArraySegment<string> segments, Member<TypeInfo> member);
     }
 
     public class TypeContainable : TypeNode, ITypeContainable
     {
         public Dictionary<string, Node> Types { get; set; } = new();
 
-        public TypeContainable(Node parent, TypeMember<TypeInfo> member) : base(parent, member)
+        public TypeContainable(Node parent, TypeMember<TypeInfo, Documentation> member) : base(parent, member)
         { }
 
-        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo> member)
+        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member)
         {
             string typeName = types.First();
             // End of nested type chain reached
@@ -229,6 +173,6 @@ namespace Docsharp.Core
     {
         public Dictionary<string, Node> Types { get; set; }
 
-        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo> member);
+        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member);
     }
 }

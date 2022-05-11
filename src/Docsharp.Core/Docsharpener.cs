@@ -14,20 +14,19 @@ using Docsharp.Core.Metadata;
 namespace Docsharp.Core
 {
     public sealed class Docsharpener : IDisposable
-    {
+    {        
         /// <summary>
-        /// Stores all class type via their <module>.<member_name>.
+        /// A tree that organizes all types.
         /// </summary>
-        public Dictionary<string, ClassType> Classes { get; private set; } = new();
-        public Dictionary<string, StructType> Structs { get; private set; } = new();
-        public Dictionary<string, InterfaceType> Interfaces { get; private set; } = new();
-        public Dictionary<string, EnumType> Enumerations { get; private set; } = new();
-        public Dictionary<string, DelegateType> Delegates { get; private set; } = new();
-
         public MetadataTree Metadata { get; private set; }
-
+        /// <summary>
+        /// Contains all reflection based metadata.
+        /// </summary>
         public ReflectedMetadataLoader ReflectedMetadata { get; private set; }
-        public WrittenMetadataLoader WrittenMetadata { get; private set; }
+        /// <summary>
+        /// Contains all human-written based metadata.
+        /// </summary>
+        public WrittenDocumentationLoader WrittenMetadata { get; private set; }
         
         private Docsharpener() { }
 
@@ -42,7 +41,7 @@ namespace Docsharp.Core
             {
                 docs.ReflectedMetadata = ReflectedMetadataLoader.From(dllPath);
                 // Read in .xml documentation to be joined with member info
-                docs.WrittenMetadata = WrittenMetadataLoader.From(xmlPath);                
+                docs.WrittenMetadata = WrittenDocumentationLoader.From(xmlPath);                
                 // Create an organized structure called a MetadataTree to represent .dll type structure
                 docs.Metadata = new MetadataTree(docs.ReflectedMetadata.AssemblyName);
 
@@ -51,23 +50,23 @@ namespace Docsharp.Core
                  */
 
                 // Classes
-                foreach (var item in docs.Classes)
+                foreach (var item in docs.ReflectedMetadata.Classes)
                     docs.Metadata.AddType(item.Key, item.Value);
 
                 // Interfaces
-                foreach (var item in docs.Interfaces)
+                foreach (var item in docs.ReflectedMetadata.Interfaces)
                     docs.Metadata.AddType(item.Key, item.Value);
 
                 // Structs
-                foreach (var item in docs.Structs)
+                foreach (var item in docs.ReflectedMetadata.Structs)
                     docs.Metadata.AddType(item.Key, item.Value);
 
                 // Enumerations
-                foreach (var item in docs.Enumerations)
+                foreach (var item in docs.ReflectedMetadata.Enumerations)
                     docs.Metadata.AddType(item.Key, item.Value);
 
                 // Delegates
-                foreach (var item in docs.Delegates)
+                foreach (var item in docs.ReflectedMetadata.Delegates)
                     docs.Metadata.AddType(item.Key, item.Value);
 
                 return docs;
