@@ -1,10 +1,9 @@
 ﻿using System.Reflection;
+using Docsharp.Core.Models.Docs;
 
-using Docsharp.Core.Metadata;
-
-namespace Docsharp.Core.Types
+namespace Docsharp.Core.Models.Types
 {
-    public class DelegateType : TypeMember<TypeInfo, Documentation>, IFunctional
+    public class DelegateModel : TypeMember<TypeInfo, Documentation>, IFunctional
     {
         public override bool CanHaveInternalTypes => false;
         public override string Type => "Delegate";
@@ -14,11 +13,11 @@ namespace Docsharp.Core.Types
         public string ReturnType { get; init; }
         public Parameter[] Parameters { get; init; }
 
-        public DelegateType(TypeInfo member) : base(member)
+        public DelegateModel(TypeInfo member) : base(member)
         {
             var info = member.GetMethod("Invoke");
             ReturnType = info.ReturnType.ToString();
             Parameters = ((IFunctional)this).GetParameters(info);
-        }        
+        }
     }
 }

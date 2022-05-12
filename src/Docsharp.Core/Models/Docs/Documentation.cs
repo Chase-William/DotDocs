@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core.Metadata
+namespace Docsharp.Core.Models.Docs
 {
     public class Documentation
     {

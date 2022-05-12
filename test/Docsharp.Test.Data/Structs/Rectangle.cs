@@ -16,5 +16,10 @@ namespace Docsharp.Test.Data.Structs
 
         public int GetWidth() => right - Left;
         public int GetHeight() => bottom - Top;
+
+        public struct Builder
+        {
+            public static Rectangle Default() => new Rectangle();
+        }
     }
 }

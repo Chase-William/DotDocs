@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core.Types
+namespace Docsharp.Core.Models
 {
     public struct Parameter
     {

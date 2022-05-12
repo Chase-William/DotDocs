@@ -1,0 +1,62 @@
+﻿using System;
+using System.Linq;
+using System.Reflection;
+
+using Docsharp.Core;
+using Docsharp.Core.Models;
+using Docsharp.Core.Tree;
+
+namespace Docsharp.Test.Interfaces.Meta
+{
+    /// <summary>
+    /// Ensures the aspects of <see cref="IConstructable"/> operate as expected.
+    /// </summary>
+    internal interface IConstructableTest
+    {
+        /// <summary>
+        /// Ensures the existance/absense of properties are handled correctly.
+        /// </summary>
+        void PropertiesExistTest();
+        /// <summary>
+        /// Ensures the existance/absense of fields are handled correctly.
+        /// (THIS TEST EXPECTS BACKING FIELDS OF PROPERTIES TO BE OMITTED)
+        /// </summary>
+        void FieldsExistTest();
+        /// <summary>
+        /// Ensures the existance/absense of methods are handled correctly.
+        /// (THIS TEST EXPECTS PRIVATE & MEMBERS System.Object TO BE OMITTED)
+        /// </summary>
+        void MethodsExistTest();
+
+        /// <summary>
+        /// Implement to get the class type provided via <paramref name="className"/>.
+        /// </summary>
+        /// <param name="className">Class type as a string to get acquired.</param>
+        /// <returns>A class type that implements <see cref="IConstructable"/>.</returns>
+        IConstructable GetClassType(string className);
+
+        /// <summary>
+        /// Returns count of fields declared in the class.
+        /// </summary>
+        /// <param name="type">Type to get fields from.</param>
+        /// <returns>Declared fields from instance within <paramref name="type"/>.</returns>
+        static int GetFieldCount(Type type)
+            => type.GetTypeInfo().GetFields().Length;
+
+        /// <summary>
+        /// Returns count of methods declared in the class.
+        /// </summary>
+        /// <param name="type">Type to get methods from.</param>
+        /// <returns>Declared methods from instance within <paramref name="type"/>.</returns>
+        static int GetMethodCount(Type type)
+            => type.GetTypeInfo().DeclaredMethods.Count();
+
+        /// <summary>
+        /// Returns count of properties declared in the class.
+        /// </summary>
+        /// <param name="type">Type to get properties from.</param>
+        /// <returns>Declared properties from instance within <paramref name="type"/>.</returns>
+        static int GetPropertyCount(Type type)
+            => type.GetTypeInfo().GetProperties().Length;
+    }
+}

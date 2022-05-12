@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using Docsharp.Core;
-using Docsharp.Core.Types;
+using Docsharp.Core.Models;
 using Docsharp.Core.Metadata;
 
 

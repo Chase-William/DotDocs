@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core.Types
+namespace Docsharp.Core.Models
 {
     public interface IFunctional
     {

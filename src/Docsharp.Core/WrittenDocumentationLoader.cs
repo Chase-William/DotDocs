@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Docsharp.Core.Metadata
+using Docsharp.Core.Models.Docs;
+
+namespace Docsharp.Core
 {
     public class WrittenDocumentationLoader
     {
@@ -10,7 +12,7 @@ namespace Docsharp.Core.Metadata
 
         public List<Documentation> Documentation { get; private set; } = new();
 
-        private WrittenDocumentationLoader() { }        
+        private WrittenDocumentationLoader() { }
 
         enum XmlElements
         {
@@ -33,7 +35,7 @@ namespace Docsharp.Core.Metadata
         public static WrittenDocumentationLoader From(string filePath)
         {
             WrittenDocumentationLoader docs = new();
-            
+
             try
             {
                 using var reader = new XmlTextReader(filePath);
@@ -104,7 +106,7 @@ namespace Docsharp.Core.Metadata
                             Console.WriteLine(reader.Value);
                             break;
                         // Contents of current node state
-                        case XmlNodeType.Text:                         
+                        case XmlNodeType.Text:
                             switch (current)
                             {
                                 case XmlElements.Name:
@@ -114,12 +116,12 @@ namespace Docsharp.Core.Metadata
                                     memDocs.Summary = reader.Value;
                                     break;
                                 case XmlElements.Param:
-                                    param.Summary = reader.Value; 
+                                    param.Summary = reader.Value;
                                     break;
                                 case XmlElements.Returns:
                                     pMemDocs.Returns = reader.Value;
                                     break;
-                                default:                                    
+                                default:
                                     break;
                             }
                             break;

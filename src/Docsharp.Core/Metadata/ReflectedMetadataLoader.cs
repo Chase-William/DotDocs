@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Docsharp.Core.Types;
+using Docsharp.Core.Models.Types;
 
 namespace Docsharp.Core.Metadata
 {
@@ -16,11 +16,11 @@ namespace Docsharp.Core.Metadata
         
         // Stores all types via their <namespace>.<member_name>.
         
-        public Dictionary<string, ClassType> Classes { get; private set; } = new();
-        public Dictionary<string, StructType> Structs { get; private set; } = new();
-        public Dictionary<string, InterfaceType> Interfaces { get; private set; } = new();
-        public Dictionary<string, EnumType> Enumerations { get; private set; } = new();
-        public Dictionary<string, DelegateType> Delegates { get; private set; } = new();
+        public Dictionary<string, ClassModel> Classes { get; private set; } = new();
+        public Dictionary<string, StructModel> Structs { get; private set; } = new();
+        public Dictionary<string, InterfaceModel> Interfaces { get; private set; } = new();
+        public Dictionary<string, EnumModel> Enumerations { get; private set; } = new();
+        public Dictionary<string, DelegateModel> Delegates { get; private set; } = new();
 
         private MetadataLoadContext mlc;
 
@@ -57,15 +57,15 @@ namespace Docsharp.Core.Metadata
             {
                 // Sort via construct type
                 if (typeInfo.BaseType?.FullName == "System.MulticastDelegate")
-                    Delegates.Add(typeInfo.FullName, new DelegateType(typeInfo));
+                    Delegates.Add(typeInfo.FullName, new DelegateModel(typeInfo));
                 else if (typeInfo.IsClass)
-                    Classes.Add(typeInfo.FullName, new ClassType(typeInfo));
+                    Classes.Add(typeInfo.FullName, new ClassModel(typeInfo));
                 else if (typeInfo.IsInterface)
-                    Interfaces.Add(typeInfo.FullName, new InterfaceType(typeInfo));
+                    Interfaces.Add(typeInfo.FullName, new InterfaceModel(typeInfo));
                 else if (typeInfo.IsEnum)
-                    Enumerations.Add(typeInfo.FullName, new EnumType(typeInfo));
+                    Enumerations.Add(typeInfo.FullName, new EnumModel(typeInfo));
                 else if (typeInfo.IsValueType) // == IsStruct
-                    Structs.Add(typeInfo.FullName, new StructType(typeInfo));
+                    Structs.Add(typeInfo.FullName, new StructModel(typeInfo));
             }
         }
 

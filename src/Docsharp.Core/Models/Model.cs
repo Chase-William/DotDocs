@@ -1,22 +1,21 @@
-﻿using Docsharp.Core.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace Docsharp.Core.Types
+using Docsharp.Core.Models.Docs;
+
+namespace Docsharp.Core.Models
 {
-    public abstract class Member<T1, T2> 
-        where T1 : MemberInfo 
+    public abstract class Member<T1, T2>
+        where T1 : MemberInfo
         where T2 : Documentation
     {
-        public T1 TypeInfo { get; private set; }
+        public T1 Meta { get; private set; }
 
         public T2 Docs { get; set; }
 
         protected Member(T1 member)
-            => this.TypeInfo = member;
+            => Meta = member;
 
-        public string Name => TypeInfo.Name;
+        public string Name => Meta.Name;
 
         public abstract string Type { get; }
 

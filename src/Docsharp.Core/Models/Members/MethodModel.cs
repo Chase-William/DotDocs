@@ -5,19 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Reflection;
+using Docsharp.Core.Models.Docs;
 
-using Docsharp.Core.Metadata;
-
-namespace Docsharp.Core.Types
+namespace Docsharp.Core.Models.Members
 {
-    public class MethodMember : Member<MethodInfo, FunctionalDocumentation>, IFunctional
+    public class MethodModel : Member<MethodInfo, FunctionalDocumentation>, IFunctional
     {
         public override string Type => "Method";
 
-        public string ReturnType => TypeInfo.ReturnType.ToString();
+        public string ReturnType => Meta.ReturnType.ToString();
         public Parameter[] Parameters { get; set; }
 
-        public MethodMember(MethodInfo member) : base(member)
+        public MethodModel(MethodInfo member) : base(member)
         {
             Parameters = ((IFunctional)this).GetParameters(member);
         }

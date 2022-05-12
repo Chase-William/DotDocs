@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core.Metadata
+namespace Docsharp.Core.Models.Docs
 {
     /// <summary>
     /// Represents documentation about a parameter.
@@ -18,6 +18,6 @@ namespace Docsharp.Core.Metadata
         /// <summary>
         /// Parameter summary.
         /// </summary>
-        public string Summary { get; set; }        
+        public string Summary { get; set; }
     }
 }
