@@ -148,7 +148,6 @@ namespace Docsharp.Test.Classes
 
         public INestable GetClassType(string className)
             => (Docs.ModelTree.Root
-                .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]

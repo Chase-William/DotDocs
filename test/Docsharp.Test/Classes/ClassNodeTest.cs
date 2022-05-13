@@ -110,7 +110,6 @@ namespace Docsharp.Test.Classes
 
         public TypeNodeNestable GetNodeType(string name)
             => Docs.ModelTree.Root
-               .Namespaces["Docsharp"]
                .Namespaces["Test"]
                .Namespaces["Data"]
                .Namespaces["Classes"]
