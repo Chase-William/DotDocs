@@ -46,7 +46,7 @@ namespace Docsharp.Core.Models
 
         public MethodModel[] GetMethods(TypeInfo info)
         {
-            var methods = info.DeclaredMethods;
+            var methods = info.GetMethods().Where(method => !method.IsSpecialName);            
             int length = methods.Count();
             if (length == 0)
                 return Array.Empty<MethodModel>();

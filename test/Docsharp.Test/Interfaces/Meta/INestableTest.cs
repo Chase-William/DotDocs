@@ -44,12 +44,13 @@ namespace Docsharp.Test.Interfaces.Meta
             => type.GetTypeInfo().GetFields().Length;
 
         /// <summary>
-        /// Returns count of methods declared in the class.
+        /// Returns count of public methods declared in the class. This ignores
+        /// generated property getter/setters.
         /// </summary>
         /// <param name="type">Type to get methods from.</param>
         /// <returns>Declared methods from instance within <paramref name="type"/>.</returns>
         static int GetMethodCount(Type type)
-            => type.GetTypeInfo().DeclaredMethods.Count();
+            => type.GetTypeInfo().GetMethods().Where(method => !method.IsSpecialName).Count();
 
         /// <summary>
         /// Returns count of properties declared in the class.

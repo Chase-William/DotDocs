@@ -9,7 +9,7 @@ using Docsharp.Test.Interfaces.Meta;
 namespace Docsharp.Test.Classes
 {
     internal class ClassMetaTest : BaseTest, INestableTest
-    {
+    {        
         [Test(Description = "Ensures all class metadata in .dll exist.")]
         public void ClassMetadataExist()
         {
@@ -72,7 +72,7 @@ namespace Docsharp.Test.Classes
         public void FieldsExistTest()
         {
             // Boat
-            Core.Models.INestable type = GetClassType(nameof(Data.Classes.Boat));
+            INestable type = GetClassType(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Boat)),
                 type.Fields.Length,
@@ -111,7 +111,7 @@ namespace Docsharp.Test.Classes
         public void MethodsExistTest()
         {
             // Boat
-            Core.Models.INestable type = GetClassType(nameof(Data.Classes.Boat));
+            INestable type = GetClassType(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Boat)),
                 type.Methods.Length,
