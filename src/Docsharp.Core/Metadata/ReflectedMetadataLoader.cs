@@ -13,6 +13,8 @@ namespace Docsharp.Core.Metadata
         /// Assembly name this <see cref="ReflectedMetadataLoader"/> instance reflected on.
         /// </summary>
         public string AssemblyName { get; private set; }
+
+        public string FullAssemblyName { get; private set; }
         
         // Stores all types via their <namespace>.<member_name>.
         
@@ -37,7 +39,8 @@ namespace Docsharp.Core.Metadata
                 var assembly = GetAssembly(meta.mlc, dllPath);
                 // Read in .dll member info
                 meta.ReadMetadataFromAssembly(assembly);
-                meta.AssemblyName = assembly.FullName;
+                meta.AssemblyName = assembly.GetName().Name;
+                meta.FullAssemblyName = assembly.FullName;
             }
             catch
             {

@@ -9,9 +9,9 @@ using Docsharp.Core.Tree;
 namespace Docsharp.Test.Interfaces.Meta
 {
     /// <summary>
-    /// Ensures the aspects of <see cref="IConstructable"/> operate as expected.
+    /// Ensures the aspects of <see cref="INestableTest"/> operate as expected.
     /// </summary>
-    internal interface IConstructableTest
+    internal interface INestableTest
     {
         /// <summary>
         /// Ensures the existance/absense of properties are handled correctly.
@@ -32,8 +32,8 @@ namespace Docsharp.Test.Interfaces.Meta
         /// Implement to get the class type provided via <paramref name="className"/>.
         /// </summary>
         /// <param name="className">Class type as a string to get acquired.</param>
-        /// <returns>A class type that implements <see cref="IConstructable"/>.</returns>
-        IConstructable GetClassType(string className);
+        /// <returns>A class type that implements <see cref="INestable"/>.</returns>
+        INestable GetClassType(string className);
 
         /// <summary>
         /// Returns count of fields declared in the class.

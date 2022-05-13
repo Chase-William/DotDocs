@@ -13,12 +13,11 @@ namespace Docsharp.Core.Tree
     /// <summary>
     /// A tree of namespaces and types created lazily that represents the structure of one's source code.
     /// </summary>
-    public class MetadataTree
+    public class ModelTree
     {
         public NamespaceNode Root { get; private set; }
 
-        public MetadataTree(string rootNamespace)
-            => Root = new NamespaceNode(null, rootNamespace);
+        public ModelTree() { }
 
         /// <summary>
         /// Adds a new type under the provided namespace.
@@ -28,11 +27,17 @@ namespace Docsharp.Core.Tree
         {
             // We know the last item in this string[] is our type
             // Everything before it, a namespace            
-            var segments = fullNamespaceToType.Split(".");
+            var segments = fullNamespaceToType.Split(".");            
 
-            ArraySegment<string> a = segments;
+            if (Root == null)
+                Root = new NamespaceNode(null, segments[0]);
 
-            Root.AddType(a, member);
+            Root.AddType(segments[1..], member);
+        }
+        
+        public void SaveModels()
+        {
+            Root.Save(new Stack<string>(), new Stack<string>());
         }
     }
 }

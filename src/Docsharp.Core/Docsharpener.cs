@@ -10,7 +10,7 @@ namespace Docsharp.Core
         /// <summary>
         /// A tree that organizes all types.
         /// </summary>
-        public MetadataTree Metadata { get; private set; }
+        public ModelTree ModelTree { get; private set; }
         /// <summary>
         /// Contains all reflection based metadata.
         /// </summary>
@@ -35,7 +35,7 @@ namespace Docsharp.Core
                 // Read in .xml documentation to be joined with member info
                 docs.WrittenMetadata = WrittenDocumentationLoader.From(xmlPath);                
                 // Create an organized structure called a MetadataTree to represent .dll type structure
-                docs.Metadata = new MetadataTree(docs.ReflectedMetadata.AssemblyName);
+                docs.ModelTree = new ModelTree();
 
                 /**
                  * Add all types to MetadataTree
@@ -43,23 +43,23 @@ namespace Docsharp.Core
 
                 // Classes
                 foreach (var item in docs.ReflectedMetadata.Classes)
-                    docs.Metadata.AddType(item.Key, item.Value);
+                    docs.ModelTree.AddType(item.Key, item.Value);
 
                 // Interfaces
                 foreach (var item in docs.ReflectedMetadata.Interfaces)
-                    docs.Metadata.AddType(item.Key, item.Value);
+                    docs.ModelTree.AddType(item.Key, item.Value);
 
                 // Structs
                 foreach (var item in docs.ReflectedMetadata.Structs)
-                    docs.Metadata.AddType(item.Key, item.Value);
+                    docs.ModelTree.AddType(item.Key, item.Value);
 
                 // Enumerations
                 foreach (var item in docs.ReflectedMetadata.Enumerations)
-                    docs.Metadata.AddType(item.Key, item.Value);
+                    docs.ModelTree.AddType(item.Key, item.Value);
 
                 // Delegates
                 foreach (var item in docs.ReflectedMetadata.Delegates)
-                    docs.Metadata.AddType(item.Key, item.Value);
+                    docs.ModelTree.AddType(item.Key, item.Value);
                 
                 return docs;
             }
@@ -68,6 +68,9 @@ namespace Docsharp.Core
                 throw;
             }            
         }
+
+        public void Save()
+            => ModelTree.SaveModels();        
 
         //public void MakeDocumentation()
         //{

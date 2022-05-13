@@ -12,7 +12,7 @@ namespace Docsharp.Test
         {
             Assert.AreEqual(
                 "IPowerable",
-                Docs.Metadata.Root
+                Docs.ModelTree.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]
@@ -26,7 +26,7 @@ namespace Docsharp.Test
         {
             Assert.AreEqual(
                 "EngineSize",
-                Docs.Metadata.Root
+                Docs.ModelTree.Root
                 .Namespaces["Docsharp"]
                 .Namespaces["Test"]
                 .Namespaces["Data"]

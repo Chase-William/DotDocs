@@ -9,15 +9,15 @@ using Docsharp.Core.Tree;
 namespace Docsharp.Test.Interfaces.Nodes
 {
     /// <summary>
-    /// Ensures the aspects of <see cref="ITypeContainable"/> operate as expected.
+    /// Ensures the aspects of <see cref="ITypeNodeNestable"/> operate as expected.
     /// </summary>
-    internal interface ITypeContainableTest : ITypeNodeTest
+    internal interface ITypeNodeNestableTest : ITypeNodeTest
     {
         /// <summary>
-        /// Ensures contained types within a <see cref="ITypeContainable"/> exist.
+        /// Ensures contained types within a <see cref="ITypeNodeNestable"/> exist.
         /// </summary>
         void ContainedTypesExist();
 
-        TypeContainable GetNodeType(string name);
+        TypeNodeNestable GetNodeType(string name);
     }
 }

@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Docsharp.Core.Models;
+using Docsharp.Core.Models.Docs;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
-
-using Docsharp.Core.Models;
-using Docsharp.Core.Models.Docs;
 
 namespace Docsharp.Core.Tree
 {
-    public class TypeContainable : TypeNode, ITypeContainable
+    public class TypeNodeNestable : TypeNode, ITypeNodeNestable
     {
         public Dictionary<string, Node> Types { get; set; } = new();
 
-        public TypeContainable(Node parent, TypeMember<TypeInfo, Documentation> member) : base(parent, member)
+        public TypeNodeNestable(Node parent, TypeMember<TypeInfo, Documentation> member) : base(parent, member)
         { }
 
         public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member)
@@ -23,23 +22,35 @@ namespace Docsharp.Core.Tree
             {
                 if (member.CanHaveInternalTypes)
                 {
-                    Types.Add(typeName, new TypeContainable(this, member));
+                    Types.Add(typeName, new TypeNodeNestable(this, member));
                     return;
                 }
                 Types.Add(typeName, new TypeNode(this, member));
                 return;
             }
 
-            TypeContainable type;
+            TypeNodeNestable type;
             if (!Types.ContainsKey(typeName))
             {
-                type = new TypeContainable(this, null);
+                type = new TypeNodeNestable(this, null);
                 Types.Add(typeName, type);
             }
             else
-                type = (TypeContainable)Types[typeName];
+                type = (TypeNodeNestable)Types[typeName];
             types = types[1..types.Count];
             type.AddType(types, member);
+        }
+
+        public override void Save(Stack<string> namespaces, Stack<string> nestables)
+        {
+            nestables.Push(GetName());
+
+            SaveMemberInfo(namespaces, nestables);
+
+            foreach (var type in Types)
+                type.Value.Save(namespaces, nestables);
+
+            nestables.Pop();
         }
     }
 }

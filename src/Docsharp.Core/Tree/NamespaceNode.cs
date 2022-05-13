@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 using Docsharp.Core.Models;
 using Docsharp.Core.Models.Docs;
+using System.IO;
 
 namespace Docsharp.Core.Tree
-{
-    public class NamespaceNode : Node, ITypeContainable
+{   
+    public class NamespaceNode : Node, ITypeNodeNestable
     {
         private readonly string _namespace;
 
@@ -42,7 +43,7 @@ namespace Docsharp.Core.Tree
                     // Case for a type that contain internally defined types
                     if (member.CanHaveInternalTypes)
                     {
-                        Types.Add(name, new TypeContainable(this, member));
+                        Types.Add(name, new TypeNodeNestable(this, member));
                         return;
                     }
                     // Add a type that cannot contain other internally defined types                  
@@ -59,10 +60,10 @@ namespace Docsharp.Core.Tree
                 // Key for namespace already exist, therefore get a ref and add type
                 if (Types.ContainsKey(name))
                 {
-                    ((ITypeContainable)Types[name]).AddType(segments[1..segments.Count], member);
+                    ((ITypeNodeNestable)Types[name]).AddType(segments[1..segments.Count], member);
                     return;
                 }
-                var typeNode = new TypeContainable(this, member);
+                var typeNode = new TypeNodeNestable(this, member);
                 Types.Add(name, typeNode);
                 // Now iterate through nested type chain
                 typeNode.AddType(segments[1..segments.Count], member);
@@ -75,6 +76,27 @@ namespace Docsharp.Core.Tree
             }
             segments = segments[1..segments.Count];
             Namespaces[name].AddType(segments, member);
+        }
+
+        public override void Save(Stack<string> namespaces, Stack<string> nestables)
+        {  
+            /* 
+             * Push this namespace to the stack because everything listed
+             * below lives under it
+             */
+            namespaces.Push(GetName());
+            // Create directory if needed
+            Directory.CreateDirectory(JoinNamespaces(namespaces));
+                    
+            // Save namespaces recursively
+            foreach (NamespaceNode node in Namespaces.Values)
+                node.Save(namespaces, nestables);
+            // Save types recursively
+            foreach (Node node in Types.Values)
+                node.Save(namespaces, nestables);
+
+            // Pop this namespace when leaving as we are traversing back up the tree                   
+            namespaces.Pop();
         }
     }
 }

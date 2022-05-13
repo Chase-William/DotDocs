@@ -6,7 +6,7 @@ using Docsharp.Core.Models.Docs;
 
 namespace Docsharp.Core.Models.Types
 {
-    public class ClassModel : TypeMember<TypeInfo, Documentation>, IConstructable
+    public class ClassModel : TypeMember<TypeInfo, Documentation>, INestable
     {
         public bool IsPublic => Meta.IsPublic;
 
@@ -19,7 +19,7 @@ namespace Docsharp.Core.Models.Types
 
         public ClassModel(TypeInfo member) : base(member)
         {
-            IConstructable.Initialize(this, member);
+            INestable.Initialize(this, member);
         }
     }
 }

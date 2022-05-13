@@ -11,7 +11,7 @@ namespace Docsharp.Core.Tree
     /// Represents a type that can contain other type definitions internally.
     /// For example, this can represent a class or struct as both can contain other class/struct type definitions.
     /// </summary>
-    public interface ITypeContainable
+    public interface ITypeNodeNestable
     {
         public Dictionary<string, Node> Types { get; set; }
 

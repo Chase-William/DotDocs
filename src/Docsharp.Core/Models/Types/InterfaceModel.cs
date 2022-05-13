@@ -5,7 +5,7 @@ using Docsharp.Core.Models.Members;
 
 namespace Docsharp.Core.Models.Types
 {
-    public class InterfaceModel : TypeMember<TypeInfo, Documentation>, IConstructable
+    public class InterfaceModel : TypeMember<TypeInfo, Documentation>, INestable
     {
         public override bool CanHaveInternalTypes => true;
         public override string Type => "Interface";
@@ -19,7 +19,7 @@ namespace Docsharp.Core.Models.Types
 
         public InterfaceModel(TypeInfo member) : base(member)
         {
-            IConstructable.Initialize(this, member);
+            INestable.Initialize(this, member);
         }
     }
 }

@@ -9,18 +9,28 @@ using System.Threading.Tasks;
 
 namespace Docsharp.Test.Classes
 {
-    internal class ClassNodeTest : BaseTest, ITypeContainableTest
+    internal class ClassNodeTest : BaseTest, ITypeNodeNestableTest
     {
+        [Test(Description = "Ensures nested types accounted for.")]
         public void ContainedTypesExist()
         {
-            throw new NotImplementedException();
+            // Boat
+            TypeNodeNestable node = GetNodeType("Boat");
+            Assert.IsEmpty(node.Types);
+
+            // Canoe
+            node = GetNodeType("Canoe");
+            Assert.IsNotEmpty(node.Types);
+            Assert.AreEqual(
+                (node.Types.Values.First() as Node).GetName(),
+                "Builder");
         }
 
         [Test(Description = "Ensures every name (key) used to search matches the type name.")]
         public void GetNameMatchesTypeName()
         {
             // Boat
-            TypeContainable node = GetNodeType("Boat");
+            TypeNodeNestable node = GetNodeType("Boat");
             Assert.AreEqual(
                 "Boat",
                 node.GetName());
@@ -54,7 +64,7 @@ namespace Docsharp.Test.Classes
         public void MemberIsNotNull()
         {
             // Boat
-            TypeContainable node = GetNodeType("Boat");
+            TypeNodeNestable node = GetNodeType("Boat");
             Assert.NotNull(node.Member);
 
             // Canoe
@@ -78,7 +88,7 @@ namespace Docsharp.Test.Classes
         public void ParentNodeNotNull()
         {
             // Boat
-            TypeContainable node = GetNodeType("Boat");
+            TypeNodeNestable node = GetNodeType("Boat");
             Assert.NotNull(node.Parent);
 
             // Canoe
@@ -98,12 +108,12 @@ namespace Docsharp.Test.Classes
             Assert.NotNull(node.Parent);
         }
 
-        public TypeContainable GetNodeType(string name)
-            => Docs.Metadata.Root
+        public TypeNodeNestable GetNodeType(string name)
+            => Docs.ModelTree.Root
                .Namespaces["Docsharp"]
                .Namespaces["Test"]
                .Namespaces["Data"]
                .Namespaces["Classes"]
-               .Types[name] as TypeContainable;
+               .Types[name] as TypeNodeNestable;
     }
 }

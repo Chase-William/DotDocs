@@ -20,5 +20,11 @@ namespace Docsharp.Test.Data.Classes
         {
             throw new NotImplementedException();
         }
+
+        public class Builder
+        {
+            public static Canoe Build()
+                => new();
+        }
     }
 }

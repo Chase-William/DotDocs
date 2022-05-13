@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 
 using Docsharp.Core.Models.Docs;
 
@@ -8,6 +9,7 @@ namespace Docsharp.Core.Models
         where T1 : MemberInfo
         where T2 : Documentation
     {
+        [JsonIgnore]
         public T1 Meta { get; private set; }
 
         public T2 Docs { get; set; }

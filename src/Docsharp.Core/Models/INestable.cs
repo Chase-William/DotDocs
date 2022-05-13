@@ -9,13 +9,13 @@ namespace Docsharp.Core.Models
     /// <summary>
     /// Represents a type that can contain Properties, Fields, and Methods.
     /// </summary>
-    public interface IConstructable
+    public interface INestable
     {
         public PropertyModel[] Properties { get; set; }
         public FieldModel[] Fields { get; set; }
         public MethodModel[] Methods { get; set; }
 
-        public static void Initialize(IConstructable constructable, TypeInfo info)
+        public static void Initialize(INestable constructable, TypeInfo info)
         {
             constructable.Properties = constructable.GetProperties(info);
             constructable.Fields = constructable.GetFields(info);

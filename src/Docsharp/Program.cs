@@ -21,7 +21,7 @@ namespace Docsharp
                 xmlPath: @"C:\Dev\Sharpocs\test\Docsharp.Test.Data\bin\Debug\net5.0\Docsharp.Test.Data.xml"
             );
 
-            // docs.MakeDocumentation();
+            docs.Save();
 
             // ...
         }

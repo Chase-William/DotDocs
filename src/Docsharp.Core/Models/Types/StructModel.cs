@@ -5,7 +5,7 @@ using Docsharp.Core.Models.Docs;
 
 namespace Docsharp.Core.Models.Types
 {
-    public class StructModel : TypeMember<TypeInfo, Documentation>, IConstructable
+    public class StructModel : TypeMember<TypeInfo, Documentation>, INestable
     {
         public override bool CanHaveInternalTypes => true;
 
@@ -17,7 +17,7 @@ namespace Docsharp.Core.Models.Types
 
         public StructModel(TypeInfo member) : base(member)
         {
-            IConstructable.Initialize(this, member);
+            INestable.Initialize(this, member);
         }
     }
 }
