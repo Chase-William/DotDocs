@@ -60,7 +60,7 @@ namespace Docsharp.Core.Tree
         }
 
         public TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> types)
-        {
+        {            
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
                 return Types[types[0]].Member;

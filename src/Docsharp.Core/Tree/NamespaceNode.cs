@@ -8,7 +8,7 @@ using Docsharp.Core.Models.Docs;
 using System.IO;
 
 namespace Docsharp.Core.Tree
-{   
+{
     public class NamespaceNode : Node, ITypeNodeNestable
     {
         private readonly string _namespace;
@@ -101,16 +101,21 @@ namespace Docsharp.Core.Tree
 
         public TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> segments)
         {
+            string first = segments[0];
+
             if (segments.Count == 1)
             {
-                segments = segments[0].Split('+');
+                segments = first.Split('+');
                 // Nested types are present
                 if (segments.Count > 1)
-                    return ((TypeNodeNestable)Types[segments[0]]).FindType(segments[1..]);
+                    return ((TypeNodeNestable)Types[first]).FindType(segments[1..]);
                 return Types[segments[0]].Member;
             }
 
-            return Namespaces[segments[0]].FindType(segments[1..]);
+            // Check to see if the namespace contains the key, if not, check within the type for a nested type
+            if (!Namespaces.Keys.Contains(first))
+                return ((TypeNodeNestable)Types[first]).FindType(segments[1..]);
+            return Namespaces[first].FindType(segments[1..]);
         }
     }
 }

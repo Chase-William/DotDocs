@@ -61,29 +61,29 @@ namespace Docsharp.Core
                 foreach (var item in docs.ReflectedMetadata.Delegates)
                     docs.Models.AddType(item.Key, item.Value);
 
-                
+
                 // TODO: COMMENTED OUT FOR TEST ATM
 
 
                 // Add written documentation to each type/member
-                //foreach (var document in docs.WrittenMetadata.Documentation)
-                //{
-                //    switch (document.Type)
-                //    {
-                //        case MemberType.Type:
-                //            var type = docs.Models.FindType(document.FullName);
-                //            type.Docs = document;
-                //            break;
-                //        case MemberType.Field:
+                foreach (var document in docs.WrittenMetadata.Documentation)
+                {
+                    switch (document.Type)
+                    {
+                        case MemberType.Type:
+                            var type = docs.Models.FindType(document.FullName);
+                            type.Docs = document;
+                            break;
+                        case MemberType.Field:
 
-                //            break;
-                //        case MemberType.Property:
+                            break;
+                        case MemberType.Property:
 
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 return docs;
             }
