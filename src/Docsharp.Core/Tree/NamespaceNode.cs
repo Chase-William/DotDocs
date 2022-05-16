@@ -65,7 +65,7 @@ namespace Docsharp.Core.Tree
                 }
                 var typeNode = new TypeNodeNestable(this, member);
                 Types.Add(name, typeNode);
-                // Now iterate through nested type chain
+               // Now iterate through nested type chain
                 typeNode.AddType(segments[1..segments.Count], member);
                 return;
             }
@@ -103,19 +103,32 @@ namespace Docsharp.Core.Tree
         {
             string first = segments[0];
 
+            // If we reached the last segment in our collection, it must be the type            
             if (segments.Count == 1)
-            {
-                segments = first.Split('+');
-                // Nested types are present
-                if (segments.Count > 1)
-                    return ((TypeNodeNestable)Types[first]).FindType(segments[1..]);
                 return Types[segments[0]].Member;
-            }
 
-            // Check to see if the namespace contains the key, if not, check within the type for a nested type
+            // Check if next segment is a namespace or type
             if (!Namespaces.Keys.Contains(first))
+                // Start the nested Types recursion search
                 return ((TypeNodeNestable)Types[first]).FindType(segments[1..]);
+            // Check the next nested namespace
             return Namespaces[first].FindType(segments[1..]);
+        }
+
+        public Member<FieldInfo, Documentation> FindField(ArraySegment<string> segments)
+        {
+            string first = segments[0];
+
+            // Check if we have reached the last type before the field
+            if (segments.Count == 2)
+                return ((IFieldable)Types[first].Member).Fields.FirstOrDefault(f => f.Name.Equals(first));            
+
+            // Check if next segment is a namespace or type
+            if (!Namespaces.Keys.Contains(first))
+                // Start the nested Types recursion search
+                return ((TypeNodeNestable)Types[first]).FindField(segments[1..]);
+            // Check the next nested namespace
+            return Namespaces[first].FindField(segments[1..]);
         }
     }
 }

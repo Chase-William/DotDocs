@@ -75,7 +75,7 @@ namespace Docsharp.Core
                             type.Docs = document;
                             break;
                         case MemberType.Field:
-
+                            var field = docs.Models.FindField(document.FullName);
                             break;
                         case MemberType.Property:
 

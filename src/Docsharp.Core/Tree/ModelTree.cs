@@ -38,8 +38,13 @@ namespace Docsharp.Core.Tree
         public TypeMember<TypeInfo, Documentation> FindType(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
-
             return Root.Namespaces[segments[1]].FindType(segments[2..]);
+        }
+
+        public Member<FieldInfo, Documentation> FindField(string fullName)
+        {
+            ArraySegment<string> segments = fullName.Split('.');
+            return Root.Namespaces[segments[1]].FindField(segments[2..]);
         }
 
         public void SaveModels()

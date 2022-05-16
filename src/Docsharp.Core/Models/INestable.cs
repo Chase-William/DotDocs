@@ -9,10 +9,10 @@ namespace Docsharp.Core.Models
     /// <summary>
     /// Represents a type that can contain Properties, Fields, and Methods.
     /// </summary>
-    public interface INestable
+    public interface INestable : IFieldable
     {
         public PropertyModel[] Properties { get; set; }
-        public FieldModel[] Fields { get; set; }
+        
         public MethodModel[] Methods { get; set; }
 
         public static void Initialize(INestable constructable, TypeInfo info)
@@ -31,18 +31,7 @@ namespace Docsharp.Core.Models
             for (int i = 0; i < props.Length; i++)
                 tempProps[i] = new PropertyModel(props[i]);
             return tempProps;
-        }
-
-        public FieldModel[] GetFields(TypeInfo info)
-        {
-            var fields = info.GetFields();
-            if (fields.Length == 0)
-                return Array.Empty<FieldModel>();
-            var tempFields = new FieldModel[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-                tempFields[i] = new FieldModel(fields[i]);
-            return tempFields;
-        }
+        }        
 
         public MethodModel[] GetMethods(TypeInfo info)
         {
