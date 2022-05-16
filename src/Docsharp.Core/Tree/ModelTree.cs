@@ -35,9 +35,14 @@ namespace Docsharp.Core.Tree
             Root.AddType(segments[1..], member);
         }
         
-        public void SaveModels()
+        public TypeMember<TypeInfo, Documentation> FindType(string fullName)
         {
-            Root.Save(new Stack<string>(), new Stack<string>());
+            ArraySegment<string> segments = fullName.Split('.');
+
+            return Root.Namespaces[segments[1]].FindType(segments[2..]);
         }
+
+        public void SaveModels()
+            => Root.Save(new Stack<string>(), new Stack<string>());
     }
 }

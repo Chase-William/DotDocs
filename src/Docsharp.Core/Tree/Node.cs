@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Docsharp.Core.Models;
+using System.Reflection;
+using Docsharp.Core.Models.Docs;
 
 namespace Docsharp.Core.Tree
 {
@@ -13,7 +16,7 @@ namespace Docsharp.Core.Tree
         protected Node(Node parent)
             => Parent = parent;
 
-        public abstract void Save(Stack<string> namespaces, Stack<string> nestables);
+        public abstract void Save(Stack<string> namespaces, Stack<string> nestables);       
 
         //public static String Join(String? separator, String?[] value, int startIndex, int count);
         protected static string JoinNamespaces(Stack<string> namespaces)

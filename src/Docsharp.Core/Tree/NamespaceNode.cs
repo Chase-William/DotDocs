@@ -14,7 +14,7 @@ namespace Docsharp.Core.Tree
         private readonly string _namespace;
 
         public Dictionary<string, NamespaceNode> Namespaces { get; set; } = new();
-        public Dictionary<string, Node> Types { get; set; } = new();
+        public Dictionary<string, TypeNode> Types { get; set; } = new();
 
         public NamespaceNode(NamespaceNode parent, string _namespace) : base(parent)
         {
@@ -97,6 +97,20 @@ namespace Docsharp.Core.Tree
 
             // Pop this namespace when leaving as we are traversing back up the tree                   
             namespaces.Pop();
+        }
+
+        public TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> segments)
+        {
+            if (segments.Count == 1)
+            {
+                segments = segments[0].Split('+');
+                // Nested types are present
+                if (segments.Count > 1)
+                    return ((TypeNodeNestable)Types[segments[0]]).FindType(segments[1..]);
+                return Types[segments[0]].Member;
+            }
+
+            return Namespaces[segments[0]].FindType(segments[1..]);
         }
     }
 }

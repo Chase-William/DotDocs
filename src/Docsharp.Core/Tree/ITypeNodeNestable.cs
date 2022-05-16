@@ -13,8 +13,10 @@ namespace Docsharp.Core.Tree
     /// </summary>
     public interface ITypeNodeNestable
     {
-        public Dictionary<string, Node> Types { get; set; }
+        Dictionary<string, TypeNode> Types { get; set; }
 
-        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member);
+        void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member);
+
+        TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> segments);
     }
 }

@@ -7,8 +7,9 @@ namespace Docsharp.Core.Models.Types
 {
     public class InterfaceModel : TypeMember<TypeInfo, Documentation>, INestable
     {
+        public const string INTERFACE_TYPE_STRING = "interface";
         public override bool CanHaveInternalTypes => true;
-        public override string Type => "Interface";
+        public override string Type => INTERFACE_TYPE_STRING;
 
         public string Namespace => Meta.Namespace;
         public string FullName => Meta.FullName;

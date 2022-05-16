@@ -1,3 +1,2 @@
-[] - Need to prevent crashing when user adds a type that already exist.
-[] - Need to add structs
-....
+[ ] - Documentation from `.xml` needs to be assigned to each type in nodes within ModelTree.
+[ ] - Documentation from `.xml` needs to be assigned to each respective member within the containing type.

@@ -4,7 +4,7 @@ using System;
 
 namespace Docsharp.Test
 {
-    internal class Tests : BaseTest
+    internal class ModelTreeTest : BaseTest
     {      
         
         [Test]
@@ -12,7 +12,7 @@ namespace Docsharp.Test
         {
             Assert.AreEqual(
                 "IPowerable",
-                Docs.ModelTree.Root
+                Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Interfaces"]
@@ -25,7 +25,7 @@ namespace Docsharp.Test
         {
             Assert.AreEqual(
                 "EngineSize",
-                Docs.ModelTree.Root
+                Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Enumerations"]

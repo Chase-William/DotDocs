@@ -64,7 +64,7 @@ namespace Docsharp.Core
                                         docs.Documentation.Add(memDocs);
                                         memDocs = null;
                                     }
-                                    else
+                                    else if (pMemDocs != null)
                                     {
                                         docs.Documentation.Add(pMemDocs);
                                         pMemDocs = null;

@@ -108,8 +108,16 @@ namespace Docsharp.Test.Classes
             Assert.NotNull(node.Parent);
         }
 
+        [Test]
+        public void FindType()
+        {
+            Assert.AreSame(
+                Docs.Models.FindType("Docsharp.Test.Data.Classes.Boat"),
+                Docs.ReflectedMetadata.Classes["Docsharp.Test.Data.Classes.Boat"]);
+        }
+
         public TypeNodeNestable GetNodeType(string name)
-            => Docs.ModelTree.Root
+            => Docs.Models.Root
                .Namespaces["Test"]
                .Namespaces["Data"]
                .Namespaces["Classes"]
