@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Docsharp.Core.Models
 {
+    /// <summary>
+    /// Represents a type that has functional based documentation like
+    /// parameters and return type.
+    /// </summary>
     public interface IFunctional
     {
         public string ReturnType { get; }

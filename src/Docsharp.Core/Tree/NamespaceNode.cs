@@ -120,8 +120,9 @@ namespace Docsharp.Core.Tree
             string first = segments[0];
 
             // Check if we have reached the last type before the field
+            // Catching this case early also simplifies handling enumerations (uses TypeNode)
             if (segments.Count == 2)
-                return ((IFieldable)Types[first].Member).Fields.FirstOrDefault(f => f.Name.Equals(first));            
+                return ((IFieldable)Types[first].Member).Fields.FirstOrDefault(f => f.Name.Equals(segments[1]));
 
             // Check if next segment is a namespace or type
             if (!Namespaces.Keys.Contains(first))
@@ -129,6 +130,30 @@ namespace Docsharp.Core.Tree
                 return ((TypeNodeNestable)Types[first]).FindField(segments[1..]);
             // Check the next nested namespace
             return Namespaces[first].FindField(segments[1..]);
+        }
+
+        public Member<PropertyInfo, Documentation> FindProperty(ArraySegment<string> segments)
+        {
+            string first = segments[0];
+
+            // Check if next segment is a namespace or type
+            if (!Namespaces.Keys.Contains(first))
+                // Start the nested Types recursion search
+                return ((TypeNodeNestable)Types[first]).FindProperty(segments[1..]);
+            // Check the next nested namespace
+            return Namespaces[first].FindProperty(segments[1..]);
+        }
+
+        public Member<EventInfo, Documentation> FindEvent(ArraySegment<string> segments)
+        {
+            string first = segments[0];
+
+            // Check if next segment is a namespace or type
+            if (!Namespaces.Keys.Contains(first))
+                // Start the nested Types recursion search
+                return ((TypeNodeNestable)Types[first]).FindEvent(segments[1..]);
+            // Check the next nested namespace
+            return Namespaces[first].FindEvent(segments[1..]);
         }
     }
 }

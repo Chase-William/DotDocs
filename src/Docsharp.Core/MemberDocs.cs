@@ -10,6 +10,7 @@ namespace Docsharp.Core
     {
         Type = 'T',
         Field = 'F',
-        Property = 'P'
+        Property = 'P',
+        Event = 'E'
     }
 }

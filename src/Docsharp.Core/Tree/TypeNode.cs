@@ -56,6 +56,6 @@ namespace Docsharp.Core.Tree
                     return;
             }
             writer.Write(info);
-        }        
+        }
     }
 }

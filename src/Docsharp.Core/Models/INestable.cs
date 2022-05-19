@@ -15,11 +15,14 @@ namespace Docsharp.Core.Models
         
         public MethodModel[] Methods { get; set; }
 
-        public static void Initialize(INestable constructable, TypeInfo info)
+        public EventModel[] Events { get; set; }
+
+        public static void Init(INestable constructable, TypeInfo info)
         {
             constructable.Properties = constructable.GetProperties(info);
             constructable.Fields = constructable.GetFields(info);
             constructable.Methods = constructable.GetMethods(info);
+            constructable.Events = constructable.GetEvents(info);
         }
 
         public PropertyModel[] GetProperties(TypeInfo info)
@@ -44,6 +47,19 @@ namespace Docsharp.Core.Models
             foreach (var method in methods)
                 tempMethods[length++] = new MethodModel(method);
             return tempMethods;
+        }
+
+        public EventModel[] GetEvents(TypeInfo info)
+        {
+            var events = info.GetEvents();
+            int length = events.Count();
+            if (length == 0)
+                return Array.Empty<EventModel>();
+            var tempEvents = new EventModel[length];
+            length = 0;
+            foreach (var method in events)
+                tempEvents[length++] = new EventModel(method);
+            return tempEvents;
         }
     }
 }

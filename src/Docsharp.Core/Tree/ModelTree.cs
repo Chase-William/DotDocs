@@ -27,14 +27,14 @@ namespace Docsharp.Core.Tree
         {
             // We know the last item in this string[] is our type
             // Everything before it, a namespace            
-            var segments = fullNamespaceToType.Split(".");            
+            var segments = fullNamespaceToType.Split(".");
 
             if (Root == null)
                 Root = new NamespaceNode(null, segments[0]);
 
             Root.AddType(segments[1..], member);
         }
-        
+
         public TypeMember<TypeInfo, Documentation> FindType(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
@@ -45,6 +45,18 @@ namespace Docsharp.Core.Tree
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindField(segments[2..]);
+        }
+
+        public Member<PropertyInfo, Documentation> FindProperty(string fullName)
+        {
+            ArraySegment<string> segments = fullName.Split('.');
+            return Root.Namespaces[segments[1]].FindProperty(segments[2..]);
+        }
+
+        public Member<EventInfo, Documentation> FindEvent(string fullName)
+        {
+            ArraySegment<string> segments = fullName.Split('.');
+            return Root.Namespaces[segments[1]].FindEvent(segments[2..]);
         }
 
         public void SaveModels()

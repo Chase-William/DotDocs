@@ -62,9 +62,6 @@ namespace Docsharp.Core
                     docs.Models.AddType(item.Key, item.Value);
 
 
-                // TODO: COMMENTED OUT FOR TEST ATM
-
-
                 // Add written documentation to each type/member
                 foreach (var document in docs.WrittenMetadata.Documentation)
                 {
@@ -76,9 +73,15 @@ namespace Docsharp.Core
                             break;
                         case MemberType.Field:
                             var field = docs.Models.FindField(document.FullName);
+                            field.Docs = document;
                             break;
                         case MemberType.Property:
-
+                            var property = docs.Models.FindProperty(document.FullName);
+                            property.Docs = document;
+                            break;
+                        case MemberType.Event:
+                            var _event = docs.Models.FindEvent(document.FullName);
+                            _event.Docs = document;
                             break;
                         default:
                             break;

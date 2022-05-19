@@ -12,6 +12,26 @@ namespace Docsharp.Test.Data.Classes
     public abstract class Boat
     {
         /// <summary>
+        /// Notifies subscribers the <see cref="Boat"/> has docked.
+        /// </summary>
+        public event EventHandler Docked;
+        /// <summary>
+        /// Notifies subscribers the <see cref="Boat"/> has undocked.
+        /// </summary>
+        public event EventHandler UnDocked
+        {
+            add
+            {
+
+            }
+
+            remove
+            {
+
+            }
+        }
+
+        /// <summary>
         /// Distance from stern to bow of a boat.
         /// </summary>
         public double Length { get; set; }

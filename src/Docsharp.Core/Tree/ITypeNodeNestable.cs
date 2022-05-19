@@ -35,5 +35,17 @@ namespace Docsharp.Core.Tree
         /// <param name="segments">Collection of namespaces and types leading to the target field.</param>
         /// <returns>Metadata about the target field.</returns>
         Member<FieldInfo, Documentation> FindField(ArraySegment<string> segments);
+        /// <summary>
+        /// Finds a given property within a type.
+        /// </summary>
+        /// <param name="segments">Collection of namespaces and types leading to the target property.</param>
+        /// <returns>Metadata about the target property.</returns>
+        Member<PropertyInfo, Documentation> FindProperty(ArraySegment<string> segments);
+        /// <summary>
+        /// Finds a given event within a type.
+        /// </summary>
+        /// <param name="segments">Collection of namespaces and types leading to the target event.</param>
+        /// <returns>Metadata about the target property.</returns>
+        Member<EventInfo, Documentation> FindEvent(ArraySegment<string> segments);
     }
 }

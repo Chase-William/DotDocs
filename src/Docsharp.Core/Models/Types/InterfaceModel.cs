@@ -17,10 +17,11 @@ namespace Docsharp.Core.Models.Types
         public PropertyModel[] Properties { get; set; }
         public FieldModel[] Fields { get; set; }
         public MethodModel[] Methods { get; set; }
+        public EventModel[] Events { get; set; }
 
         public InterfaceModel(TypeInfo member) : base(member)
         {
-            INestable.Initialize(this, member);
+            INestable.Init(this, member);
         }
     }
 }

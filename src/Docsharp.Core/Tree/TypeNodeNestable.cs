@@ -63,7 +63,7 @@ namespace Docsharp.Core.Tree
         {            
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
-                return Types[types[0]].Member;
+                return Member;
             // Check nested types
             return ((TypeNodeNestable)Types[types[0]]).FindType(types[1..]);
         }
@@ -72,9 +72,25 @@ namespace Docsharp.Core.Tree
         {
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
-                return ((INestable)Types[types[0]]).Fields.FirstOrDefault(f => f.Name.Equals(types[0]));
+                return ((IFieldable)Member).Fields.FirstOrDefault(f => f.Name.Equals(types[0]));
             // Check nested types
             return ((TypeNodeNestable)Types[types[0]]).FindField(types[1..]);
+        }
+
+        public Member<PropertyInfo, Documentation> FindProperty(ArraySegment<string> types)
+        {
+            if (types.Count == 1)
+                return ((INestable)Member).Properties.FirstOrDefault(f => f.Name.Equals(types[0]));
+            // Check nested types
+            return ((TypeNodeNestable)Types[types[0]]).FindProperty(types[1..]);
+        }
+
+        public Member<EventInfo, Documentation> FindEvent(ArraySegment<string> types)
+        {
+            if (types.Count == 1)
+                return ((INestable)Member).Events.FirstOrDefault(f => f.Name.Equals(types[0]));
+            // Check nested types
+            return ((TypeNodeNestable)Types[types[0]]).FindEvent(types[1..]);
         }
     }
 }
