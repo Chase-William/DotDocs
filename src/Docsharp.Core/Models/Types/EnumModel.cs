@@ -15,8 +15,6 @@ namespace Docsharp.Core.Models.Types
 
         public string UnderLyingType => Meta.GetEnumUnderlyingType().ToString();        
 
-        //public string BackingType => Meta.
-
         public EnumModel(TypeInfo member, DocXmlReader reader) : base(member)
         {
             // Omit first the element as it is provided by default by the compiler
