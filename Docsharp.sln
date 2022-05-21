@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp.Test", "test\Docsh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp.Test.Data", "test\Docsharp.Test.Data\Docsharp.Test.Data.csproj", "{97364CB2-DA93-4DE9-9608-E09E28306D5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp.Core.Xml", "src\Docsharp.Core.Xml\Docsharp.Core.Xml.csproj", "{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
