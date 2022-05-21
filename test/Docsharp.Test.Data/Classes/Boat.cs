@@ -4,15 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Docsharp.Test.Data.Structs;
+
 namespace Docsharp.Test.Data.Classes
 {
+    /// <remarks>
+    /// Blah Blah Blah
+    /// <para>
+    /// From para
+    /// </para>
+    /// </remarks>
     /// <summary>
     /// Represents the core common aspects of a boat.
-    /// </summary>
+    /// <para>
+    /// Hello
+    /// <para>
+    /// Inside Nested Para
+    /// </para>
+    /// </para>
+    /// </summary>    
     public abstract class Boat
     {
         /// <summary>
-        /// Notifies subscribers the <see cref="Boat"/> has docked.
+        /// Notifies subscribers the <see cref="Point"/> has docked.
         /// </summary>
         public event EventHandler Docked;
         /// <summary>

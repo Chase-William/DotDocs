@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Docsharp.Core.Models.Types;
 
-namespace Docsharp.Core.Metadata
+namespace Docsharp.Core.Loaders
 {
     public sealed class ReflectedMetadataLoader : IDisposable
     {

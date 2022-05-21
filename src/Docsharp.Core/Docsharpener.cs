@@ -1,6 +1,7 @@
 ﻿using System;
-
-using Docsharp.Core.Metadata;
+using Docsharp.Core.Loaders;
+using Docsharp.Core.Xml;
+using Docsharp.Core.Xml.Models;
 using Docsharp.Core.Tree;
 
 namespace Docsharp.Core
@@ -18,7 +19,7 @@ namespace Docsharp.Core
         /// <summary>
         /// Contains all human-written based metadata.
         /// </summary>
-        public WrittenDocumentationLoader WrittenMetadata { get; private set; }
+        public Entity[] Documentation { get; private set; }
         
         private Docsharpener() { }
 
@@ -33,7 +34,7 @@ namespace Docsharp.Core
             {
                 docs.ReflectedMetadata = ReflectedMetadataLoader.From(dllPath);
                 // Read in .xml documentation to be joined with member info
-                docs.WrittenMetadata = WrittenDocumentationLoader.From(xmlPath);                
+                docs.Documentation = XmlDocLoader.Parse(xmlPath);              
                 // Create an organized structure called a MetadataTree to represent .dll type structure
                 docs.Models = new ModelTree();
 
@@ -63,30 +64,30 @@ namespace Docsharp.Core
 
 
                 // Add written documentation to each type/member
-                foreach (var document in docs.WrittenMetadata.Documentation)
-                {
-                    switch (document.Type)
-                    {
-                        case MemberType.Type:
-                            var type = docs.Models.FindType(document.FullName);
-                            type.Docs = document;
-                            break;
-                        case MemberType.Field:
-                            var field = docs.Models.FindField(document.FullName);
-                            field.Docs = document;
-                            break;
-                        case MemberType.Property:
-                            var property = docs.Models.FindProperty(document.FullName);
-                            property.Docs = document;
-                            break;
-                        case MemberType.Event:
-                            var _event = docs.Models.FindEvent(document.FullName);
-                            _event.Docs = document;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                //foreach (var document in docs.WrittenMetadata.Documentation)
+                //{
+                //    switch (document.Type)
+                //    {
+                //        case MemberType.Type:
+                //            var type = docs.Models.FindType(document.FullName);
+                //            type.Docs = document;
+                //            break;
+                //        case MemberType.Field:
+                //            var field = docs.Models.FindField(document.FullName);
+                //            field.Docs = document;
+                //            break;
+                //        case MemberType.Property:
+                //            var property = docs.Models.FindProperty(document.FullName);
+                //            property.Docs = document;
+                //            break;
+                //        case MemberType.Event:
+                //            var _event = docs.Models.FindEvent(document.FullName);
+                //            _event.Docs = document;
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
 
                 return docs;
             }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Xml;
 
 using Docsharp.Core.Models.Docs;
+using Docsharp.Core.Xml.Enumerations;
 
-namespace Docsharp.Core
+namespace Docsharp.Core.Loaders
 {
     public class WrittenDocumentationLoader
     {
@@ -75,7 +76,7 @@ namespace Docsharp.Core
                                     memDocs = new Documentation
                                     {
                                         // Cast leading character to type
-                                        Type = (MemberType)nameAttr[0],
+                                        Type = (EntityType)nameAttr[0],
                                         // Omit type and colon from FullName always
                                         FullName = nameAttr[2..nameAttr.Length]
                                     };

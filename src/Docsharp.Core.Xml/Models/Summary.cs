@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core
+namespace Docsharp.Core.Xml.Models
 {
-    public enum MemberType
+    public class Summary
     {
-        Type = 'T',
-        Field = 'F',
-        Property = 'P',
-        Event = 'E'
+
+    }
+  
+    internal class Ref
+    {
+
     }
 }

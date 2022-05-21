@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32314.265
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp", "src\Docsharp\Docsharp.csproj", "{EF56C0EE-5E93-4AB0-93B8-B77BD202A0D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp", "src\Docsharp\Docsharp.csproj", "{EF56C0EE-5E93-4AB0-93B8-B77BD202A0D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp.Core", "src\Docsharp.Core\Docsharp.Core.csproj", "{0F6D424C-B7FE-4C33-B55D-6F28C6419469}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp.Core", "src\Docsharp.Core\Docsharp.Core.csproj", "{0F6D424C-B7FE-4C33-B55D-6F28C6419469}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp.Test", "test\Docsharp.Test\Docsharp.Test.csproj", "{88EF99D1-54E5-4740-8B21-8A041D981B40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp.Test", "test\Docsharp.Test\Docsharp.Test.csproj", "{88EF99D1-54E5-4740-8B21-8A041D981B40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp.Test.Data", "test\Docsharp.Test.Data\Docsharp.Test.Data.csproj", "{97364CB2-DA93-4DE9-9608-E09E28306D5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docsharp.Test.Data", "test\Docsharp.Test.Data\Docsharp.Test.Data.csproj", "{97364CB2-DA93-4DE9-9608-E09E28306D5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docsharp.Core.Xml", "src\Docsharp.Core.Xml\Docsharp.Core.Xml.csproj", "{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D0B3EE5-8EF8-4905-BBEA-CC4A8A96C9EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
