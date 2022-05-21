@@ -1,4 +1,5 @@
 ﻿using Docsharp.Core.Models.Members;
+using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Docsharp.Core.Models
     {
         FieldModel[] Fields { get; set; }
 
-        FieldModel[] GetFields(TypeInfo info)
+        FieldModel[] GetFields(TypeInfo info, DocXmlReader reader)
         {
             var fields = info.GetFields();
             if (fields.Length == 0)

@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Collections.Generic;
 
 using Docsharp.Core.Models;
-using Docsharp.Core.Models.Docs;
 using System.IO;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Tree
 {
@@ -24,7 +24,7 @@ namespace Docsharp.Core.Tree
         public override string GetName()
             => _namespace;
 
-        public void AddType(ArraySegment<string> segments, TypeMember<TypeInfo, Documentation> member)
+        public void AddType(ArraySegment<string> segments, TypeMember<TypeInfo, TypeComments> member)
         {
             string name = segments.First();
 
@@ -99,7 +99,7 @@ namespace Docsharp.Core.Tree
             namespaces.Pop();
         }
 
-        public TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> segments)
+        public TypeMember<TypeInfo, TypeComments> FindType(ArraySegment<string> segments)
         {
             string first = segments[0];
 
@@ -115,7 +115,7 @@ namespace Docsharp.Core.Tree
             return Namespaces[first].FindType(segments[1..]);
         }
 
-        public Member<FieldInfo, Documentation> FindField(ArraySegment<string> segments)
+        public Member<FieldInfo, CommonComments> FindField(ArraySegment<string> segments)
         {
             string first = segments[0];
 
@@ -132,7 +132,7 @@ namespace Docsharp.Core.Tree
             return Namespaces[first].FindField(segments[1..]);
         }
 
-        public Member<PropertyInfo, Documentation> FindProperty(ArraySegment<string> segments)
+        public Member<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments)
         {
             string first = segments[0];
 
@@ -144,7 +144,7 @@ namespace Docsharp.Core.Tree
             return Namespaces[first].FindProperty(segments[1..]);
         }
 
-        public Member<EventInfo, Documentation> FindEvent(ArraySegment<string> segments)
+        public Member<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments)
         {
             string first = segments[0];
 

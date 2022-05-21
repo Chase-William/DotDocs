@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Docsharp.Core.Models;
-using Docsharp.Core.Models.Docs;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Tree
 {
@@ -23,7 +23,7 @@ namespace Docsharp.Core.Tree
         /// Adds a new type under the provided namespace.
         /// </summary>
         /// <param name="fullNamespaceToType"></param>
-        public void AddType(string fullNamespaceToType, TypeMember<TypeInfo, Documentation> member)
+        public void AddType(string fullNamespaceToType, TypeMember<TypeInfo, TypeComments> member)
         {
             // We know the last item in this string[] is our type
             // Everything before it, a namespace            
@@ -35,25 +35,25 @@ namespace Docsharp.Core.Tree
             Root.AddType(segments[1..], member);
         }
 
-        public TypeMember<TypeInfo, Documentation> FindType(string fullName)
+        public TypeMember<TypeInfo, TypeComments> FindType(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindType(segments[2..]);
         }
 
-        public Member<FieldInfo, Documentation> FindField(string fullName)
+        public Member<FieldInfo, CommonComments> FindField(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindField(segments[2..]);
         }
 
-        public Member<PropertyInfo, Documentation> FindProperty(string fullName)
+        public Member<PropertyInfo, CommonComments> FindProperty(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindProperty(segments[2..]);
         }
 
-        public Member<EventInfo, Documentation> FindEvent(string fullName)
+        public Member<EventInfo, CommonComments> FindEvent(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindEvent(segments[2..]);

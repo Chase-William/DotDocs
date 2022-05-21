@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docsharp.Core.Models.Docs
+namespace Docsharp.Core.Xml.Models
 {
-    /// <summary>
-    /// Represents documentation about a parameter.
-    /// </summary>
-    public class ParamDocumentation
+    public class Parameter
     {
         /// <summary>
         /// Name of the parameter.
@@ -18,6 +15,6 @@ namespace Docsharp.Core.Models.Docs
         /// <summary>
         /// Parameter summary.
         /// </summary>
-        public string Summary { get; set; }
+        public string Summary { get; set; }        
     }
 }

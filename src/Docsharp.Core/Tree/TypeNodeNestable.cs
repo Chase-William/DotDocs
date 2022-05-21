@@ -1,5 +1,5 @@
 ﻿using Docsharp.Core.Models;
-using Docsharp.Core.Models.Docs;
+using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +11,10 @@ namespace Docsharp.Core.Tree
     {
         public Dictionary<string, TypeNode> Types { get; set; } = new();
 
-        public TypeNodeNestable(Node parent, TypeMember<TypeInfo, Documentation> member) : base(parent, member)
+        public TypeNodeNestable(Node parent, TypeMember<TypeInfo, TypeComments> member) : base(parent, member)
         { }
 
-        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, Documentation> member)
+        public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, TypeComments> member)
         {
             string typeName = types.First();
             // End of nested type chain reached
@@ -59,7 +59,7 @@ namespace Docsharp.Core.Tree
             nestables.Pop();
         }
 
-        public TypeMember<TypeInfo, Documentation> FindType(ArraySegment<string> types)
+        public TypeMember<TypeInfo, TypeComments> FindType(ArraySegment<string> types)
         {            
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
@@ -68,7 +68,7 @@ namespace Docsharp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindType(types[1..]);
         }
 
-        public Member<FieldInfo, Documentation> FindField(ArraySegment<string> types)
+        public Member<FieldInfo, CommonComments> FindField(ArraySegment<string> types)
         {
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
@@ -77,7 +77,7 @@ namespace Docsharp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindField(types[1..]);
         }
 
-        public Member<PropertyInfo, Documentation> FindProperty(ArraySegment<string> types)
+        public Member<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> types)
         {
             if (types.Count == 1)
                 return ((INestable)Member).Properties.FirstOrDefault(f => f.Name.Equals(types[0]));
@@ -85,7 +85,7 @@ namespace Docsharp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindProperty(types[1..]);
         }
 
-        public Member<EventInfo, Documentation> FindEvent(ArraySegment<string> types)
+        public Member<EventInfo, CommonComments> FindEvent(ArraySegment<string> types)
         {
             if (types.Count == 1)
                 return ((INestable)Member).Events.FirstOrDefault(f => f.Name.Equals(types[0]));

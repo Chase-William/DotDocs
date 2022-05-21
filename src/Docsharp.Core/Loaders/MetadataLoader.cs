@@ -4,13 +4,14 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Docsharp.Core.Models.Types;
+using LoxSmoke.DocXml;
 
-namespace Docsharp.Core.Metadata
+namespace Docsharp.Core.Loaders
 {
-    public sealed class ReflectedMetadataLoader : IDisposable
+    public sealed class MetadataLoader : IDisposable
     {
         /// <summary>
-        /// Assembly name this <see cref="ReflectedMetadataLoader"/> instance reflected on.
+        /// Assembly name this <see cref="MetadataLoader"/> instance reflected on.
         /// </summary>
         public string AssemblyName { get; private set; }
 
@@ -26,11 +27,11 @@ namespace Docsharp.Core.Metadata
 
         private MetadataLoadContext mlc;
 
-        private ReflectedMetadataLoader() { }
+        private MetadataLoader() { }
 
-        public static ReflectedMetadataLoader From(string dllPath)
+        public static MetadataLoader From(string dllPath, string xmlPath)
         {
-            var meta = new ReflectedMetadataLoader();
+            var meta = new MetadataLoader();
             try
             {
                 // Init context for reading member info from .dll
@@ -38,7 +39,7 @@ namespace Docsharp.Core.Metadata
                 // Get assembly reference for metadatatree
                 var assembly = GetAssembly(meta.mlc, dllPath);
                 // Read in .dll member info
-                meta.ReadMetadataFromAssembly(assembly);
+                meta.ResolveMetadata(assembly, xmlPath);
                 meta.AssemblyName = assembly.GetName().Name;
                 meta.FullAssemblyName = assembly.FullName;
             }
@@ -54,21 +55,39 @@ namespace Docsharp.Core.Metadata
             mlc.Dispose();
         }
 
-        private void ReadMetadataFromAssembly(Assembly assembly)
+        private void ResolveMetadata(Assembly assembly, string xmlPath)
         {
+            DocXmlReader reader = new DocXmlReader(xmlPath);
+            TypeComments comments = null;
             foreach (TypeInfo typeInfo in assembly.DefinedTypes)
             {
+                comments = reader.GetTypeComments(typeInfo);
                 // Sort via construct type
-                if (typeInfo.BaseType?.FullName == "System.MulticastDelegate")
-                    Delegates.Add(typeInfo.FullName, new DelegateModel(typeInfo));
-                else if (typeInfo.IsClass)
-                    Classes.Add(typeInfo.FullName, new ClassModel(typeInfo));
+                if (typeInfo.BaseType?.FullName == "System.MulticastDelegate")                
+                    Delegates.Add(typeInfo.FullName, new DelegateModel(typeInfo)
+                    {
+                        Comments = comments
+                    });                
+                else if (typeInfo.IsClass)                
+                    Classes.Add(typeInfo.FullName, new ClassModel(typeInfo, reader)
+                    {
+                        Comments = comments
+                    });               
                 else if (typeInfo.IsInterface)
-                    Interfaces.Add(typeInfo.FullName, new InterfaceModel(typeInfo));
+                    Interfaces.Add(typeInfo.FullName, new InterfaceModel(typeInfo, reader)
+                    {
+                        Comments = comments
+                    });
                 else if (typeInfo.IsEnum)
-                    Enumerations.Add(typeInfo.FullName, new EnumModel(typeInfo));
+                    Enumerations.Add(typeInfo.FullName, new EnumModel(typeInfo, reader)
+                    {
+                        Comments = comments
+                    });
                 else if (typeInfo.IsValueType) // == IsStruct
-                    Structs.Add(typeInfo.FullName, new StructModel(typeInfo));
+                    Structs.Add(typeInfo.FullName, new StructModel(typeInfo, reader)
+                    {
+                        Comments = comments
+                    });
             }
         }
 

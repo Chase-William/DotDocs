@@ -6,16 +6,16 @@ using System.Reflection;
 using System.Text.Json;
 
 using Docsharp.Core.Models;
-using Docsharp.Core.Models.Docs;
 using Docsharp.Core.Models.Types;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Tree
 {
     public class TypeNode : Node
     {        
-        public TypeMember<TypeInfo, Documentation> Member { get; private set; }
+        public TypeMember<TypeInfo, TypeComments> Member { get; private set; }
 
-        public TypeNode(Node parent, TypeMember<TypeInfo, Documentation> member) : base(parent)
+        public TypeNode(Node parent, TypeMember<TypeInfo, TypeComments> member) : base(parent)
         {
             Member = member;
         }

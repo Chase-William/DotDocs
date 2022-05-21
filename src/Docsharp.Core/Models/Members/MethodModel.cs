@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Reflection;
-using Docsharp.Core.Models.Docs;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Models.Members
 {
-    public class MethodModel : Member<MethodInfo, FunctionalDocumentation>, IFunctional
+    public class MethodModel : Member<MethodInfo, MethodComments>, IFunctional
     {
         public override string Type => "Method";
 
