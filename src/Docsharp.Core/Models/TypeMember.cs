@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reflection;
 
-using Docsharp.Core.Models.Docs;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Models
 {
     public abstract class TypeMember<T1, T2> : Member<T1, T2>
         where T1 : TypeInfo
-        where T2 : Documentation
+        where T2 : TypeComments
     {
         public abstract bool CanHaveInternalTypes { get; }
 

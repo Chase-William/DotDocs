@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Docsharp.Core.Models;
 using System.Reflection;
-using Docsharp.Core.Models.Docs;
 
 namespace Docsharp.Core.Tree
 {

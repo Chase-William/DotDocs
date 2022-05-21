@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-using Docsharp.Core.Models.Docs;
+using LoxSmoke.DocXml;
 
 namespace Docsharp.Core.Models.Members
 {
-    public class EventModel : Member<EventInfo, Documentation>
+    public class EventModel : Member<EventInfo, CommonComments>
     {
         public override string Type => "event";
 
