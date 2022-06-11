@@ -9,8 +9,9 @@ namespace Charp.Core.Models.Types
     {
         public const string STRUCT_TYPE_STRING = "struct";
         public override bool CanHaveInternalTypes => true;
-
         public override string Type => STRUCT_TYPE_STRING;
+
+        public bool IsStatic => Meta.IsAbstract && Meta.IsSealed;
 
         public PropertyModel[] Properties { get; set; }
         public FieldModel[] Fields { get; set; }

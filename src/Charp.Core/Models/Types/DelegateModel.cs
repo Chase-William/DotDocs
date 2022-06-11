@@ -11,6 +11,8 @@ namespace Charp.Core.Models.Types
 
         // public new FunctionalDocumentation Docs => (FunctionalDocumentation)base.Docs;
 
+
+
         public string ReturnType { get; init; }
         public Parameter[] Parameters { get; init; }
 

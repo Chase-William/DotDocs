@@ -15,5 +15,12 @@ namespace Charp.Test.Data.Interfaces
         /// Quantity of engines.
         /// </summary>
         public int EngineCount { get; set; }
+
+        public interface Builder { }
+    }
+
+    public interface Test : IPowerable.Builder
+    {
+
     }
 }

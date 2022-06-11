@@ -17,7 +17,7 @@ namespace Charp.Core.Models
         
         public MethodModel[] Methods { get; set; }
 
-        public EventModel[] Events { get; set; }
+        public EventModel[] Events { get; set; }      
 
         public static void Init(INestable constructable, TypeInfo info, DocXmlReader reader)
         {
@@ -29,7 +29,9 @@ namespace Charp.Core.Models
 
         public PropertyModel[] GetProperties(TypeInfo info, DocXmlReader reader)
         {
-            var properties = info.GetProperties();
+            // Need to call GetRuntime because otherwise private getters are omitted
+            var properties = info.GetRuntimeProperties();            
+            //var properties = info.GetProperties();
             int length = properties.Count();
             if (length == 0)
                 return Array.Empty<PropertyModel>();

@@ -4,6 +4,7 @@ using System.Reflection;
 
 using Charp.Core;
 using Charp.Core.Models;
+using Charp.Core.Models.Types;
 using Charp.Core.Tree;
 
 namespace Charp.Test.Interfaces.Meta
@@ -33,7 +34,7 @@ namespace Charp.Test.Interfaces.Meta
         /// </summary>
         /// <param name="className">Class type as a string to get acquired.</param>
         /// <returns>A class type that implements <see cref="INestable"/>.</returns>
-        INestable GetClassType(string className);
+        T GetType<T>(string className) where T : INestable;
 
         /// <summary>
         /// Returns count of fields declared in the class.

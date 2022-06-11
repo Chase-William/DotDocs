@@ -11,11 +11,18 @@ namespace Charp.Test.Data.Classes
     /// </summary>
     public class Canoe : Boat
     {
+        public override event EventHandler Docked;
+
         public override bool TryDock()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException">Testing 123</exception>
         public override bool TryUndock()
         {
             throw new NotImplementedException();

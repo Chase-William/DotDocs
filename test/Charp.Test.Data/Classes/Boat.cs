@@ -26,13 +26,21 @@ namespace Charp.Test.Data.Classes
     public abstract class Boat
     {
         /// <summary>
+        /// A simple public event.
+        /// </summary>
+        public event EventHandler PublicEvent;
+        /// <summary>
+        /// A simple private event.
+        /// </summary>
+        event EventHandler PrivateEvent;
+        /// <summary>
         /// Notifies subscribers the <see cref="Point"/> has docked.
         /// </summary>
-        public event EventHandler Docked;
+        public abstract event EventHandler Docked;
         /// <summary>
         /// Notifies subscribers the <see cref="Boat"/> has undocked.
         /// </summary>
-        public event EventHandler UnDocked
+        public virtual event EventHandler UnDocked
         {
             add
             {
@@ -45,6 +53,10 @@ namespace Charp.Test.Data.Classes
             }
         }
 
+        public virtual event EventHandler VirtualEvent;
+
+        public static event EventHandler StaticEvent;
+
         /// <summary>
         /// Distance from stern to bow of a boat.
         /// </summary>
@@ -53,6 +65,40 @@ namespace Charp.Test.Data.Classes
         /// Mass of the boat in tons.
         /// </summary>
         public double Weight { get; set; }
+
+        public int NoSetterProperty { get; }        
+
+        public int NoGetterProperty
+        {
+            set
+            {
+
+            }
+        }
+
+        public int PrivateSetterProperty { get; private set; }
+        public int PrivateGetterProperty { private get; set; }
+
+        /// <summary>
+        /// My field does what a field does.
+        /// </summary>
+        public double MyField;
+
+        /// <summary>
+        /// Does what a static field would do.
+        /// </summary>
+        public static int MyStaticField;
+
+        /// <summary>
+        /// A constant field.
+        /// </summary>
+        public const string MyConstantField = "I am constant :P";
+
+        /// <summary>
+        /// A readonly field.
+        /// </summary>
+        public readonly string MyReadonlyField 
+            = "I have an initial value or can be set in ctor.. thats all..";
 
         /// <summary>
         /// Attempts to dock the ship.
@@ -65,5 +111,10 @@ namespace Charp.Test.Data.Classes
         /// </summary>
         /// <returns></returns>
         public abstract bool TryUndock();
+
+        public static void ExampleStaticMethod(int a, Sailboat b)
+        {
+
+        }
     }
 }

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Charp.Test.Classes
+namespace Charp.Test
 {
-    internal class ClassNodeTest : BaseTest, ITypeNodeNestableTest
+    internal class NodeTest : BaseTest, ITypeNodeNestableTest
     {
         [Test(Description = "Ensures nested types accounted for.")]
         public void ContainedTypesExist()

@@ -20,8 +20,8 @@ namespace Charp.Test
         public void Setup()
         {
             Docs = Charper.From(
-                @"C:\Dev\Charp\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.dll",
-                @"C:\Dev\Charp\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.xml");
+                dllPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.dll",
+                xmlPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.xml");
         }
 
         [OneTimeTearDown]

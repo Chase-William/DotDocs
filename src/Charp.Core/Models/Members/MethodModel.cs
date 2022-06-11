@@ -11,14 +11,15 @@ namespace Charp.Core.Models.Members
 {
     public class MethodModel : Member<MethodInfo, MethodComments>, IFunctional
     {
-        public override string Type => "Method";
-
+        public override string Type => "method";
         public string ReturnType => Meta.ReturnType.ToString();
         public Parameter[] Parameters { get; set; }
+        public bool IsVirtual => Meta.IsVirtual && !IsAbstract;
+        public bool IsPublic => Meta.IsPublic;
+        public bool IsAbstract => Meta.IsAbstract;
+        public bool IsStatic => Meta.IsStatic;
 
         public MethodModel(MethodInfo member) : base(member)
-        {
-            Parameters = ((IFunctional)this).GetParameters(member);
-        }
+            => Parameters = ((IFunctional)this).GetParameters(member);        
     }
 }

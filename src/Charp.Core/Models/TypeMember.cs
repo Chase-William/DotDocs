@@ -14,6 +14,10 @@ namespace Charp.Core.Models
         public string Namespace => Meta.Namespace;
         public string FullName => Meta.FullName;
 
+        public bool IsPublic => Meta.IsPublic || Meta.IsNestedPublic;
+        public bool IsInternal => !Meta.IsVisible;
+        public string Parent => Meta.BaseType?.ToString();
+
         protected TypeMember(T1 member) : base(member)
         { }
     }
