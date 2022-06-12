@@ -1,4 +1,4 @@
-<p style="text-align:center;">
+<p style="align:center;">
   <img src="./docs/media/charp-core-logo.png" style="width:350px;">
 </p>
 
