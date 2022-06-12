@@ -16,15 +16,15 @@ namespace Charp
     {        
         static void Main(string[] args)
         {
-            //var docs = Charper.From(
-            //    dllPath: args[0],
-            //    xmlPath: args[1]
-            //);
-
             var docs = Charper.From(
-                dllPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.dll",
-                xmlPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.xml"
+                dllPath: args[0],
+                xmlPath: args[1]
             );
+
+            //var docs = Charper.From(
+            //    dllPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.dll",
+            //    xmlPath: @"C:\Dev\Charp.Core\test\Charp.Test.Data\bin\Debug\net5.0\Charp.Test.Data.xml"
+            //);
 
             docs.Save();
         }

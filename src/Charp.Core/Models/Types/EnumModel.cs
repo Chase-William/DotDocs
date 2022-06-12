@@ -13,7 +13,7 @@ namespace Charp.Core.Models.Types
 
         public FieldModel[] Fields { get; set; }
 
-        public string UnderLyingType => Meta.GetEnumUnderlyingType().ToString();        
+        public string UnderlyingType => Meta.GetEnumUnderlyingType().ToString();        
 
         public EnumModel(TypeInfo member, DocXmlReader reader) : base(member)
         {
