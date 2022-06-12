@@ -1,6 +1,11 @@
-[ ] - Documentation from `.xml` needs to be assigned to each type in nodes within ModelTree.
+<p style="text-align:center;">
+<img src="./docs/media/charp-core-logo.png" style="max-width:50%;">
+</p>
 
-[ ] - Documentation from `.xml` needs to be assigned to each respective member within the containing type.
+# Charp
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+
 
 ## `Class` Meta
 
@@ -19,7 +24,7 @@
 
 ## `Interface` Meta
 
-### Unit Test Structure
+## Unit Tests
 
 #### Types
 
