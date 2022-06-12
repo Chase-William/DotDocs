@@ -1,5 +1,5 @@
 <p style="text-align:center;">
-  <img src="./docs/media/charp-core-logo.png" style="width:300px;">
+  <img src="./docs/media/charp-core-logo.png" style="max-width:400px;">
 </p>
 
 # Charp
