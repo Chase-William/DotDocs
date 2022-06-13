@@ -18,15 +18,23 @@ namespace Charp.Core
         /// Contains all human-written based metadata.
         /// </summary>
         //public Entity[] Documentation { get; private set; }
-        
+
+        public string OutputPath { get; set; }
+
         private Charper() { }
 
         public void Dispose()
             => ReflectedMetadata.Dispose();
 
-        public static Charper From(string dllPath, string xmlPath)
+        public static Charper From(
+            string dllPath, 
+            string xmlPath,
+            string outputPath)
         {
-            var docs = new Charper();            
+            var docs = new Charper
+            {
+                OutputPath = outputPath
+            };
 
             try
             {
@@ -69,6 +77,6 @@ namespace Charp.Core
         }
 
         public void Save()
-            => Models.SaveModels();             
+            => Models.SaveModels(OutputPath);             
     }
 }

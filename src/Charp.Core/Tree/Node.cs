@@ -15,7 +15,7 @@ namespace Charp.Core.Tree
         protected Node(Node parent)
             => Parent = parent;
 
-        public abstract void Save(Stack<string> namespaces, Stack<string> nestables);       
+        public abstract void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables);       
 
         //public static String Join(String? separator, String?[] value, int startIndex, int count);
         protected static string JoinNamespaces(Stack<string> namespaces)

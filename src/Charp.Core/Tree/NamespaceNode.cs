@@ -78,22 +78,23 @@ namespace Charp.Core.Tree
             Namespaces[name].AddType(segments, member);
         }
 
-        public override void Save(Stack<string> namespaces, Stack<string> nestables)
-        {  
+        public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)
+        {
             /* 
              * Push this namespace to the stack because everything listed
              * below lives under it
              */
             namespaces.Push(GetName());
+
             // Create directory if needed
-            Directory.CreateDirectory(JoinNamespaces(namespaces));
+            Directory.CreateDirectory(Path.Combine(outputPath, JoinNamespaces(namespaces)));
                     
             // Save namespaces recursively
             foreach (NamespaceNode node in Namespaces.Values)
-                node.Save(namespaces, nestables);
+                node.Save(outputPath, namespaces, nestables);
             // Save types recursively
             foreach (Node node in Types.Values)
-                node.Save(namespaces, nestables);
+                node.Save(outputPath, namespaces, nestables);
 
             // Pop this namespace when leaving as we are traversing back up the tree                   
             namespaces.Pop();

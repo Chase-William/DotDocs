@@ -23,17 +23,17 @@ namespace Charp.Core.Tree
         public override string GetName()
             => Member.Name;
 
-        public override void Save(Stack<string> namespaces, Stack<string> nestables)
+        public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)
         {
             nestables.Push(GetName());
             // Combine namespace dir and nestables name convention for valid file location
-            WriteInfo(namespaces, nestables);
+            WriteInfo(outputPath, namespaces, nestables);
             nestables.Pop();
         }
 
-        protected virtual void WriteInfo(Stack<string> namespaces, Stack<string> nestables)
+        protected virtual void WriteInfo(string outputPath, Stack<string> namespaces, Stack<string> nestables)
         {
-            using StreamWriter writer = new(Path.Combine(JoinNamespaces(namespaces), JoinNestables(nestables)) + ".json", false);
+            using StreamWriter writer = new(Path.Combine(outputPath, JoinNamespaces(namespaces), JoinNestables(nestables)) + ".json", false);
             string info = string.Empty;
             switch (Member.Type)
             {

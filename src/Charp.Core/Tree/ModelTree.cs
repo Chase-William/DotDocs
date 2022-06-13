@@ -59,7 +59,7 @@ namespace Charp.Core.Tree
             return Root.Namespaces[segments[1]].FindEvent(segments[2..]);
         }
 
-        public void SaveModels()
-            => Root.Save(new Stack<string>(), new Stack<string>());
+        public void SaveModels(string outputPath)
+            => Root.Save(outputPath, new Stack<string>(), new Stack<string>());
     }
 }

@@ -47,14 +47,14 @@ namespace Charp.Core.Tree
         /// </summary>
         /// <param name="namespaces"></param>
         /// <param name="nestables"></param>
-        public override void Save(Stack<string> namespaces, Stack<string> nestables)
+        public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)
         {
             nestables.Push(GetName());
 
-            base.WriteInfo(namespaces, nestables);            
+            base.WriteInfo(outputPath, namespaces, nestables);            
 
             foreach (var type in Types)
-                type.Value.Save(namespaces, nestables);
+                type.Value.Save(outputPath, namespaces, nestables);
 
             nestables.Pop();
         }
