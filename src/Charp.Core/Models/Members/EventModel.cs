@@ -4,7 +4,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    public class EventModel : Member<EventInfo, CommonComments>
+    public class EventModel : Model<EventInfo, CommonComments>
     {
         public override string Type => Meta.EventHandlerType?.ToString();
 
@@ -12,6 +12,7 @@ namespace Charp.Core.Models.Members
         public bool IsPublic => (Meta.AddMethod?.IsPublic ?? false) || (Meta.RemoveMethod?.IsPublic ?? false);
         public bool IsAbstract => (Meta.AddMethod?.IsAbstract ?? false) || (Meta.RemoveMethod?.IsAbstract ?? false);
         public bool IsStatic => (Meta.AddMethod?.IsStatic ?? false) || (Meta.RemoveMethod?.IsStatic ?? false);
+
 
         public EventModel(EventInfo member) : base(member) { }
     }

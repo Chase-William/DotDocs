@@ -8,20 +8,18 @@ using Charp.Test.Data.Structs;
 
 namespace Charp.Test.Data.Classes
 {
+    //class Test
+    //{
+    //    Test()
+    //    {
+    //        Sailboat b = new();
+    //        var e = b.SetProtectedProperty;
+    //        b.SetProtectedProperty = 2;
+    //    }
+    //}
+
     /// <remarks>
     /// Blah Blah Blah
-    /// <para>
-    /// From para
-    /// </para>
-    /// </remarks>
-    /// <summary>
-    /// Represents the core common aspects of a boat.
-    /// <para>
-    /// Hello
-    /// <para>
-    /// Inside Nested Para
-    /// </para>
-    /// </para>
     /// </summary>    
     public abstract class Boat
     {
@@ -75,6 +73,36 @@ namespace Charp.Test.Data.Classes
 
             }
         }
+
+        #region Protected Properties
+        protected int FullProtectedProperty { get; set; }
+        public int GetProtectedProperty { protected get; set; }
+        public int SetProtectedProperty { get; protected set; }
+        protected int GetProtectedNoSetProperty { get; }
+        protected int GetProtectedNoGetProperty { set { } }
+        #endregion
+
+        #region Internal Properties
+        internal int InternalProperty { get; set; }
+        public int InternalGetProperty { internal get; set; }
+        public int InternalSetProperty { get; internal set; }
+        internal int InternalNoSetProperty { get; }
+        internal int InternalNoGetProperty { set { } }
+        #endregion
+
+        #region Internal & Protected Properties
+        internal protected int InternalProtectedProperty { get; set; }
+        public int InternalProtectedGetProperty { internal protected get; set; }
+        public int InternalProtectedSetProperty { get; internal protected set; }        
+        internal protected int InternalProtectedNoSetProperty { get; }
+        internal protected int InternalProtectedNoGetProperty { set { } }
+        #endregion
+
+        #region Static & Internal & Protected
+        static internal protected int StaticInternalProtectedProperty { get; set; }
+        static internal protected int StaticInternalProtectedNoGetProperty { set { } }
+        static internal protected int StaticInternalProtectedNoSetProperty { get; }
+        #endregion
 
         public int PrivateSetterProperty { get; private set; }
         public int PrivateGetterProperty { private get; set; }

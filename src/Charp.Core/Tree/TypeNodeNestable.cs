@@ -1,4 +1,5 @@
 ﻿using Charp.Core.Models;
+using Charp.Core.Models.Types;
 using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace Charp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindType(types[1..]);
         }
 
-        public Member<FieldInfo, CommonComments> FindField(ArraySegment<string> types)
+        public Model<FieldInfo, CommonComments> FindField(ArraySegment<string> types)
         {
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
@@ -77,18 +78,18 @@ namespace Charp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindField(types[1..]);
         }
 
-        public Member<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> types)
+        public Model<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> types)
         {
             if (types.Count == 1)
-                return ((INestable)Member).Properties.FirstOrDefault(f => f.Name.Equals(types[0]));
+                return ((IMemberContainable)Member).Properties.FirstOrDefault(f => f.Name.Equals(types[0]));
             // Check nested types
             return ((TypeNodeNestable)Types[types[0]]).FindProperty(types[1..]);
         }
 
-        public Member<EventInfo, CommonComments> FindEvent(ArraySegment<string> types)
+        public Model<EventInfo, CommonComments> FindEvent(ArraySegment<string> types)
         {
             if (types.Count == 1)
-                return ((INestable)Member).Events.FirstOrDefault(f => f.Name.Equals(types[0]));
+                return ((IMemberContainable)Member).Events.FirstOrDefault(f => f.Name.Equals(types[0]));
             // Check nested types
             return ((TypeNodeNestable)Types[types[0]]).FindEvent(types[1..]);
         }

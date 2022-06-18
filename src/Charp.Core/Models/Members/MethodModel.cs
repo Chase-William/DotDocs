@@ -9,7 +9,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    public class MethodModel : Member<MethodInfo, MethodComments>, IFunctional
+    public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional
     {
         public override string Type => "method";
         public string ReturnType => Meta.ReturnType.ToString();

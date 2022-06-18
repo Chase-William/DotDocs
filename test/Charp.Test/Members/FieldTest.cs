@@ -1,5 +1,6 @@
 ﻿using Charp.Core.Models;
 using Charp.Core.Models.Members;
+using Charp.Core.Models.Types;
 using Charp.Test.Data.Classes;
 using NUnit.Framework;
 using System;
@@ -58,7 +59,7 @@ namespace Charp.Test.Members
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
                 .Types[className]
-                .Member as INestable)
+                .Member as IMemberContainable)
             .Fields
             .Single(e => e.Name == fieldName);
     }

@@ -6,12 +6,12 @@ using Charp.Core.Models.Members;
 
 using LoxSmoke.DocXml;
 
-namespace Charp.Core.Models
+namespace Charp.Core.Models.Types
 {
     /// <summary>
     /// Represents a type that can contain Properties, Fields, and Methods.
     /// </summary>
-    public interface INestable : IFieldable
+    public interface IMemberContainable : IFieldable
     {
         public PropertyModel[] Properties { get; set; }
         
@@ -19,7 +19,7 @@ namespace Charp.Core.Models
 
         public EventModel[] Events { get; set; }      
 
-        public static void Init(INestable constructable, TypeInfo info, DocXmlReader reader)
+        public static void Init(IMemberContainable constructable, TypeInfo info, DocXmlReader reader)
         {
             constructable.Properties = constructable.GetProperties(info, reader);
             constructable.Fields = constructable.GetFields(info, reader);

@@ -5,7 +5,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Types
 {
-    public class InterfaceModel : TypeMember<TypeInfo, TypeComments>, INestable
+    public class InterfaceModel : TypeMember<TypeInfo, TypeComments>, IMemberContainable
     {
         public const string INTERFACE_TYPE_STRING = "interface";
         public override bool CanHaveInternalTypes => true;
@@ -18,7 +18,7 @@ namespace Charp.Core.Models.Types
 
         public InterfaceModel(TypeInfo member, DocXmlReader reader) : base(member)
         {
-            INestable.Init(this, member, reader);
+            IMemberContainable.Init(this, member, reader);
         }
     }
 }

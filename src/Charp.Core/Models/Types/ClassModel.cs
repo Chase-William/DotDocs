@@ -6,7 +6,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Types
 {
-    public class ClassModel : TypeMember<TypeInfo, TypeComments>, INestable
+    public class ClassModel : TypeMember<TypeInfo, TypeComments>, IMemberContainable
     {
         public const string CLASS_TYPE_STRING = "class";
         
@@ -27,6 +27,6 @@ namespace Charp.Core.Models.Types
         public EventModel[] Events { get; set; }      
 
         public ClassModel(TypeInfo member, DocXmlReader reader) : base(member)
-            => INestable.Init(this, member, reader);                    
+            => IMemberContainable.Init(this, member, reader);                    
     }
 }

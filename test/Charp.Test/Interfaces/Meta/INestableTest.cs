@@ -33,8 +33,8 @@ namespace Charp.Test.Interfaces.Meta
         /// Implement to get the class type provided via <paramref name="className"/>.
         /// </summary>
         /// <param name="className">Class type as a string to get acquired.</param>
-        /// <returns>A class type that implements <see cref="INestable"/>.</returns>
-        T GetType<T>(string className) where T : INestable;
+        /// <returns>A class type that implements <see cref="IMemberContainable"/>.</returns>
+        T GetType<T>(string className) where T : IMemberContainable;
 
         /// <summary>
         /// Returns count of fields declared in the class.
@@ -59,6 +59,6 @@ namespace Charp.Test.Interfaces.Meta
         /// <param name="type">Type to get properties from.</param>
         /// <returns>Declared properties from instance within <paramref name="type"/>.</returns>
         static int GetPropertyCount(Type type)
-            => type.GetTypeInfo().GetProperties().Length;
+            => type.GetTypeInfo().GetRuntimeProperties().Count();
     }
 }

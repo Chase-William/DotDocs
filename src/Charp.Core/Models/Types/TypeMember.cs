@@ -3,9 +3,9 @@ using System.Reflection;
 
 using LoxSmoke.DocXml;
 
-namespace Charp.Core.Models
+namespace Charp.Core.Models.Types
 {
-    public abstract class TypeMember<T1, T2> : Member<T1, T2>
+    public abstract class TypeMember<T1, T2> : Model<T1, T2>
         where T1 : TypeInfo
         where T2 : TypeComments
     {

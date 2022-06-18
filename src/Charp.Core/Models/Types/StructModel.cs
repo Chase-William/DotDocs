@@ -5,7 +5,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Types
 {
-    public class StructModel : TypeMember<TypeInfo, TypeComments>, INestable
+    public class StructModel : TypeMember<TypeInfo, TypeComments>, IMemberContainable
     {
         public const string STRUCT_TYPE_STRING = "struct";
         public override bool CanHaveInternalTypes => true;
@@ -18,7 +18,7 @@ namespace Charp.Core.Models.Types
 
         public StructModel(TypeInfo member, DocXmlReader reader) : base(member)
         {
-            INestable.Init(this, member, reader);
+            IMemberContainable.Init(this, member, reader);
         }
     }
 }

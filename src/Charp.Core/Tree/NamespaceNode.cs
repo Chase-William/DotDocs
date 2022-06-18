@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Charp.Core.Models;
 using System.IO;
 using LoxSmoke.DocXml;
+using Charp.Core.Models.Types;
 
 namespace Charp.Core.Tree
 {
@@ -116,7 +117,7 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindType(segments[1..]);
         }
 
-        public Member<FieldInfo, CommonComments> FindField(ArraySegment<string> segments)
+        public Model<FieldInfo, CommonComments> FindField(ArraySegment<string> segments)
         {
             string first = segments[0];
 
@@ -133,7 +134,7 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindField(segments[1..]);
         }
 
-        public Member<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments)
+        public Model<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments)
         {
             string first = segments[0];
 
@@ -145,7 +146,7 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindProperty(segments[1..]);
         }
 
-        public Member<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments)
+        public Model<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments)
         {
             string first = segments[0];
 

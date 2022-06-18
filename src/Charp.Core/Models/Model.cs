@@ -5,7 +5,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models
 {
-    public abstract class Member<T1, T2>
+    public abstract class Model<T1, T2>
         where T1 : MemberInfo
         where T2 : CommonComments
     {
@@ -14,7 +14,7 @@ namespace Charp.Core.Models
 
         public T2 Comments { get; set; }
 
-        protected Member(T1 member)
+        protected Model(T1 member)
             => Meta = member;
 
         public string Name => Meta.Name;

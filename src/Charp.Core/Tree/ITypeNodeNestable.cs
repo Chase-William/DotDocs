@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using Charp.Core.Models;
+using Charp.Core.Models.Types;
 using LoxSmoke.DocXml;
 
 namespace Charp.Core.Tree
@@ -34,18 +35,18 @@ namespace Charp.Core.Tree
         /// </summary>
         /// <param name="segments">Collection of namespaces and types leading to the target field.</param>
         /// <returns>Metadata about the target field.</returns>
-        Member<FieldInfo, CommonComments> FindField(ArraySegment<string> segments);
+        Model<FieldInfo, CommonComments> FindField(ArraySegment<string> segments);
         /// <summary>
         /// Finds a given property within a type.
         /// </summary>
         /// <param name="segments">Collection of namespaces and types leading to the target property.</param>
         /// <returns>Metadata about the target property.</returns>
-        Member<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments);
+        Model<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments);
         /// <summary>
         /// Finds a given event within a type.
         /// </summary>
         /// <param name="segments">Collection of namespaces and types leading to the target event.</param>
         /// <returns>Metadata about the target property.</returns>
-        Member<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments);
+        Model<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments);
     }
 }

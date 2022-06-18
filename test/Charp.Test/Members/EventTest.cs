@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Charp.Core.Models.Types;
 
 namespace Charp.Test.Members
 {
@@ -62,7 +62,7 @@ namespace Charp.Test.Members
                 .Namespaces["Data"]
                 .Namespaces["Classes"]
                 .Types[className]
-                .Member as INestable)
+                .Member as IMemberContainable)
             .Events
             .Single(e => e.Name == eventName);
     }

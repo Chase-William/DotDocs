@@ -31,7 +31,7 @@ namespace Charp.Test.Types
         public void PropertiesExistTest()
         {
             // Boat
-            INestable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Boat)),
                 type.Properties.Length,
@@ -70,7 +70,7 @@ namespace Charp.Test.Types
         public void FieldsExistTest()
         {
             // Boat
-            INestable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Boat)),
                 type.Fields.Length,
@@ -109,7 +109,7 @@ namespace Charp.Test.Types
         public void MethodsExistTest()
         {
             // Boat
-            INestable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Boat)),
                 type.Methods.Length,
@@ -198,12 +198,12 @@ namespace Charp.Test.Types
         //        .Types[className]
         //        .Member as ClassModel;
 
-        public T GetType<T>(string className) where T : INestable
+        public T GetType<T>(string className) where T : IMemberContainable
             => (T)(Docs.Models.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]
                     .Types[className]
-                    .Member as INestable);
+                    .Member as IMemberContainable);
     }
 }

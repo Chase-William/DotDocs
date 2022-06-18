@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Charp.Core.Models;
+using Charp.Core.Models.Types;
 using LoxSmoke.DocXml;
 
 namespace Charp.Core.Tree
@@ -41,19 +42,19 @@ namespace Charp.Core.Tree
             return Root.Namespaces[segments[1]].FindType(segments[2..]);
         }
 
-        public Member<FieldInfo, CommonComments> FindField(string fullName)
+        public Model<FieldInfo, CommonComments> FindField(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindField(segments[2..]);
         }
 
-        public Member<PropertyInfo, CommonComments> FindProperty(string fullName)
+        public Model<PropertyInfo, CommonComments> FindProperty(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindProperty(segments[2..]);
         }
 
-        public Member<EventInfo, CommonComments> FindEvent(string fullName)
+        public Model<EventInfo, CommonComments> FindEvent(string fullName)
         {
             ArraySegment<string> segments = fullName.Split('.');
             return Root.Namespaces[segments[1]].FindEvent(segments[2..]);

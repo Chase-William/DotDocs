@@ -60,13 +60,21 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - IsConstant
   - IsStatic
 - `Property`
-  - CanGet
-  - CanSet
-  - IsSetPrivate
-  - IsGetPrivate
-  - IsAbstract
-  - IsVirtual
-  - IsStatic
+  - Tested
+    - HasGetter
+    - HasSetter
+    - IsGetPublic
+    - IsSetPublic
+    - IsGetProtected
+    - IsSetProtected
+    - IsGetInternal
+    - IsSetInternal
+    - IsAbstract
+    - IsVirtual
+    - IsStatic
+    - IsPublic
+    - IsProtected
+    - IsInternal
 - `Method`
   - IsPublic
   - IsAbstract
@@ -74,3 +82,13 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - IsStatic
   - ReturnType
   - Parameters
+
+### Needs Test
+
+- `Enum` type
+
+
+## Update in Charp Node
+
+- Class HasSetter
+- Class HasGetter

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Charp.Core.Models.Types;
 
 namespace Charp.Test.Members
 {
@@ -83,7 +84,7 @@ namespace Charp.Test.Members
                 .Namespaces["Data"]
                 .Namespaces[_namespace]
                 .Types[className]
-                .Member as INestable)
+                .Member as IMemberContainable)
             .Methods
             .Single(e => e.Name == methodName);
     }
