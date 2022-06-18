@@ -54,6 +54,8 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - IsVirtual
   - IsAbstract
   - IsStatic
+  - IsProtected
+  - IsInternal
 - `Field`
   - IsPublic
   - IsReadonly

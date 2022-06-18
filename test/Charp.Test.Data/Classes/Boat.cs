@@ -55,6 +55,11 @@ namespace Charp.Test.Data.Classes
 
         public static event EventHandler StaticEvent;
 
+        protected event EventHandler ProtectedEvent;
+        internal event EventHandler InternalEvent;
+        internal protected event EventHandler InternalProtectedEvent;
+        static internal protected event EventHandler StaticInternalProtectedEvent;
+
         /// <summary>
         /// Distance from stern to bow of a boat.
         /// </summary>

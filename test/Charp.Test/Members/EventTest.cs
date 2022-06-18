@@ -56,6 +56,27 @@ namespace Charp.Test.Members
             Assert.AreEqual(false, GetEvent(nameof(Boat), nameof(Boat.VirtualEvent)).IsStatic);
         }
 
+        [Test(Description = "Ensures the <IsProtected> member of the <EventModel> type is set correctly.")]
+        public void IsProtectedSetCorrectly()
+        {
+            Assert.IsTrue(GetBoatClassEvent("ProtectedEvent").IsProtected);
+            Assert.IsFalse(GetBoatClassEvent("InternalEvent").IsProtected);
+            Assert.IsTrue(GetBoatClassEvent("InternalProtectedEvent").IsProtected);
+            Assert.IsTrue(GetBoatClassEvent("StaticInternalProtectedEvent").IsProtected);
+        }
+
+        [Test(Description = "Ensures the <IsInternal> member of the <EventModel> type is set correctly.")]
+        public void IsInternalSetCorrectly()
+        {
+            Assert.IsFalse(GetBoatClassEvent("ProtectedEvent").IsInternal);
+            Assert.IsTrue(GetBoatClassEvent("InternalEvent").IsInternal);
+            Assert.IsTrue(GetBoatClassEvent("InternalProtectedEvent").IsInternal);
+            Assert.IsTrue(GetBoatClassEvent("StaticInternalProtectedEvent").IsInternal);
+        }
+
+        EventModel GetBoatClassEvent(string eventName)
+            => GetEvent(nameof(Boat), eventName);
+
         public EventModel GetEvent(string className, string eventName)
             => (Docs.Models.Root
                 .Namespaces["Test"]

@@ -63,7 +63,7 @@ namespace Charp.Core.Models.Types
 
         public EventModel[] GetEvents(TypeInfo info, DocXmlReader reader)
         {
-            var events = info.GetEvents();
+            var events = info.GetRuntimeEvents();
             int length = events.Count();
             if (length == 0)
                 return Array.Empty<EventModel>();
