@@ -59,22 +59,23 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - IsReadonly
   - IsConstant
   - IsStatic
+  - IsProtected
+  - IsInternal
 - `Property`
-  - Tested
-    - HasGetter
-    - HasSetter
-    - IsGetPublic
-    - IsSetPublic
-    - IsGetProtected
-    - IsSetProtected
-    - IsGetInternal
-    - IsSetInternal
-    - IsAbstract
-    - IsVirtual
-    - IsStatic
-    - IsPublic
-    - IsProtected
-    - IsInternal
+  - HasGetter
+  - HasSetter
+  - IsGetPublic
+  - IsSetPublic
+  - IsGetProtected
+  - IsSetProtected
+  - IsGetInternal
+  - IsSetInternal
+  - IsAbstract
+  - IsVirtual
+  - IsStatic
+  - IsPublic
+  - IsProtected
+  - IsInternal
 - `Method`
   - IsPublic
   - IsAbstract

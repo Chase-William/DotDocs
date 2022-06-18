@@ -8,13 +8,13 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    internal interface Accessible
+    internal interface IAccessible
     {
         public bool IsInternal { get; }
         public bool IsPublic { get; }
     }
 
-    internal interface IMemberable : Accessible
+    internal interface IMemberable : IAccessible
     {
         public bool IsProtected { get; }
     }

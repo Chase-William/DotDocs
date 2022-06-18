@@ -53,6 +53,27 @@ namespace Charp.Test.Members
             // Not currently exposing private fields
         }
 
+        [Test(Description = "Ensures the <IsProtected> member of the <FieldTest> type is set correctly.")]
+        public void IsProtectedSetCorrectly()
+        {
+            Assert.IsTrue(GetBoatClassField("ProtectedField").IsProtected);
+            Assert.IsFalse(GetBoatClassField("InternalField").IsProtected);
+            Assert.IsTrue(GetBoatClassField("InternalProtectedField").IsProtected);
+            Assert.IsTrue(GetBoatClassField("StaticInternalProtectedField").IsProtected);
+        }
+
+        [Test(Description = "Ensures the <IsInternal> member of the <FieldTest> type is set correctly.")]
+        public void IsInternalSetCorrectly()
+        {
+            Assert.IsFalse(GetBoatClassField("ProtectedField").IsInternal);
+            Assert.IsTrue(GetBoatClassField("InternalField").IsInternal);
+            Assert.IsTrue(GetBoatClassField("InternalProtectedField").IsInternal);
+            Assert.IsTrue(GetBoatClassField("StaticInternalProtectedField").IsInternal);
+        }
+
+        FieldModel GetBoatClassField(string field)
+            => GetField(nameof(Boat), field);
+
         public FieldModel GetField(string className, string fieldName)
             => (Docs.Models.Root
                 .Namespaces["Test"]

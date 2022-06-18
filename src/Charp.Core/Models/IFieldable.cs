@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +21,19 @@ namespace Charp.Core.Models
 
         FieldModel[] GetFields(TypeInfo info, DocXmlReader reader)
         {
-            var fields = info.GetFields();
-            if (fields.Length == 0)
+            var allFields = info.GetRuntimeFields();
+
+            // Filter out backing fields
+            var userFields = allFields
+                .Where(field => !field.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
+                .ToArray();
+            
+            if (userFields.Length == 0)
                 return Array.Empty<FieldModel>();
-            var tempFields = new FieldModel[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-                tempFields[i] = new FieldModel(fields[i]);
+
+            var tempFields = new FieldModel[userFields.Length];
+            for (int i = 0; i < userFields.Length; i++)
+                tempFields[i] = new FieldModel(userFields[i]);
             return tempFields;
         }
     }

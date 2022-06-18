@@ -104,8 +104,17 @@ namespace Charp.Test.Data.Classes
         static internal protected int StaticInternalProtectedNoSetProperty { get; }
         #endregion
 
+
         public int PrivateSetterProperty { get; private set; }
         public int PrivateGetterProperty { private get; set; }
+
+
+
+        protected int ProtectedField;
+        internal int InternalField;
+        internal protected int InternalProtectedField;
+        static internal protected int StaticInternalProtectedField;
+
 
         /// <summary>
         /// My field does what a field does.

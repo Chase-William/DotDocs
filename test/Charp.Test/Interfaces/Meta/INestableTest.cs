@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 using Charp.Core;
 using Charp.Core.Models;
 using Charp.Core.Models.Types;
@@ -42,8 +42,10 @@ namespace Charp.Test.Interfaces.Meta
         /// <param name="type">Type to get fields from.</param>
         /// <returns>Declared fields from instance within <paramref name="type"/>.</returns>
         static int GetFieldCount(Type type)
-            => type.GetTypeInfo().GetFields().Length;
-
+            =>  type.GetRuntimeFields()
+            .Where(field => !field.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
+            .Count();
+        
         /// <summary>
         /// Returns count of public methods declared in the class. This ignores
         /// generated property getter/setters.
