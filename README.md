@@ -6,26 +6,6 @@
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
 
-
-## `Class` Meta
-
-| Member | Type | Description |
-| ------ | ---- | ----------- |
-| IsPublic | `bool` | ... |
-| IsSealed | `bool` | ... |
-| IsAbstract | `bool` | ... |
-| IsStatic | `bool` | ... |
-| Parent | `...` | ... |
-
-// List of interfaces it implements?
-// Parent class?
-
-## `Struct` Meta
-
-## `Interface` Meta
-
-## Unit Tests
-
 #### Types
 
 - `Class`
@@ -51,11 +31,11 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 
 - `Event`
   - IsPublic
-  - IsVirtual
-  - IsAbstract
   - IsStatic
   - IsProtected
   - IsInternal
+  - IsAbstract
+  - IsVirtual
 - `Field`
   - IsPublic
   - IsReadonly
@@ -87,6 +67,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - Parameters
   - IsInternal
   - IsProtected
+
 ### Needs Test
 
 - `Enum` type
