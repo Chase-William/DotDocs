@@ -10,21 +10,29 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 
 - `Class`
   - IsPublic
-  - IsAbstract
+  - IsPrivate
   - IsInternal
+  - IsProtected
+  - IsAbstract
   - IsSealed
   - IsStatic
   - Parent
 - `Struct`
   - IsPublic
+  - IsPrivate
   - IsInternal
+  - IsProtected
   - Parent
 - `Interface`
   - IsPublic
+  - IsPrivate
   - IsInternal
+  - IsProtected
 - `Delegate`
   - IsPublic
+  - IsPrivate
   - IsInternal
+  - IsProtected
   - Parent
 
 #### Members

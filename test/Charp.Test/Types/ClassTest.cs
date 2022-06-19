@@ -10,56 +10,56 @@ using System;
 
 namespace Charp.Test.Types
 {
-    internal class ClassTest : BaseTest, INestableTest
+    internal class ClassTest : BaseTest
     {
         [Test(Description = "Ensures all class metadata in .dll exist.")]
         public void ClassExist()
         {
             // Boat
-            Assert.NotNull(GetType<ClassModel>(nameof(Boat)));
+            Assert.NotNull(GetClassModel(nameof(Boat)));
             // Canoe
-            Assert.NotNull(GetType<ClassModel>(nameof(Canoe)));
+            Assert.NotNull(GetClassModel(nameof(Canoe)));
             // Runabout
-            Assert.NotNull(GetType<ClassModel>(nameof(Runabout)));
+            Assert.NotNull(GetClassModel(nameof(Runabout)));
             // Sailboat
-            Assert.NotNull(GetType<ClassModel>(nameof(Sailboat)));
+            Assert.NotNull(GetClassModel(nameof(Sailboat)));
             // Yacht
-            Assert.NotNull(GetType<ClassModel>(nameof(Yacht)));
+            Assert.NotNull(GetClassModel(nameof(Yacht)));
         }
 
         [Test(Description = "Ensures the existance/absense of properties are handled correctly.")]
         public void PropertiesExistTest()
         {
             // Boat
-            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetClassModel(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Boat)),
                 type.Properties.Length,
                 GetTypeTestMessage(typeof(Boat)));
 
             // Canoe
-            type = GetType<ClassModel>(nameof(Canoe));
+            type = GetClassModel(nameof(Canoe));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Canoe)),
                 type.Properties.Length,
                 GetTypeTestMessage(typeof(Canoe)));
 
             // Runabout
-            type = GetType<ClassModel>(nameof(Runabout));
+            type = GetClassModel(nameof(Runabout));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Runabout)),
                 type.Properties.Length,
                 GetTypeTestMessage(typeof(Runabout)));
 
             // Sailboat
-            type = GetType<ClassModel>(nameof(Sailboat));
+            type = GetClassModel(nameof(Sailboat));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Sailboat)),
                 type.Properties.Length,
                 GetTypeTestMessage(typeof(Sailboat)));
 
             // Yacht
-            type = GetType<ClassModel>(nameof(Yacht));
+            type = GetClassModel(nameof(Yacht));
             Assert.AreEqual(
                 INestableTest.GetPropertyCount(typeof(Yacht)),
                 type.Properties.Length,
@@ -70,35 +70,35 @@ namespace Charp.Test.Types
         public void FieldsExistTest()
         {
             // Boat
-            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetClassModel(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Boat)),
                 type.Fields.Length,
                 GetTypeTestMessage(typeof(Boat)));
 
             // Canoe
-            type = GetType<ClassModel>(nameof(Canoe));
+            type = GetClassModel(nameof(Canoe));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Canoe)),
                 type.Fields.Length,
                 GetTypeTestMessage(typeof(Canoe)));
 
             // Runabout
-            type = GetType<ClassModel>(nameof(Runabout));
+            type = GetClassModel(nameof(Runabout));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Runabout)),
                 type.Fields.Length,
                 GetTypeTestMessage(typeof(Runabout)));
 
             // Sailboat
-            type = GetType<ClassModel>(nameof(Sailboat));
+            type = GetClassModel(nameof(Sailboat));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Sailboat)),
                 type.Fields.Length,
                 GetTypeTestMessage(typeof(Sailboat)));
 
             // Yacht
-            type = GetType<ClassModel>(nameof(Yacht));
+            type = GetClassModel(nameof(Yacht));
             Assert.AreEqual(
                 INestableTest.GetFieldCount(typeof(Yacht)),
                 type.Fields.Length,
@@ -109,35 +109,35 @@ namespace Charp.Test.Types
         public void MethodsExistTest()
         {
             // Boat
-            IMemberContainable type = GetType<ClassModel>(nameof(Boat));
+            IMemberContainable type = GetClassModel(nameof(Boat));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Boat)),
                 type.Methods.Length,
                 GetTypeTestMessage(typeof(Boat)));
 
             // Canoe
-            type = GetType<ClassModel>(nameof(Canoe));
+            type = GetClassModel(nameof(Canoe));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Canoe)),
                 type.Methods.Length,
                 GetTypeTestMessage(typeof(Canoe)));
 
             // Runabout
-            type = GetType<ClassModel>(nameof(Runabout));
+            type = GetClassModel(nameof(Runabout));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Runabout)),
                 type.Methods.Length,
                 GetTypeTestMessage(typeof(Runabout)));
 
             // Sailboat
-            type = GetType<ClassModel>(nameof(Sailboat));
+            type = GetClassModel(nameof(Sailboat));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Sailboat)),
                 type.Methods.Length,
                 GetTypeTestMessage(typeof(Sailboat)));
 
             // Yacht
-            type = GetType<ClassModel>(nameof(Yacht));
+            type = GetClassModel(nameof(Yacht));
             Assert.AreEqual(
                 INestableTest.GetMethodCount(typeof(Yacht)),
                 type.Methods.Length,
@@ -147,47 +147,47 @@ namespace Charp.Test.Types
         [Test(Description = "Ensures the <IsPublic> member of the <ClassModel> type is set correctly.")]
         public void IsPublicSetCorrectly()
         {
-            Assert.IsTrue(GetType<ClassModel>(nameof(Boat)).IsPublic);
-            Assert.IsTrue(GetType<ClassModel>(nameof(Sailboat)).IsPublic);
+            Assert.IsTrue(GetClassModel(nameof(Boat)).IsPublic);
+            Assert.IsTrue(GetClassModel(nameof(Sailboat)).IsPublic);
             // Can't test true case... where is my <friend> modifier from C++?
         }
 
         [Test(Description = "Ensures the <IsAbstract> member of the <ClassModel> type is set correctly.")]
         public void IsAbstractSetCorrectly()
         {
-            Assert.IsTrue(GetType<ClassModel>(nameof(Boat)).IsAbstract);
-            Assert.IsFalse(GetType<ClassModel>(nameof(Sailboat)).IsAbstract);
+            Assert.IsTrue(GetClassModel(nameof(Boat)).IsAbstract);
+            Assert.IsFalse(GetClassModel(nameof(Sailboat)).IsAbstract);
         }
 
         [Test(Description = "Ensures the <IsInternal> member of the <ClassModel> type is set correctly.")]
         public void IsInternalSetCorrectly()
         {
-            Assert.IsTrue(GetType<ClassModel>(nameof(Boat)).IsAbstract);
-            Assert.IsFalse(GetType<ClassModel>(nameof(Sailboat)).IsAbstract);
+            Assert.IsTrue(GetClassModel(nameof(Boat)).IsAbstract);
+            Assert.IsFalse(GetClassModel(nameof(Sailboat)).IsAbstract);
             // Can't test true case... where is my <friend> modifier from C++?
         }
 
         [Test(Description = "Ensures the <IsSealed> member of the <ClassModel> type is set correctly.")]
         public void IsSealedSetCorrectly()
         {
-            Assert.IsFalse(GetType<ClassModel>(nameof(Boat)).IsSealed);
-            Assert.IsTrue(GetType<ClassModel>(nameof(Sailboat)).IsSealed);
+            Assert.IsFalse(GetClassModel(nameof(Boat)).IsSealed);
+            Assert.IsTrue(GetClassModel(nameof(Sailboat)).IsSealed);
         }
 
         [Test(Description = "Ensures the <IsStatic> member of the <ClassModel> type is set correctly.")]
         public void IsStaticSetCorrectly()
         {
-            Assert.IsFalse(GetType<ClassModel>(nameof(Boat)).IsStatic);
-            Assert.IsFalse(GetType<ClassModel>(nameof(Sailboat)).IsStatic);
-            Assert.IsTrue(GetType<ClassModel>(nameof(BoatUtil)).IsStatic);
+            Assert.IsFalse(GetClassModel(nameof(Boat)).IsStatic);
+            Assert.IsFalse(GetClassModel(nameof(Sailboat)).IsStatic);
+            Assert.IsTrue(GetClassModel(nameof(BoatUtil)).IsStatic);
         }
 
         [Test(Description = "Ensures the <Parent> member of the <ClassModel> type is set correctly.")]
         public void IsParentSetCorrectly()
         {
-            Assert.AreEqual(typeof(object).ToString(), GetType<ClassModel>(nameof(Boat)).Parent);
-            Assert.AreEqual(typeof(Boat).ToString(), GetType<ClassModel>(nameof(Sailboat)).Parent);
-            Assert.AreEqual(typeof(object).ToString(), GetType<ClassModel>(nameof(BoatUtil)).Parent);
+            Assert.AreEqual(typeof(object).ToString(), GetClassModel(nameof(Boat)).Parent);
+            Assert.AreEqual(typeof(Boat).ToString(), GetClassModel(nameof(Sailboat)).Parent);
+            Assert.AreEqual(typeof(object).ToString(), GetClassModel(nameof(BoatUtil)).Parent);
         }
 
         //public ClassModel GetType(string className)
@@ -198,12 +198,12 @@ namespace Charp.Test.Types
         //        .Types[className]
         //        .Member as ClassModel;
 
-        public T GetType<T>(string className) where T : IMemberContainable
-            => (T)(Docs.Models.Root
+        public static ClassModel GetClassModel(string className)
+            => (ClassModel)(Docs.Models.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]
                     .Types[className]
-                    .Member as IMemberContainable);
+                    .Member);
     }
 }

@@ -23,7 +23,7 @@ namespace Charp.Test.Types
             Assert.IsFalse(GetInterfaceModel(nameof(IPowerable)).IsInternal);
         }
 
-        public InterfaceModel GetInterfaceModel(string interfaceName)
+        public static InterfaceModel GetInterfaceModel(string interfaceName)
             => Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]

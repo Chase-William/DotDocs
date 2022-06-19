@@ -49,7 +49,7 @@ namespace Charp.Test.Types
                 .Parent);
         }
 
-        public DelegateModel GetDelegateModel(string delegateName)
+        public static DelegateModel GetDelegateModel(string delegateName)
             => Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
@@ -57,7 +57,7 @@ namespace Charp.Test.Types
                 .Types[delegateName]
                 .Member as DelegateModel;
 
-        public DelegateModel GetNestedInClassDelegateModel(string className, string delegateName)
+        public static DelegateModel GetNestedInClassDelegateModel(string className, string delegateName)
          => (Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]

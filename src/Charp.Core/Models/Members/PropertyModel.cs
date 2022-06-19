@@ -4,13 +4,15 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    public class PropertyModel : Model<PropertyInfo, CommonComments>, IMemberable
+    public class PropertyModel : Model<PropertyInfo, CommonComments>, IAccessible
     {
         #region Individual Get & Set Info
         public bool HasGetter => Meta.CanRead;
         public bool HasSetter => Meta.CanWrite;
-        public bool? IsGetPublic => !Meta.GetMethod?.IsPrivate;
-        public bool? IsSetPublic => !Meta.SetMethod?.IsPrivate;
+        public bool? IsGetPublic => Meta.GetMethod?.IsPublic;
+        public bool? IsSetPublic => Meta.SetMethod?.IsPublic;
+        public bool? IsGetPrivate => Meta.GetMethod?.IsPrivate;
+        public bool? IsSetPrivate => Meta.SetMethod?.IsPrivate;
         public bool? IsGetProtected
         {
             get
@@ -62,7 +64,7 @@ namespace Charp.Core.Models.Members
         public bool IsVirtual => (Meta.GetMethod?.IsVirtual ?? false) || (Meta.SetMethod?.IsVirtual ?? false);
         public override string Type => Meta.PropertyType.ToString();
 
-        #region IMemberable
+        #region IAccessible
         /// <summary>
         /// Determines if the property is protected as a whole. This means both the set and get methods are protected if present.
         /// </summary>
@@ -77,6 +79,7 @@ namespace Charp.Core.Models.Members
         /// Determines if the property is publicly accessible to any degree.
         /// </summary>
         public bool IsPublic => (IsGetPublic ?? false) || (IsSetPublic ?? false);
+        public bool IsPrivate => (IsGetPrivate ?? false) || (IsSetPrivate ?? false);
         #endregion
         #endregion
 

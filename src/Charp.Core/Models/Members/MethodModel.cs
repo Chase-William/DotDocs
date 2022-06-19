@@ -9,7 +9,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional, IMemberable
+    public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional, IAccessible
     {
         public override string Type => "method";
         public string ReturnType => Meta.ReturnType.ToString();
@@ -18,10 +18,11 @@ namespace Charp.Core.Models.Members
         public bool IsAbstract => Meta.IsAbstract;
         public bool IsStatic => Meta.IsStatic;
 
-        #region IMemberable
-        public bool IsPublic => Meta.IsPublic;
-        public bool IsProtected => Meta.IsFamily || Meta.IsFamilyOrAssembly;
+        #region IAccessible
+        public bool IsPublic => Meta.IsPublic;        
+        public bool IsProtected => Meta.IsFamily || Meta.IsFamilyOrAssembly || Meta.IsFamilyAndAssembly;
         public bool IsInternal => Meta.IsAssembly || Meta.IsFamilyOrAssembly;
+        public bool IsPrivate => Meta.IsPrivate;
         #endregion
 
         public MethodModel(MethodInfo member) : base(member)

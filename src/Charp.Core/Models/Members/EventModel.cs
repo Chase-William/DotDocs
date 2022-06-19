@@ -4,7 +4,7 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
-    public class EventModel : Model<EventInfo, CommonComments>, IMemberable
+    public class EventModel : Model<EventInfo, CommonComments>, IAccessible
     {
         public override string Type => Meta.EventHandlerType?.ToString();
 
@@ -12,8 +12,9 @@ namespace Charp.Core.Models.Members
         public bool IsAbstract => (Meta.AddMethod?.IsAbstract ?? false) || (Meta.RemoveMethod?.IsAbstract ?? false);
         public bool IsStatic => (Meta.AddMethod?.IsStatic ?? false) || (Meta.RemoveMethod?.IsStatic ?? false);
 
-        #region IMemberable
+        #region IAccessible
         public bool IsPublic => (Meta.AddMethod?.IsPublic ?? true) || (Meta.RemoveMethod?.IsPublic ?? true);
+        public bool IsPrivate => (Meta.AddMethod?.IsPrivate ?? true) || (Meta.RemoveMethod?.IsPrivate ?? true);
         public bool IsProtected => (Meta.AddMethod?.IsFamily ?? true) || (Meta.RemoveMethod?.IsFamilyOrAssembly ?? true);
         public bool IsInternal => (Meta.AddMethod?.IsAssembly ?? true) || (Meta.RemoveMethod?.IsFamilyOrAssembly ?? true);
         #endregion

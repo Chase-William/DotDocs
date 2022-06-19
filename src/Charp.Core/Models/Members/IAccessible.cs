@@ -12,10 +12,7 @@ namespace Charp.Core.Models.Members
     {
         public bool IsInternal { get; }
         public bool IsPublic { get; }
-    }
-
-    internal interface IMemberable : IAccessible
-    {
+        public bool IsPrivate { get; }
         public bool IsProtected { get; }
     }
 }

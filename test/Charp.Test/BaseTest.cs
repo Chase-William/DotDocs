@@ -10,7 +10,7 @@ namespace Charp.Test
 {
     internal class BaseTest
     {
-        public Charper Docs;
+        public static Charper Docs;
 
         /// <summary>
         /// OneTimeSetup is required because having multiple active MetadataLoadContexts 

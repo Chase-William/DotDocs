@@ -35,7 +35,7 @@ namespace Charp.Test.Types
             // Can't test internal == true
         }
 
-        public StructModel GetStructModel(string structName)
+        public static StructModel GetStructModel(string structName)
             => Docs.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]

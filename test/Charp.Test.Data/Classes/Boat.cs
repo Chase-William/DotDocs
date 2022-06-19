@@ -8,16 +8,6 @@ using Charp.Test.Data.Structs;
 
 namespace Charp.Test.Data.Classes
 {
-    //class Test
-    //{
-    //    Test()
-    //    {
-    //        Sailboat b = new();
-    //        var e = b.SetProtectedProperty;
-    //        b.SetProtectedProperty = 2;
-    //    }
-    //}
-
     /// <remarks>
     /// Blah Blah Blah
     /// </summary>    
@@ -162,5 +152,23 @@ namespace Charp.Test.Data.Classes
         {
 
         }
+    }
+
+    public class PublicClass
+    {
+        public class NestedPublicClass { }
+        private class NestedPrivateClass { }
+        internal class NestedInternalClass { }
+        protected class NestedProtectedClass { }
+        internal protected class NestedInternalProtectedClass { }
+    }
+
+    internal class InternalClass
+    {
+        public class NestedPublicClass { }
+        private class NestedPrivateClass { }
+        internal class NestedInternalClass { }
+        protected class NestedProtectedClass { }
+        internal protected class NestedInternalProtectedClass { }
     }
 }
