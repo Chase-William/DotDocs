@@ -78,6 +78,27 @@ namespace Charp.Test.Members
             .Parameters);
         }
 
+        [Test(Description = "Ensures the <IsProtected> member of the <EventModel> type is set correctly.")]
+        public void IsProtectedSetCorrectly()
+        {
+            Assert.IsTrue(GetBoatClassMethod("ProtectedMethod").IsProtected);
+            Assert.IsFalse(GetBoatClassMethod("InternalMethod").IsProtected);
+            Assert.IsTrue(GetBoatClassMethod("InternalProtectedMethod").IsProtected);
+            Assert.IsTrue(GetBoatClassMethod("StaticInternalProtectedMethod").IsProtected);
+        }
+
+        [Test(Description = "Ensures the <IsInternal> member of the <EventModel> type is set correctly.")]
+        public void IsInternalSetCorrectly()
+        {
+            Assert.IsFalse(GetBoatClassMethod("ProtectedMethod").IsInternal);
+            Assert.IsTrue(GetBoatClassMethod("InternalMethod").IsInternal);
+            Assert.IsTrue(GetBoatClassMethod("InternalProtectedMethod").IsInternal);
+            Assert.IsTrue(GetBoatClassMethod("StaticInternalProtectedMethod").IsInternal);
+        }
+
+        MethodModel GetBoatClassMethod(string methodName)
+            => GetMethodModel(nameof(Data.Classes), nameof(Boat), methodName);        
+
         public MethodModel GetMethodModel(string _namespace, string className, string methodName)
             => (Docs.Models.Root
                 .Namespaces["Test"]

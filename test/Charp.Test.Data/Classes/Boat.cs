@@ -120,6 +120,10 @@ namespace Charp.Test.Data.Classes
         internal protected int InternalProtectedField;
         static internal protected int StaticInternalProtectedField;
 
+        protected void ProtectedMethod() { }
+        internal void InternalMethod() { }
+        internal protected void InternalProtectedMethod() { }
+        static internal protected void StaticInternalProtectedMethod() { }
 
         /// <summary>
         /// My field does what a field does.

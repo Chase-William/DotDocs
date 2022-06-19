@@ -45,7 +45,13 @@ namespace Charp.Test.Interfaces.Meta
             =>  type.GetRuntimeFields()
             .Where(field => !field.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
             .Count();
-        
+
+        /// <summary>
+        /// Collection of members always present in an object.
+        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// </summary>
+        static readonly string[] DEFAULT_OBJ_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
+
         /// <summary>
         /// Returns count of public methods declared in the class. This ignores
         /// generated property getter/setters.
@@ -53,7 +59,11 @@ namespace Charp.Test.Interfaces.Meta
         /// <param name="type">Type to get methods from.</param>
         /// <returns>Declared methods from instance within <paramref name="type"/>.</returns>
         static int GetMethodCount(Type type)
-            => type.GetTypeInfo().GetMethods().Where(method => !method.IsSpecialName).Count();
+            => type // Filter out default methods and compiler generated
+                .GetRuntimeMethods()
+                .Where(method => !method.IsSpecialName &&
+                !DEFAULT_OBJ_METHODS.Any(name => name.Equals(method.Name))
+            ).Count();
 
         /// <summary>
         /// Returns count of properties declared in the class.

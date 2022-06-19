@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 using Charp.Core.Models.Members;
 
 using LoxSmoke.DocXml;
@@ -42,12 +42,24 @@ namespace Charp.Core.Models.Types
                 {
                     Comments = reader.GetMemberComments(property)
                 };
-            return tempProps;
-        }        
+            return tempProps; 
+        }
+
+        /// <summary>
+        /// Collection of members always present in an object.
+        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// </summary>
+        static readonly string[] DEFAULT_OBJ_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
         public MethodModel[] GetMethods(TypeInfo info, DocXmlReader reader)
         {
-            var methods = info.GetMethods().Where(method => !method.IsSpecialName);            
+            // Filter out default methods and compiler generated
+            var methods = info
+                .GetRuntimeMethods()
+                .Where(method => !method.IsSpecialName &&
+                !DEFAULT_OBJ_METHODS.Any(name => name.Equals(method.Name))
+            );
+
             int length = methods.Count();
             if (length == 0)
                 return Array.Empty<MethodModel>();

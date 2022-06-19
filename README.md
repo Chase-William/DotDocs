@@ -85,7 +85,8 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
   - IsStatic
   - ReturnType
   - Parameters
-
+  - IsInternal
+  - IsProtected
 ### Needs Test
 
 - `Enum` type
