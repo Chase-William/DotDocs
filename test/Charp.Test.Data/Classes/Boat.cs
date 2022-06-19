@@ -50,6 +50,13 @@ namespace Charp.Test.Data.Classes
         internal protected event EventHandler InternalProtectedEvent;
         static internal protected event EventHandler StaticInternalProtectedEvent;
 
+        public abstract int AbstractProperty { get; set; }
+        public abstract int AbstractNoSetProperty { get; }
+        public abstract int AbstractNoGetProperty { set; }
+        public virtual int VirtualProperty { get; set; }
+        public virtual int VirtualNoSetProperty { get; }
+        public virtual int VirtualNoGetProperty { set { } }
+
         private int PrivateProperty { get; set; }
         private int PrivateNoSetProperty { get; }
         private int PrivateNoGetProperty { set { } }
