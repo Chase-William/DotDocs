@@ -14,6 +14,11 @@ namespace Charp.Test.Data.Classes
         public EngineSize Engine { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int EngineCount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public double SailHeight { get; private set; }
+        public override int AbstractProperty { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public override int AbstractNoSetProperty => throw new NotImplementedException();
+
+        public override int AbstractNoGetProperty { set => throw new NotImplementedException(); }
 
         public override event EventHandler Docked;
 
