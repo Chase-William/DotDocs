@@ -50,6 +50,10 @@ namespace Charp.Test.Data.Classes
         internal protected event EventHandler InternalProtectedEvent;
         static internal protected event EventHandler StaticInternalProtectedEvent;
 
+        private int PrivateProperty { get; set; }
+        private int PrivateNoSetProperty { get; }
+        private int PrivateNoGetProperty { set { } }
+
         /// <summary>
         /// Distance from stern to bow of a boat.
         /// </summary>
