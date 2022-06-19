@@ -53,15 +53,28 @@ namespace Charp.Test.Members
         [Test(Description = "Ensures the <IsVirtual> member of the <PropertyModel> type is set correctly.")]
         public void IsVirtualSetCorrectly()
         {
-            Assert.IsFalse(GetPropertyModel(nameof(Data.Classes), nameof(Boat), nameof(Boat.Length)).IsVirtual);
-            Assert.IsFalse(GetPropertyModel(nameof(Data.Classes), nameof(Boat), nameof(Boat.Weight)).IsVirtual);
+            // Assert.IsNull(GetBoatClassProperty(nameof(Boat.Length)).Test);
+            Assert.IsFalse(GetBoatClassProperty(nameof(Boat.Length)).IsVirtual);
+            Assert.IsFalse(GetBoatClassProperty(nameof(Boat.Weight)).IsVirtual);
+            Assert.IsFalse(GetBoatClassProperty("AbstractProperty").IsVirtual);
+            Assert.IsFalse(GetBoatClassProperty("AbstractNoSetProperty").IsVirtual);
+            Assert.IsFalse(GetBoatClassProperty("AbstractNoGetProperty").IsVirtual);
+            Assert.IsTrue(GetBoatClassProperty("VirtualProperty").IsVirtual);
+            Assert.IsTrue(GetBoatClassProperty("VirtualNoSetProperty").IsVirtual);
+            Assert.IsTrue(GetBoatClassProperty("VirtualNoGetProperty").IsVirtual);
         }
 
         [Test(Description = "Ensures the <IsAbstract> member of the <PropertyModel> type is set correctly.")]
         public void IsAbstractSetCorrectly()
         {
-            Assert.IsFalse(GetPropertyModel(nameof(Data.Classes), nameof(Boat), nameof(Boat.Length)).IsVirtual);
-            Assert.IsFalse(GetPropertyModel(nameof(Data.Classes), nameof(Boat), nameof(Boat.Weight)).IsVirtual);
+            Assert.IsFalse(GetBoatClassProperty(nameof(Boat.Length)).IsAbstract);
+            Assert.IsFalse(GetBoatClassProperty(nameof(Boat.Weight)).IsAbstract);
+            Assert.IsTrue(GetBoatClassProperty("AbstractProperty").IsAbstract);
+            Assert.IsTrue(GetBoatClassProperty("AbstractNoSetProperty").IsAbstract);
+            Assert.IsTrue(GetBoatClassProperty("AbstractNoGetProperty").IsAbstract);
+            Assert.IsFalse(GetBoatClassProperty("VirtualProperty").IsAbstract);
+            Assert.IsFalse(GetBoatClassProperty("VirtualNoSetProperty").IsAbstract);
+            Assert.IsFalse(GetBoatClassProperty("VirtualNoGetProperty").IsAbstract);
         }
 
         [Test(Description = "Ensures the <IsAbstract> member of the <PropertyModel> type is set correctly.")]

@@ -57,11 +57,20 @@ namespace Charp.Core.Models.Members
         /// <summary>
         /// Determines if the property is static if either of it's methods are static themselves.
         /// </summary>
-        public bool IsStatic => (Meta.GetMethod?.IsStatic ?? false) || (Meta.SetMethod?.IsStatic ?? false);
+        public bool IsStatic => (Meta.GetMethod?.IsStatic ?? true) || (Meta.SetMethod?.IsStatic ?? true);
         /// <summary>
-        /// Determines if the property is virtual if either of it's methods are static themselves.
+        /// Determines if the property is virtual if either of it's methods are virtual themselves.
         /// </summary>
-        public bool IsVirtual => (Meta.GetMethod?.IsVirtual ?? false) || (Meta.SetMethod?.IsVirtual ?? false);
+        public bool IsVirtual 
+            => (!(Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false)) ||
+               (!(Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));
+        public MethodAttributes? Test => Meta.GetMethod?.Attributes;
+        /// <summary>
+        /// Determines if the propert is abstract if either of it's methods are abstract themselves.
+        /// </summary>
+        public bool IsAbstract
+            => ((Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false)) ||
+               ((Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));
         public override string Type => Meta.PropertyType.ToString();
 
         #region IAccessible
