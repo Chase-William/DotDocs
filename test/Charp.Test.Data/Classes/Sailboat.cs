@@ -32,6 +32,11 @@ namespace Charp.Test.Data.Classes
             throw new NotImplementedException();            
         }
 
+        /// <summary>
+        /// Attemps to deploy the sail to a specified percentage.
+        /// </summary>
+        /// <param name="percentage">To be deployed to.</param>
+        /// <returns>True if deployment was successful, false otherwise.</returns>
         public bool TryDeploySailToPercentage(double percentage) => true;
     }
 }
