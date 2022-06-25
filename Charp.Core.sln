@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32314.265
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Charp", "src\Charp\Charp.csproj", "{EF56C0EE-5E93-4AB0-93B8-B77BD202A0D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Charp.Runner", "src\Charp.Runner\Charp.Runner.csproj", "{EF56C0EE-5E93-4AB0-93B8-B77BD202A0D6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Charp.Core", "src\Charp.Core\Charp.Core.csproj", "{0F6D424C-B7FE-4C33-B55D-6F28C6419469}"
 EndProject

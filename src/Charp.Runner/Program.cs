@@ -10,7 +10,7 @@ using Charp.Core.Models;
 using Charp.Core.Loaders;
 
 
-namespace Charp
+namespace Charp.Runner
 {
     internal class Program
     {        
