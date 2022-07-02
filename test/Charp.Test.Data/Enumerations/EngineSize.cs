@@ -11,7 +11,7 @@ namespace Charp.Test.Data.Enumerations
     /// </summary>
     public enum EngineSize
     {
-        /// <summary>`
+        /// <summary>
         /// Small Engine Size.
         /// </summary>
         Small,
