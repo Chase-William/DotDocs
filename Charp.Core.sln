@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Charp.Test", "test\Charp.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Charp.Test.Data", "test\Charp.Test.Data\Charp.Test.Data.csproj", "{97364CB2-DA93-4DE9-9608-E09E28306D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalProjectDependency", "test\LocalProjectDependency\LocalProjectDependency.csproj", "{81E4FA6B-7746-4915-BE7A-68A103D70CD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E4FA6B-7746-4915-BE7A-68A103D70CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E4FA6B-7746-4915-BE7A-68A103D70CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E4FA6B-7746-4915-BE7A-68A103D70CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E4FA6B-7746-4915-BE7A-68A103D70CD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -38,11 +38,13 @@ namespace Charp.Core
         /// <summary>
         /// Initializes a new instance of <see cref="Charper"/> loaded with data.
         /// </summary>
+        /// <param name="csProjPath">csProject used for locating dependencies and dll/xml if needed.</param>
         /// <param name="dllPath">Dynamic Link Library to read from.</param>
         /// <param name="xmlPath">XML with comments to read from.</param>
         /// <param name="outputPath">Location for JSON output.</param>
         /// <returns>Instance of <see cref="Charper"/>.</returns>
         public static Charper From(
+            string csProjPath,
             string dllPath, 
             string xmlPath,
             string outputPath)
@@ -54,7 +56,7 @@ namespace Charp.Core
 
             try
             {
-                docs.ReflectedMetadata = MetadataLoader.From(dllPath, xmlPath);
+                docs.ReflectedMetadata = MetadataLoader.From(csProjPath, dllPath, xmlPath);
                 // Read in .xml documentation to be joined with member info
                 // docs.Documentation = XmlDocLoader.Parse(xmlPath);              
                 // Create an organized structure called a MetadataTree to represent .dll type structure

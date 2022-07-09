@@ -1,5 +1,6 @@
 ﻿using Charp.Test.Data.Enumerations;
 using Charp.Test.Data.Interfaces;
+using LocalProjectDependency;
 using System;
 
 namespace Charp.Test.Data.Classes
@@ -27,7 +28,7 @@ namespace Charp.Test.Data.Classes
         public override bool TryUndock()
         {
             throw new System.NotImplementedException();
-        }
+        }        
 
         public class Builder { }
     }

@@ -29,13 +29,13 @@ namespace Charp.Core.Loaders
 
         private MetadataLoader() { }
 
-        public static MetadataLoader From(string dllPath, string xmlPath)
+        public static MetadataLoader From(string csProjPath, string dllPath, string xmlPath)
         {
             var meta = new MetadataLoader();
             try
             {
                 // Init context for reading member info from .dll
-                meta.mlc = InitMetadataLoadContext(dllPath);
+                meta.mlc = InitMetadataLoadContext(csProjPath, dllPath);
                 // Get assembly reference for metadatatree
                 var assembly = GetAssembly(meta.mlc, dllPath);
                 // Read in .dll member info
@@ -103,16 +103,18 @@ namespace Charp.Core.Loaders
             }
         }
 
-        private static MetadataLoadContext InitMetadataLoadContext(string dllPath)
-        {
+        private static MetadataLoadContext InitMetadataLoadContext(string csProjPath, string dllPath)
+        {            
             try
             {
                 string[] runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
 
+                var deps = DependencyRetriever.FindAll(csProjPath, runtimeAssemblies);
+
                 // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
-                var paths = new List<string>(runtimeAssemblies)
+                var paths = new List<string>(deps)
                 {
-                    dllPath
+                    dllPath                   
                 };
 
                 // Create PathAssemblyResolver that can resolve assemblies using the created list.
