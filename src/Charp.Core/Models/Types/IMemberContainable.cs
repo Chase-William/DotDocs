@@ -9,16 +9,35 @@ using LoxSmoke.DocXml;
 namespace Charp.Core.Models.Types
 {
     /// <summary>
-    /// Represents a type that can contain Properties, Fields, and Methods.
+    /// Represents a entity that can contain properties, fields, events, and methods.
     /// </summary>
     public interface IMemberContainable : IFieldable
     {
-        public PropertyModel[] Properties { get; set; }
-        
-        public MethodModel[] Methods { get; set; }
+        /// <summary>
+        /// Collection of members always present in an object.
+        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// </summary>
+        static readonly string[] DEFAULT_OBJ_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
+        /// <summary>
+        /// Properties of this <see cref="IMemberContainable"/>.
+        /// </summary>
+        public PropertyModel[] Properties { get; set; }
+        /// <summary>
+        /// Methods of this <see cref="Methods"/>.
+        /// </summary>
+        public MethodModel[] Methods { get; set; }
+        /// <summary>
+        /// Events of this <see cref="IMemberContainable"/>.
+        /// </summary>
         public EventModel[] Events { get; set; }      
 
+        /// <summary>
+        /// Loads <see cref="IMemberContainable"/>'s properties, fields, events, and methods with members.
+        /// </summary>
+        /// <param name="constructable">Instance of <see cref="IMemberContainable"/> to call methods on.</param>
+        /// <param name="info">Data source to pull members from.</param>
+        /// <param name="reader">Reader to acquire written documentation from.</param>
         public static void Init(IMemberContainable constructable, TypeInfo info, DocXmlReader reader)
         {
             constructable.Properties = constructable.GetProperties(info, reader);
@@ -27,6 +46,12 @@ namespace Charp.Core.Models.Types
             constructable.Events = constructable.GetEvents(info, reader);
         }
 
+        /// <summary>
+        /// Gets all the desired properties from the type info with documentation.
+        /// </summary>
+        /// <param name="info">Information about the type.</param>
+        /// <param name="reader">Used to get the written documentation.</param>
+        /// <returns>Collection of desired properties.</returns>
         public PropertyModel[] GetProperties(TypeInfo info, DocXmlReader reader)
         {
             // Need to call GetRuntime because otherwise private getters are omitted
@@ -46,11 +71,11 @@ namespace Charp.Core.Models.Types
         }
 
         /// <summary>
-        /// Collection of members always present in an object.
-        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// Gets all the desired methods from the type info with documentation.
         /// </summary>
-        static readonly string[] DEFAULT_OBJ_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
-
+        /// <param name="info">Information about the type.</param>
+        /// <param name="reader">Used to get the written documentation.</param>
+        /// <returns>Collection of desired methods.</returns>
         public MethodModel[] GetMethods(TypeInfo info, DocXmlReader reader)
         {
             // Filter out default methods and compiler generated
@@ -73,6 +98,12 @@ namespace Charp.Core.Models.Types
             return tempMethods;
         }
 
+        /// <summary>
+        /// Gets all the desired events from the type info with documentation.
+        /// </summary>
+        /// <param name="info">Information about the type.</param>
+        /// <param name="reader">Used to get the written documentation.</param>
+        /// <returns>Collection of desired events.</returns>
         public EventModel[] GetEvents(TypeInfo info, DocXmlReader reader)
         {
             var events = info.GetRuntimeEvents();

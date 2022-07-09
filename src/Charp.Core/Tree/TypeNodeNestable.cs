@@ -8,13 +8,29 @@ using System.Reflection;
 
 namespace Charp.Core.Tree
 {
+    /// <summary>
+    /// A class that can contain other types while being a type itself.
+    /// </summary>
     public class TypeNodeNestable : TypeNode, ITypeNodeNestable
     {
+        /// <summary>
+        /// Types contained within.
+        /// </summary>
         public Dictionary<string, TypeNode> Types { get; set; } = new();
 
+        /// <summary>
+        /// Intializes a new instance of <see cref="TypeNodeNestable"/>.
+        /// </summary>
+        /// <param name="parent">Parent of this node.</param>
+        /// <param name="member">Information about this type.</param>
         public TypeNodeNestable(Node parent, TypeMember<TypeInfo, TypeComments> member) : base(parent, member)
         { }
 
+        /// <summary>
+        /// A recursive method for adding a type to another <see cref="TypeNodeNestable"/>.
+        /// </summary>
+        /// <param name="types">Type trace.</param>
+        /// <param name="member">Information about the type to be added.</param>
         public void AddType(ArraySegment<string> types, TypeMember<TypeInfo, TypeComments> member)
         {
             string typeName = types.First();
@@ -46,8 +62,8 @@ namespace Charp.Core.Tree
         /// Iterate through <see cref="Types"/> defined in this type and save them, along with
         /// <see cref="TypeNodeNestable"/> info.
         /// </summary>
-        /// <param name="namespaces"></param>
-        /// <param name="nestables"></param>
+        /// <param name="namespaces">Namespace trace.</param>
+        /// <param name="nestables">Type trace.</param>
         public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)
         {
             nestables.Push(GetName());
@@ -60,6 +76,11 @@ namespace Charp.Core.Tree
             nestables.Pop();
         }
 
+        /// <summary>
+        /// Searches through this <see cref="TypeNodeNestable"/> and it's nested <see cref="Types"/>.
+        /// </summary>
+        /// <param name="types">Type trace.</param>
+        /// <returns>Information about the target type.</returns>
         public TypeMember<TypeInfo, TypeComments> FindType(ArraySegment<string> types)
         {            
             // Base case for when we have finally found the desired type
@@ -69,8 +90,13 @@ namespace Charp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindType(types[1..]);
         }
 
+        /// <summary>
+        /// Searches through this <see cref="TypeNode.Member"/> as a <see cref="IFieldable"/> to find the target field.
+        /// </summary>
+        /// <param name="types">Type trace.</param>
+        /// <returns>Information about the target field.</returns>
         public Model<FieldInfo, CommonComments> FindField(ArraySegment<string> types)
-        {
+        {            
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
                 return ((IFieldable)Member).Fields.FirstOrDefault(f => f.Name.Equals(types[0]));
@@ -78,6 +104,11 @@ namespace Charp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindField(types[1..]);
         }
 
+        /// <summary>
+        /// Searches through this <see cref="TypeNode.Member"/> as a <see cref="IMemberContainable"/> to find the target property.
+        /// </summary>
+        /// <param name="types">Type trace.</param>
+        /// <returns>Information about the target property.</returns>
         public Model<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> types)
         {
             if (types.Count == 1)
@@ -86,6 +117,11 @@ namespace Charp.Core.Tree
             return ((TypeNodeNestable)Types[types[0]]).FindProperty(types[1..]);
         }
 
+        /// <summary>
+        /// Searches through this <see cref="TypeNode.Member"/> as a <see cref="IMemberContainable"/> to find the target event.
+        /// </summary>
+        /// <param name="types">Type trace.</param>
+        /// <returns>Information about the target event.</returns>
         public Model<EventInfo, CommonComments> FindEvent(ArraySegment<string> types)
         {
             if (types.Count == 1)

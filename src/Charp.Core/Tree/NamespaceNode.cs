@@ -1,30 +1,55 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
 using Charp.Core.Models;
-using System.IO;
 using LoxSmoke.DocXml;
 using Charp.Core.Models.Types;
 
 namespace Charp.Core.Tree
 {
+    /// <summary>
+    /// Represents a namespace as a node.
+    /// </summary>
     public class NamespaceNode : Node, ITypeNodeNestable
     {
+        /// <summary>
+        /// Namespace string for this <see cref="NamespaceNode"/>.
+        /// </summary>
         private readonly string _namespace;
 
+        /// <summary>
+        /// Contains all the namespaces containe within this <see cref="NamespaceNode"/>.
+        /// </summary>
         public Dictionary<string, NamespaceNode> Namespaces { get; set; } = new();
+
+        /// <summary>
+        /// Contains all the types within this <see cref="NamespaceNode"/>.
+        /// </summary>
         public Dictionary<string, TypeNode> Types { get; set; } = new();
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="NamespaceNode"/>.
+        /// </summary>
+        /// <param name="parent">Node this node branches off of.</param>
+        /// <param name="_namespace">Name as a string for this node.</param>
         public NamespaceNode(NamespaceNode parent, string _namespace) : base(parent)
-        {
-            this._namespace = _namespace;
-        }
+            => this._namespace = _namespace;        
 
+        /// <summary>
+        /// Gets the namespace name.
+        /// </summary>
+        /// <returns>Namespace's name.</returns>
         public override string GetName()
             => _namespace;
 
+        /// <summary>
+        /// Adds a given type to either this node or one of it's descendents in a recursive fashion.
+        /// </summary>
+        /// <param name="segments">Namespace & type trace leading to where the type should be added.</param>
+        /// <param name="member">Information about the type.</param>
         public void AddType(ArraySegment<string> segments, TypeMember<TypeInfo, TypeComments> member)
         {
             string name = segments.First();
@@ -79,6 +104,12 @@ namespace Charp.Core.Tree
             Namespaces[name].AddType(segments, member);
         }
 
+        /// <summary>
+        /// Begins the process of writing this <see cref="NamespaceNode"/> and all its <see cref="Namespaces"/> & <see cref="Types"/> to file.
+        /// </summary>
+        /// <param name="outputPath">Location to write to.</param>
+        /// <param name="namespaces">Namespace trace.</param>
+        /// <param name="nestables">Nestable trace.</param>
         public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)
         {
             /* 
@@ -101,6 +132,11 @@ namespace Charp.Core.Tree
             namespaces.Pop();
         }
 
+        /// <summary>
+        /// Searches for a type that branches of this <see cref="NamespaceNode"/>.
+        /// </summary>
+        /// <param name="segments">Location of the type.</param>
+        /// <returns>The found type.</returns>
         public TypeMember<TypeInfo, TypeComments> FindType(ArraySegment<string> segments)
         {
             string first = segments[0];
@@ -117,6 +153,11 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindType(segments[1..]);
         }
 
+        /// <summary>
+        /// Searches for a field that branches off this <see cref="NamespaceNode"/>.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
         public Model<FieldInfo, CommonComments> FindField(ArraySegment<string> segments)
         {
             string first = segments[0];
@@ -134,6 +175,11 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindField(segments[1..]);
         }
 
+        /// <summary>
+        /// Searches for a property that branches of this <see cref="NamespaceNode"/>.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
         public Model<PropertyInfo, CommonComments> FindProperty(ArraySegment<string> segments)
         {
             string first = segments[0];
@@ -146,6 +192,11 @@ namespace Charp.Core.Tree
             return Namespaces[first].FindProperty(segments[1..]);
         }
 
+        /// <summary>
+        /// Searches for an event that branches off this <see cref="NamespaceNode"/>.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
         public Model<EventInfo, CommonComments> FindEvent(ArraySegment<string> segments)
         {
             string first = segments[0];

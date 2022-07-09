@@ -17,8 +17,17 @@ namespace Charp.Core.Models
     /// </summary>
     public interface IFieldable
     {
+        /// <summary>
+        /// Fields of this type.
+        /// </summary>
         FieldModel[] Fields { get; set; }
 
+        /// <summary>
+        /// Gets all the desired fields from the type info with documentation.
+        /// </summary>
+        /// <param name="info">Information about the type.</param>
+        /// <param name="reader">Used to get the written documentation.</param>
+        /// <returns>Collection of desired fields.</returns>
         FieldModel[] GetFields(TypeInfo info, DocXmlReader reader)
         {
             var allFields = info.GetRuntimeFields();

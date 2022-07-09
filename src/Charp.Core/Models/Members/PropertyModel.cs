@@ -4,6 +4,9 @@ using LoxSmoke.DocXml;
 
 namespace Charp.Core.Models.Members
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class PropertyModel : Model<PropertyInfo, CommonComments>, IAccessible
     {
         #region Individual Get & Set Info
