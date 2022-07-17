@@ -58,7 +58,7 @@ namespace Charp.Core.Loaders
         private void ResolveMetadata(Assembly assembly, string xmlPath)
         {
             DocXmlReader reader = new DocXmlReader(xmlPath);
-            TypeComments comments = null;
+            TypeComments comments;
             foreach (TypeInfo typeInfo in assembly.DefinedTypes)
             {
                 comments = reader.GetTypeComments(typeInfo);
@@ -107,21 +107,21 @@ namespace Charp.Core.Loaders
         {            
             try
             {
-                string[] runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
+                //string[] runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
 
-                var deps = DependencyRetriever.FindAll(csProjPath, runtimeAssemblies);
+                //var deps = DependencyRetriever.FindAll(csProjPath, runtimeAssemblies);
+
+                var ctx = DependencyLoadContext.From(csProjPath);
 
                 // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
-                var paths = new List<string>(deps)
-                {
-                    dllPath                   
-                };
+                var paths = new List<string>(ctx.AssemblyReferences);
+                //paths.AddRange(runtimeAssemblies);
 
                 // Create PathAssemblyResolver that can resolve assemblies using the created list.
                 var resolver = new PathAssemblyResolver(paths);
 
                 // KEEP CONNECTION UNTIL END OF PROGRAM
-                return new MetadataLoadContext(resolver, "System.Private.CoreLib");
+                return new MetadataLoadContext(resolver);
             }
             catch
             {

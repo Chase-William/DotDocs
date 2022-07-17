@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="LoxSmoke.DocXml" Version="3.4.5" />
+    <PackageReference Include="MSBuild.StructuredLogger" Version="2.1.669" />
     <PackageReference Include="System.Reflection.MetadataLoadContext" Version="6.0.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
   </ItemGroup>

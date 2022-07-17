@@ -1,4 +1,5 @@
 ﻿using LocalProjectDependency;
+using LoxSmoke.DocXml;
 
 namespace Charp.Test.Data.Classes
 {
@@ -6,5 +7,7 @@ namespace Charp.Test.Data.Classes
     {
         [Newtonsoft.Json.JsonProperty(PropertyName = "myProperty")]
         public int MyProperty { get; set; }
+
+        public CommonComments Test { get; set; }
     }
 }

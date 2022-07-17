@@ -1,16 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="LoxSmoke.DocXml" Version="3.4.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\LocalProjectDependency\LocalProjectDependency.csproj" />
   </ItemGroup>
-
 </Project>
