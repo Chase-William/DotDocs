@@ -1,4 +1,4 @@
-﻿using Docshark.Core.Models.Members;
+﻿using Docshark.Core.Models.Lang.Members;
 using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docshark.Core.Models
+namespace Docshark.Core.Models.Lang
 {
     /// <summary>
     /// Represents a type that can contain fields.
@@ -36,7 +36,7 @@ namespace Docshark.Core.Models
             var userFields = allFields
                 .Where(field => !field.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
                 .ToArray();
-            
+
             if (userFields.Length == 0)
                 return Array.Empty<FieldModel>();
 

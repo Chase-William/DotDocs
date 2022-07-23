@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docshark.Core.Models
+namespace Docshark.Core.Models.Lang
 {
     /// <summary>
     /// Represents a parameter in a function signature.

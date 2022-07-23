@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-
+using Docshark.Core.Models.Lang;
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Models.Members
+namespace Docshark.Core.Models.Lang.Members
 {
     /// <summary>
     /// 

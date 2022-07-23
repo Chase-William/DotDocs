@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using Docshark.Core.Models.Types;
+using Docshark.Core.Models;
+using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 
 namespace Docshark.Core.Loaders
@@ -29,42 +29,28 @@ namespace Docshark.Core.Loaders
 
         private MetadataLoader() { }
 
-        public static MetadataLoader From(string csProjPath)
+        public static MetadataLoader From(string targetAsmPath, string[] depAsmPaths)
         {
-            var meta = new MetadataLoader();
-            try
-            {
-                ProjectFile proj = ProjectFile.From(csProjPath);
-                if (proj.ApplyDocsharkConfiguration())
-                    proj.Save();
+            var meta = new MetadataLoader();                       
 
-                if (!proj.TryBuildProject(csProjPath, out string targetAsmPath, out string[] depAsmPaths))
-                    return null;
+            // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
+            var paths = new List<string>(depAsmPaths);
 
-                // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
-                var paths = new List<string>(depAsmPaths);
-
-                // Create PathAssemblyResolver that can resolve assemblies using the created list.
-                // Init context for reading member info from .dll
-                meta.mlc = new MetadataLoadContext(new PathAssemblyResolver(paths));
-                // Get assembly reference for metadatatree
-                var assembly = GetAssembly(meta.mlc, targetAsmPath);
-                // Read in .dll member info
-                meta.ResolveMetadata(assembly, targetAsmPath.Substring(0, targetAsmPath.LastIndexOf(".")) + ".xml");
-                meta.AssemblyName = assembly.GetName().Name;
-                meta.FullAssemblyName = assembly.FullName;
-            }
-            catch
-            {
-                throw;
-            }
+            // Create PathAssemblyResolver that can resolve assemblies using the created list.
+            // Init context for reading member info from .dll
+            meta.mlc = new MetadataLoadContext(new PathAssemblyResolver(paths));
+            // Get assembly reference for metadatatree
+            var assembly = GetAssembly(meta.mlc, targetAsmPath);
+            // Read in .dll member info
+            meta.ResolveMetadata(assembly, targetAsmPath.Substring(0, targetAsmPath.LastIndexOf(".")) + ".xml");
+            meta.AssemblyName = assembly.GetName().Name;
+            meta.FullAssemblyName = assembly.FullName;
+          
             return meta;
         }
 
         public void Dispose()
-        {
-            mlc.Dispose();
-        }
+            => mlc.Dispose();        
 
         private void ResolveMetadata(Assembly assembly, string xmlPath)
         {

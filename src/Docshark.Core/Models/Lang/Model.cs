@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Models
+namespace Docshark.Core.Models.Lang
 {
     /// <summary>
     /// The root base class to all types and members.

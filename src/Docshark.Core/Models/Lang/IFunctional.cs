@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Docshark.Core.Models
+namespace Docshark.Core.Models.Lang
 {
     /// <summary>
     /// Represents a type that has functional based documentation like parameters and return type.

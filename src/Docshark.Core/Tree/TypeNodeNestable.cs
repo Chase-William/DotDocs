@@ -1,5 +1,5 @@
-﻿using Docshark.Core.Models;
-using Docshark.Core.Models.Types;
+﻿using Docshark.Core.Models.Lang;
+using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,5 @@
 ﻿using Docshark.Test.Data.Enumerations;
 using Docshark.Test.Data.Interfaces;
-using LocalProjectDependency;
 using System;
 
 namespace Docshark.Test.Data.Classes

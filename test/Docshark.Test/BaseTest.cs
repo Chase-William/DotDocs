@@ -10,7 +10,7 @@ namespace Docshark.Test
 {
     internal class BaseTest
     {
-        public static Core.Docshark Docs;
+        public static Docsharker Docs;
 
         /// <summary>
         /// OneTimeSetup is required because having multiple active MetadataLoadContexts 
@@ -19,14 +19,35 @@ namespace Docshark.Test
         [OneTimeSetUp]
         public void Setup()
         {
-            Docs = Core.Docshark.From(
-                csProjPath: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
-                outputPath: "");
+            try
+            {
+                Docs = new Docsharker(
+                    csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Standard\Docshark.Test.Standard.csproj",
+                    outputPath: @"C:\Users\Chase Roth\Desktop"
+                );
+
+                //Docs = new Docsharker(
+                //    csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
+                //    outputPath: @"C:\Users\Chase Roth\Desktop"
+                //);
+
+                Docs.Prepare();
+                Docs.Load();
+                Docs.Make();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Docs = null;
+            }
         }
 
         [OneTimeTearDown]
         public void TearDown()
-            => Docs.Dispose();
+        {
+            if (Docs != null)
+                Docs.Dispose();
+        }
 
         public static string GetTypeTestMessage(Type type)
             => $"Type Tested: {type.FullName}";

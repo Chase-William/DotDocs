@@ -1,12 +1,14 @@
-﻿using Microsoft.Build.Logging.StructuredLogger;
+﻿using Docshark.Core.Exceptions;
+using Microsoft.Build.Logging.StructuredLogger;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Docshark.Core
+namespace Docshark.Core.Models
 {
     public class ProjectFile
     {
@@ -26,7 +28,7 @@ namespace Docshark.Core
          */
 
         public static ProjectFile From(string csProjFile)
-        {            
+        {
             var proj = new ProjectFile
             {
                 docFile = XDocument.Parse(File.ReadAllText(csProjFile)),
@@ -54,10 +56,10 @@ namespace Docshark.Core
                     default:
                         break;
                 }
-            }            
+            }
 
             return proj;
-        }        
+        }
 
         public bool ApplyDocsharkConfiguration()
         {
@@ -91,23 +93,43 @@ namespace Docshark.Core
             docFile.Save(stream);
         }
 
-        public bool TryBuildProject(string csProjPath, out string targetAssemblyPath, out string[] depAssemblyPaths)
+        public void BuildProject(string csProjPath, out string targetAsmPath, out string[] depAsmPaths)
         {
             try
             {
-                var cmd = new Process();
-                cmd.StartInfo.FileName = "cmd.exe";
-                cmd.StartInfo.CreateNoWindow = true;
-                cmd.StartInfo.UseShellExecute = false;
-                cmd.StartInfo.Arguments = $"/C dotnet msbuild {csProjPath} /bl";
+                var cmd = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        Arguments = $"/C dotnet build {csProjPath} /bl"
+                    }
+                };
                 cmd.Start();
+
                 // Wait for files to finish being written & process close
                 cmd.WaitForExit();
 
+
+                //var cmd = new Process();
+                //cmd.StartInfo.FileName = "cmd.exe";
+                //cmd.StartInfo.CreateNoWindow = true;
+                //cmd.StartInfo.UseShellExecute = false;
+                //cmd.StartInfo.Arguments = $"/C dotnet msbuild {csProjPath} /bl";
+                //cmd.Start();
+                //// Wait for files to finish being written & process close
+                //cmd.WaitForExit();
+
                 var build = BinaryLog.ReadBuild("msbuild.binlog");
 
+                // If the build fails throw exception with build info
+                if (!build.Succeeded)
+                    throw new BuildException(build.FindChildrenRecursive<Error>());
+
                 var project = build
-                    .FindChild<Project>();
+                    .FindLastChild<Project>();
 
                 { // Locate paths to all dependency assemblies
                     var target = project
@@ -115,22 +137,19 @@ namespace Docshark.Core
                     var refFolder = target
                         .FindChild<Folder>("TargetOutputs");
                     var references = refFolder.Children;
-                    depAssemblyPaths = references.Select(item => (item as Item).Text).ToArray();
+                    depAsmPaths = references.Select(item => (item as Item).Text).ToArray();
                 }
 
                 { // Locate root assembly
                     var target = project.FindChild<Target>("GetTargetPath");
                     var outputs = target.FindChild<Folder>("TargetOutputs");
-                    targetAssemblyPath = ((Item)outputs.Children.First()).ShortenedText;
-                }             
+                    targetAsmPath = ((Item)outputs.Children.First()).ShortenedText;
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 throw;
             }
-
-
-            return true;
         }
     }
 }

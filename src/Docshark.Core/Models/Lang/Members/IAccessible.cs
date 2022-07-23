@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Models.Members
+namespace Docshark.Core.Models.Lang.Members
 {
     internal interface IAccessible
     {

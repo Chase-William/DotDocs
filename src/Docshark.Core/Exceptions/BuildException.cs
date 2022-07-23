@@ -1,0 +1,28 @@
+﻿using Microsoft.Build.Logging.StructuredLogger;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Docshark.Core.Exceptions
+{
+    public class BuildException : Exception
+    {
+        public IReadOnlyList<Error> Errors { get; set; }
+
+        public BuildException(IReadOnlyList<Error> errors)
+            => Errors = errors;
+
+        public override string Message
+        {
+            get
+            {
+                var builder = new StringBuilder(base.Message);
+                foreach (var err in Errors)
+                    builder.AppendLine(err.ToString());
+                return builder.ToString();
+            }
+        }
+    }
+}

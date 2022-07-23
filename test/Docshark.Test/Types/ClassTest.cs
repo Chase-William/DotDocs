@@ -4,9 +4,9 @@ using NUnit.Framework;
 using Docshark.Core.Tree;
 using Docshark.Core.Models;
 using Docshark.Test.Data.Classes;
-using Docshark.Test.Interfaces.Meta;
-using Docshark.Core.Models.Types;
 using System;
+using Docshark.Core.Models.Lang.Types;
+using Docshark.Test.Interfaces.Meta;
 
 namespace Docshark.Test.Types
 {
@@ -199,7 +199,7 @@ namespace Docshark.Test.Types
         //        .Member as ClassModel;
 
         public static ClassModel GetClassModel(string className)
-            => (ClassModel)(Docs.Models.Root
+            => (ClassModel)(Docs.Builder.Models.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]

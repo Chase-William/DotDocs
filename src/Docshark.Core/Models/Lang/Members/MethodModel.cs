@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 using System.Reflection;
 using LoxSmoke.DocXml;
+using Docshark.Core.Models.Lang;
 
-namespace Docshark.Core.Models.Members
+namespace Docshark.Core.Models.Lang.Members
 {
     public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional, IAccessible
     {

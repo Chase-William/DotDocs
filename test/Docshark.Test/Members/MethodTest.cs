@@ -1,11 +1,9 @@
-﻿using Docshark.Core.Models;
-using Docshark.Core.Models.Members;
-using Docshark.Test.Data.Classes;
+﻿using Docshark.Test.Data.Classes;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Docshark.Core.Models.Types;
+using Docshark.Core.Models.Lang;
+using Docshark.Core.Models.Lang.Members;
+using Docshark.Core.Models.Lang.Types;
 
 namespace Docshark.Test.Members
 {
@@ -100,7 +98,7 @@ namespace Docshark.Test.Members
             => GetMethodModel(nameof(Data.Classes), nameof(Boat), methodName);        
 
         public MethodModel GetMethodModel(string _namespace, string className, string methodName)
-            => (Docs.Models.Root
+            => (Docs.Builder.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces[_namespace]

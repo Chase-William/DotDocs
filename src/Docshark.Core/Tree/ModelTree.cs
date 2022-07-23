@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-using Docshark.Core.Models;
-using Docshark.Core.Models.Types;
+using Docshark.Core.Models.Lang;
+using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 
 namespace Docshark.Core.Tree

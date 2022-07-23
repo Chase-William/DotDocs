@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Docshark.Core.Models.Lang.Types;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Docshark.Core;
-using Docshark.Core.Models;
-using Docshark.Core.Models.Types;
-using Docshark.Core.Tree;
 
 namespace Docshark.Test.Interfaces.Meta
 {

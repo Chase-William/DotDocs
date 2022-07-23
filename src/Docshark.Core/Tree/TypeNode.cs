@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 
 using System.Text.Json;
-using Docshark.Core.Models.Types;
+using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 
 namespace Docshark.Core.Tree

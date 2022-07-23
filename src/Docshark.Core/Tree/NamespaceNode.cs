@@ -3,10 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
-
-using Docshark.Core.Models;
 using LoxSmoke.DocXml;
-using Docshark.Core.Models.Types;
+using Docshark.Core.Models.Lang;
+using Docshark.Core.Models.Lang.Types;
 
 namespace Docshark.Core.Tree
 {

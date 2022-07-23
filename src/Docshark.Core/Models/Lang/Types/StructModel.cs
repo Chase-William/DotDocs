@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
-
-using Docshark.Core.Models.Members;
+using Docshark.Core.Models.Lang.Members;
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Models.Types
+namespace Docshark.Core.Models.Lang.Types
 {
     /// <summary>
     /// Represents a struct.

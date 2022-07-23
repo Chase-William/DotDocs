@@ -37,7 +37,7 @@ namespace Docshark.Test.Data.Classes
         public class Builder
         {
             public static Canoe Build()
-                => new();
+                => new Canoe();
         }
     }
 }

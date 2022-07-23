@@ -1,7 +1,8 @@
-﻿using LoxSmoke.DocXml;
+﻿using Docshark.Core.Models.Lang;
+using LoxSmoke.DocXml;
 using System.Reflection;
 
-namespace Docshark.Core.Models.Types
+namespace Docshark.Core.Models.Lang.Types
 {
     /// <summary>
     /// Represents a delegate.
