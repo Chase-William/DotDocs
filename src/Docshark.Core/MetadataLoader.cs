@@ -29,17 +29,28 @@ namespace Docshark.Core.Loaders
 
         private MetadataLoader() { }
 
-        public static MetadataLoader From(string csProjPath, string dllPath, string xmlPath)
+        public static MetadataLoader From(string csProjPath)
         {
             var meta = new MetadataLoader();
             try
             {
+                ProjectFile proj = ProjectFile.From(csProjPath);
+                if (proj.ApplyDocsharkConfiguration())
+                    proj.Save();
+
+                if (!proj.TryBuildProject(csProjPath, out string targetAsmPath, out string[] depAsmPaths))
+                    return null;
+
+                // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
+                var paths = new List<string>(depAsmPaths);
+
+                // Create PathAssemblyResolver that can resolve assemblies using the created list.
                 // Init context for reading member info from .dll
-                meta.mlc = InitMetadataLoadContext(csProjPath, dllPath);
+                meta.mlc = new MetadataLoadContext(new PathAssemblyResolver(paths));
                 // Get assembly reference for metadatatree
-                var assembly = GetAssembly(meta.mlc, dllPath);
+                var assembly = GetAssembly(meta.mlc, targetAsmPath);
                 // Read in .dll member info
-                meta.ResolveMetadata(assembly, xmlPath);
+                meta.ResolveMetadata(assembly, targetAsmPath.Substring(0, targetAsmPath.LastIndexOf(".")) + ".xml");
                 meta.AssemblyName = assembly.GetName().Name;
                 meta.FullAssemblyName = assembly.FullName;
             }
@@ -96,32 +107,6 @@ namespace Docshark.Core.Loaders
             try
             {
                 return mlc.LoadFromAssemblyPath(dllPath);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        private static MetadataLoadContext InitMetadataLoadContext(string csProjPath, string dllPath)
-        {            
-            try
-            {
-                //string[] runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
-
-                //var deps = DependencyRetriever.FindAll(csProjPath, runtimeAssemblies);
-
-                var ctx = DependencyLoadContext.From(csProjPath);
-
-                // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
-                var paths = new List<string>(ctx.AssemblyReferences);
-                //paths.AddRange(runtimeAssemblies);
-
-                // Create PathAssemblyResolver that can resolve assemblies using the created list.
-                var resolver = new PathAssemblyResolver(paths);
-
-                // KEEP CONNECTION UNTIL END OF PROGRAM
-                return new MetadataLoadContext(resolver);
             }
             catch
             {

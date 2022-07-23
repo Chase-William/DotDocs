@@ -10,7 +10,7 @@ namespace Docshark.Test
 {
     internal class BaseTest
     {
-        public static Charper Docs;
+        public static Core.Docshark Docs;
 
         /// <summary>
         /// OneTimeSetup is required because having multiple active MetadataLoadContexts 
@@ -19,10 +19,8 @@ namespace Docshark.Test
         [OneTimeSetUp]
         public void Setup()
         {
-            Docs = Charper.From(
+            Docs = Core.Docshark.From(
                 csProjPath: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
-                dllPath: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\bin\Debug\net6.0\Docshark.Test.Data.dll",
-                xmlPath: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\bin\Debug\net6.0\Docshark.Test.Data.xml",
                 outputPath: "");
         }
 

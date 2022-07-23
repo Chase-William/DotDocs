@@ -7,7 +7,7 @@ namespace Docshark.Core
     /// <summary>
     /// The main hub for Charp.Core.
     /// </summary>
-    public sealed class Charper : IDisposable
+    public sealed class Docshark : IDisposable
     {        
         /// <summary>
         /// A tree that organizes all types.
@@ -25,9 +25,9 @@ namespace Docshark.Core
         public string OutputPath { get; set; }
 
         /// <summary>
-        /// Initializes an instance of <see cref="Charper"/>.
+        /// Initializes an instance of <see cref="Docshark"/>.
         /// </summary>
-        private Charper() { }
+        private Docshark() { }
 
         /// <summary>
         /// Cleanup unmanaged resources linked with <see cref="ReflectedMetadata"/>.
@@ -36,29 +36,24 @@ namespace Docshark.Core
             => ReflectedMetadata.Dispose();
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Charper"/> loaded with data.
+        /// Initializes a new instance of <see cref="Docshark"/> loaded with data.
         /// </summary>
         /// <param name="csProjPath">csProject used for locating dependencies and dll/xml if needed.</param>
-        /// <param name="dllPath">Dynamic Link Library to read from.</param>
-        /// <param name="xmlPath">XML with comments to read from.</param>
         /// <param name="outputPath">Location for JSON output.</param>
-        /// <returns>Instance of <see cref="Charper"/>.</returns>
-        public static Charper From(
+        /// <returns>Instance of <see cref="Docshark"/>.</returns>
+        public static Docshark From(
             string csProjPath,
-            string dllPath, 
-            string xmlPath,
             string outputPath)
         {
-            var docs = new Charper
+            var docs = new Docshark
             {
                 OutputPath = outputPath
             };
 
             try
             {
-                docs.ReflectedMetadata = MetadataLoader.From(csProjPath, dllPath, xmlPath);
-                // Read in .xml documentation to be joined with member info
-                // docs.Documentation = XmlDocLoader.Parse(xmlPath);              
+                docs.ReflectedMetadata = MetadataLoader.From(csProjPath);
+                // Read in .xml documentation to be joined with member info        
                 // Create an organized structure called a MetadataTree to represent .dll type structure
                 docs.Models = new ModelTree();
 
@@ -67,9 +62,9 @@ namespace Docshark.Core
                  */
 
                 // Classes
-                foreach (var item in docs.ReflectedMetadata.Classes)
+                foreach (var item in docs.ReflectedMetadata.Classes)               
                     docs.Models.AddType(item.Key, item.Value);
-
+                
                 // Interfaces
                 foreach (var item in docs.ReflectedMetadata.Interfaces)
                     docs.Models.AddType(item.Key, item.Value);
