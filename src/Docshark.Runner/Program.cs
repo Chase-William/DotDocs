@@ -3,6 +3,7 @@ using Docshark.Core;
 using Docshark.Core.Exceptions;
 using System.Linq;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Docshark.Runner
 {
@@ -48,19 +49,22 @@ namespace Docshark.Runner
             }
             catch (BuildException ex)
             {
-                var test = ex.Errors.Select(err => new Error
+                var err = new ErrorRoot
                 {
-                    Timestamp = err.Timestamp,
-                    Code = err.Code,
-                    ColumnNumber = err.ColumnNumber,
-                    EndColumnNumber = err.EndColumnNumber,
-                    EndLineNumber = err.EndLineNumber,
-                    File = err.File,
-                    LineNumber = err.LineNumber,
-                    ProjectFile = err.ProjectFile,
-                    Subcategory = err.Subcategory
-                });
-                Console.WriteLine(JsonSerializer.Serialize(test));
+                    Errors = ex.Errors.Select(err => new BuildError
+                    {
+                        Timestamp = err.Timestamp,
+                        Code = err.Code,
+                        ColumnNumber = err.ColumnNumber,
+                        EndColumnNumber = err.EndColumnNumber,
+                        EndLineNumber = err.EndLineNumber,
+                        File = err.File,
+                        LineNumber = err.LineNumber,
+                        ProjectFile = err.ProjectFile,
+                        Subcategory = err.Subcategory
+                    }).ToArray()
+                };
+                Console.WriteLine(JsonSerializer.Serialize(err));
             }
             catch (Exception ex)
             {
@@ -68,7 +72,12 @@ namespace Docshark.Runner
             }
         }
 
-        class Error
+        class ErrorRoot
+        {
+            public BuildError[] Errors { get; set; }
+        }
+
+        class BuildError
         {
             public DateTime Timestamp { get; set; }
             public string Code { get; set; }
