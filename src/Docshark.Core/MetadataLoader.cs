@@ -31,7 +31,7 @@ namespace Docshark.Core.Loaders
 
         public static MetadataLoader From(string targetAsmPath, string[] depAsmPaths)
         {
-            var meta = new MetadataLoader();                       
+            var meta = new MetadataLoader();
 
             // Create the list of assembly paths consisting of runtime assemblies and the inspected assembly.
             var paths = new List<string>(depAsmPaths);

@@ -18,7 +18,7 @@ namespace Docshark.Core
         /// <param name="csProjFile">csProject used for locating dependencies and dll/xml if needed.</param>
         /// <param name="outputPath">Location for JSON output.</param>
         public Docsharker(string csProjFile, string outputPath)
-            => Builder = new Builder(outputPath, csProjFile);                           
+            => Builder = new Builder(csProjFile, outputPath);                           
 
         /// <summary>
         /// Cleanup unmanaged resources linked with <see cref="Builder"/>.

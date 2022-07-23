@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text.Json;
 using Docshark.Core;
-using Docshark.Core.Models;
-using Docshark.Core.Loaders;
 using Docshark.Core.Exceptions;
-using System.Text.Json.Serialization;
+using System.Linq;
+using System.Text.Json;
 
 namespace Docshark.Runner
 {
@@ -55,12 +48,37 @@ namespace Docshark.Runner
             }
             catch (BuildException ex)
             {
-                Console.WriteLine(ex.Message);
+                var test = ex.Errors.Select(err => new Error
+                {
+                    Timestamp = err.Timestamp,
+                    Code = err.Code,
+                    ColumnNumber = err.ColumnNumber,
+                    EndColumnNumber = err.EndColumnNumber,
+                    EndLineNumber = err.EndLineNumber,
+                    File = err.File,
+                    LineNumber = err.LineNumber,
+                    ProjectFile = err.ProjectFile,
+                    Subcategory = err.Subcategory
+                });
+                Console.WriteLine(JsonSerializer.Serialize(test));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        class Error
+        {
+            public DateTime Timestamp { get; set; }
+            public string Code { get; set; }
+            public int ColumnNumber { get; set; }
+            public int EndColumnNumber { get; set; }
+            public int EndLineNumber { get; set; }
+            public string File { get; set; }
+            public int LineNumber { get; set; }
+            public string ProjectFile { get; set; }
+            public string Subcategory { get; set; }
         }
     }
 }

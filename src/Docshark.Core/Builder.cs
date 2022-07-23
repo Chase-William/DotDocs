@@ -38,10 +38,10 @@ namespace Docshark.Core
         string targetAsmPath;
         string[] depAsmPaths;
 
-        public Builder(string outputPath, string csProjFile)
+        public Builder(string csProjFile, string outputPath)
         {
-            OutputPath = outputPath;
             ProjectPath = csProjFile;
+            OutputPath = outputPath;
         }
 
         public void Prepare()
@@ -62,8 +62,8 @@ namespace Docshark.Core
             Models = new ModelTree();
 
             /**
-                * Add all types to MetadataTree
-                */
+             * Add all types to MetadataTree
+             */
 
             // Classes
             foreach (var item in metadata.Classes)
