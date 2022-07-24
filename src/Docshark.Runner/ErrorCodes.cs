@@ -8,7 +8,7 @@ namespace Docshark.Runner
 {
     internal enum ErrorCodes
     {
-        BuildError = 1,
-        MissingProjectFileError = 2
+        UserError = 1,
+        InternalError = 2
     }
 }

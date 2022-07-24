@@ -46,15 +46,15 @@ namespace Docshark.Runner
             }
             catch (BuildException ex)
             {
-                Console.WriteLine(((int)ErrorCodes.BuildError) + " " + ex.Stringify());
+                Console.WriteLine(((int)ErrorCodes.UserError) + " " + ex.Message);
             }
             catch (MissingProjectFileException ex)
             {
-                Console.WriteLine(((int)ErrorCodes.MissingProjectFileError) + " " + ex.Stringify());
+                Console.WriteLine(((int)ErrorCodes.UserError) + " " + ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine((int)ErrorCodes.InternalError + " " + ex.Message);
             }
         }
     }

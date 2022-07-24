@@ -12,5 +12,7 @@ namespace Docshark.Core.Exceptions
 
         public MissingProjectFileException(string csProjFile)
             => ProjectFile = csProjFile;
+
+        public override string Message => "Was unable to locate the following file: '" + ProjectFile + "'.";
     }
 }
