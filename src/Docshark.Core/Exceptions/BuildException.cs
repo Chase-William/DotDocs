@@ -18,7 +18,7 @@ namespace Docshark.Core.Exceptions
         {
             get
             {
-                var builder = new StringBuilder(base.Message);
+                var builder = new StringBuilder();
                 foreach (var err in Errors)
                     builder.AppendLine(err.ToString());
                 return builder.ToString();

@@ -19,7 +19,7 @@ namespace Docshark.Test.Data.Structs
 
         public struct Builder
         {
-            public static Rectangle Default() => new Rectangle()
+            public static Rectangle Default() => new Rectangle();
         }
     }
 }

@@ -19,6 +19,6 @@ namespace Docshark.Test.Data.Structs
         /// <summary>
         /// Y coordinate location.
         /// </summary>
-        public int y
+        public int y;
     }
 }
