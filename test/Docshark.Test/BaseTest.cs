@@ -22,14 +22,9 @@ namespace Docshark.Test
             try
             {
                 Docs = new Docsharker(
-                    csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Standard\Docshark.Test.Standard.csproj",
+                    csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
                     outputPath: @"C:\Users\Chase Roth\Desktop"
                 );
-
-                //Docs = new Docsharker(
-                //    csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
-                //    outputPath: @"C:\Users\Chase Roth\Desktop"
-                //);
 
                 Docs.Prepare();
                 Docs.Load();

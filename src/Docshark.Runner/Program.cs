@@ -1,9 +1,6 @@
 ﻿using System;
 using Docshark.Core;
 using Docshark.Core.Exceptions;
-using System.Linq;
-using System.Text.Json;
-using System.Collections.Generic;
 
 namespace Docshark.Runner
 {
@@ -49,45 +46,16 @@ namespace Docshark.Runner
             }
             catch (BuildException ex)
             {
-                var err = new ErrorRoot
-                {
-                    Errors = ex.Errors.Select(err => new BuildError
-                    {
-                        Timestamp = err.Timestamp,
-                        Code = err.Code,
-                        ColumnNumber = err.ColumnNumber,
-                        EndColumnNumber = err.EndColumnNumber,
-                        EndLineNumber = err.EndLineNumber,
-                        File = err.File,
-                        LineNumber = err.LineNumber,
-                        ProjectFile = err.ProjectFile,
-                        Subcategory = err.Subcategory
-                    }).ToArray()
-                };
-                Console.WriteLine(JsonSerializer.Serialize(err));
+                Console.WriteLine(ErrorCodes.BuildError + " " + ex.Stringify());
+            }
+            catch (MissingProjectFileException ex)
+            {
+                Console.WriteLine(ErrorCodes.MissingProjectFileError + " " + ex.Stringify());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
-        }
-
-        class ErrorRoot
-        {
-            public BuildError[] Errors { get; set; }
-        }
-
-        class BuildError
-        {
-            public DateTime Timestamp { get; set; }
-            public string Code { get; set; }
-            public int ColumnNumber { get; set; }
-            public int EndColumnNumber { get; set; }
-            public int EndLineNumber { get; set; }
-            public string File { get; set; }
-            public int LineNumber { get; set; }
-            public string ProjectFile { get; set; }
-            public string Subcategory { get; set; }
         }
     }
 }

@@ -29,6 +29,9 @@ namespace Docshark.Core.Models
 
         public static ProjectFile From(string csProjFile)
         {
+            if (!File.Exists(csProjFile))
+                throw new MissingProjectFileException(csProjFile);
+
             var proj = new ProjectFile
             {
                 docFile = XDocument.Parse(File.ReadAllText(csProjFile)),
