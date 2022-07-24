@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Docshark.Core.Models;
 using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
@@ -40,7 +42,7 @@ namespace Docshark.Core.Loaders
             // Init context for reading member info from .dll
             meta.mlc = new MetadataLoadContext(new PathAssemblyResolver(paths));
             // Get assembly reference for metadatatree
-            var assembly = GetAssembly(meta.mlc, targetAsmPath);
+            var assembly = meta.mlc.LoadFromAssemblyPath(targetAsmPath);
             // Read in .dll member info
             meta.ResolveMetadata(assembly, targetAsmPath.Substring(0, targetAsmPath.LastIndexOf(".")) + ".xml");
             meta.AssemblyName = assembly.GetName().Name;
@@ -65,7 +67,7 @@ namespace Docshark.Core.Loaders
                     {
                         Comments = comments
                     });                
-                else if (typeInfo.IsClass)                
+                else if (typeInfo.IsClass && !typeInfo.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))                
                     Classes.Add(typeInfo.FullName, new ClassModel(typeInfo, reader)
                     {
                         Comments = comments
@@ -85,18 +87,6 @@ namespace Docshark.Core.Loaders
                     {
                         Comments = comments
                     });
-            }
-        }
-
-        private static Assembly GetAssembly(MetadataLoadContext mlc, string dllPath)
-        {
-            try
-            {
-                return mlc.LoadFromAssemblyPath(dllPath);
-            }
-            catch
-            {
-                throw;
             }
         }
     }
