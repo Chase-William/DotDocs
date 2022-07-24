@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Docshark.Runner
 {
-    internal class Class1
+    internal enum ErrorCodes
     {
+        BuildError = 1,
+        MissingProjectFileError = 2
     }
 }
