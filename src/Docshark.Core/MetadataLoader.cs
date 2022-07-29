@@ -46,8 +46,8 @@ namespace Docshark.Core.Loaders
             // Read in .dll member info
             meta.ResolveMetadata(assembly, targetAsmPath.Substring(0, targetAsmPath.LastIndexOf(".")) + ".xml");
             meta.AssemblyName = assembly.GetName().Name;
-            meta.FullAssemblyName = assembly.FullName;
-          
+            meta.FullAssemblyName = assembly.FullName;            
+
             return meta;
         }
 
@@ -62,31 +62,51 @@ namespace Docshark.Core.Loaders
             {
                 comments = reader.GetTypeComments(typeInfo);
                 // Sort via construct type
-                if (typeInfo.BaseType?.FullName == "System.MulticastDelegate")                
-                    Delegates.Add(typeInfo.FullName, new DelegateModel(typeInfo)
+                if (typeInfo.BaseType?.FullName == "System.MulticastDelegate")
+                {
+                    var model = new DelegateModel(typeInfo)
                     {
                         Comments = comments
-                    });                
-                else if (typeInfo.IsClass && !typeInfo.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))                
-                    Classes.Add(typeInfo.FullName, new ClassModel(typeInfo, reader)
+                    };
+                    Delegates.Add(typeInfo.FullName, model);
+                    TypeMetaMapper.Add(model);
+                }              
+                else if (typeInfo.IsClass && !typeInfo.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
+                {
+                    var model = new ClassModel(typeInfo, reader)
                     {
                         Comments = comments
-                    });               
+                    };
+                    Classes.Add(typeInfo.FullName, model);
+                    TypeMetaMapper.Add(model);
+                }              
                 else if (typeInfo.IsInterface)
-                    Interfaces.Add(typeInfo.FullName, new InterfaceModel(typeInfo, reader)
+                {
+                    var model = new InterfaceModel(typeInfo, reader)
                     {
                         Comments = comments
-                    });
+                    };
+                    Interfaces.Add(typeInfo.FullName, model);
+                    TypeMetaMapper.Add(model);
+                }
                 else if (typeInfo.IsEnum)
-                    Enumerations.Add(typeInfo.FullName, new EnumModel(typeInfo, reader)
+                {
+                    var model = new EnumModel(typeInfo, reader)
                     {
                         Comments = comments
-                    });
+                    };
+                    Enumerations.Add(typeInfo.FullName, model);
+                    TypeMetaMapper.Add(model);
+                }
                 else if (typeInfo.IsValueType) // == IsStruct
-                    Structs.Add(typeInfo.FullName, new StructModel(typeInfo, reader)
+                {
+                    var model = new StructModel(typeInfo, reader)
                     {
                         Comments = comments
-                    });
+                    };
+                    Structs.Add(typeInfo.FullName, model);
+                    TypeMetaMapper.Add(model);
+                }                
             }
         }
     }

@@ -87,6 +87,9 @@ namespace Docshark.Core.Tree
         /// </summary>
         /// <param name="outputPath">Location to write from.</param>
         public void SaveModels(string outputPath)
-            => Root.Save(outputPath, new Stack<string>(), new Stack<string>());
+        {
+            Utility.CleanDirectory(outputPath);
+            Root.Save(outputPath, new Stack<string>(), new Stack<string>());
+        }            
     }
 }

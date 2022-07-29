@@ -145,7 +145,7 @@ namespace Docshark.Core.Tree
                 return Types[segments[0]].Member;
 
             // Check if next segment is a namespace or type
-            if (!Namespaces.Keys.Contains(first))
+            if (!Namespaces.ContainsKey(first))
                 // Start the nested Types recursion search
                 return ((TypeNodeNestable)Types[first]).FindType(segments[1..]);
             // Check the next nested namespace
@@ -167,7 +167,7 @@ namespace Docshark.Core.Tree
                 return ((IFieldable)Types[first].Member).Fields.FirstOrDefault(f => f.Name.Equals(segments[1]));
 
             // Check if next segment is a namespace or type
-            if (!Namespaces.Keys.Contains(first))
+            if (!Namespaces.ContainsKey(first))
                 // Start the nested Types recursion search
                 return ((TypeNodeNestable)Types[first]).FindField(segments[1..]);
             // Check the next nested namespace
@@ -184,7 +184,7 @@ namespace Docshark.Core.Tree
             string first = segments[0];
 
             // Check if next segment is a namespace or type
-            if (!Namespaces.Keys.Contains(first))
+            if (!Namespaces.ContainsKey(first))
                 // Start the nested Types recursion search
                 return ((TypeNodeNestable)Types[first]).FindProperty(segments[1..]);
             // Check the next nested namespace

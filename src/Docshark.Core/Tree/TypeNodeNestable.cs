@@ -9,12 +9,12 @@ using System.Reflection;
 namespace Docshark.Core.Tree
 {
     /// <summary>
-    /// A class that can contain other types while being a type itself.
+    /// A type that can contain other types.
     /// </summary>
     public class TypeNodeNestable : TypeNode, ITypeNodeNestable
     {
         /// <summary>
-        /// Types contained within.
+        /// Nested types.
         /// </summary>
         public Dictionary<string, TypeNode> Types { get; set; } = new();
 
@@ -62,6 +62,7 @@ namespace Docshark.Core.Tree
         /// Iterate through <see cref="Types"/> defined in this type and save them, along with
         /// <see cref="TypeNodeNestable"/> info.
         /// </summary>
+        /// <param name="outputPath">Location to write to.</param>
         /// <param name="namespaces">Namespace trace.</param>
         /// <param name="nestables">Type trace.</param>
         public override void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables)

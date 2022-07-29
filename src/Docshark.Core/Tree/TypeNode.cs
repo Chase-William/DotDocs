@@ -61,19 +61,19 @@ namespace Docshark.Core.Tree
             switch (Member.Type)
             {
                 case ClassModel.CLASS_TYPE_STRING:
-                    info = JsonSerializer.Serialize(Member as ClassModel);
+                    info = JsonSerializer.Serialize((ClassModel)Member);
                     break;
                 case StructModel.STRUCT_TYPE_STRING:
-                    info = JsonSerializer.Serialize(Member as StructModel);
+                    info = JsonSerializer.Serialize((StructModel)Member);
                     break;
                 case InterfaceModel.INTERFACE_TYPE_STRING:
-                    info = JsonSerializer.Serialize(Member as InterfaceModel);
+                    info = JsonSerializer.Serialize((InterfaceModel)Member);
                     break;
                 case DelegateModel.DELEGATE_TYPE_STRING:
-                    info = JsonSerializer.Serialize(Member as DelegateModel);
+                    info = JsonSerializer.Serialize((DelegateModel)Member);
                     break;
                 case EnumModel.ENUM_TYPE_STRING:
-                    info = JsonSerializer.Serialize(Member as EnumModel);
+                    info = JsonSerializer.Serialize((EnumModel)Member);
                     break;
                 default:
                     return;

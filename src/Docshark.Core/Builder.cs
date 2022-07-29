@@ -16,6 +16,19 @@ namespace Docshark.Core
     public class Builder : IDisposable
     {
         /// <summary>
+        /// The root folder of all file output produced by this project.
+        /// </summary>
+        public const string DOCSHARK_CORE_ROOT_FOLDER = "core-data";
+        /// <summary>
+        /// Folder that contains the project's namespace and type tree.
+        /// </summary>
+        public const string PROJECT_SRC_FOLDER = "src";
+        /// <summary>
+        /// Folder that contains general metadata about the project.
+        /// </summary>
+        public const string META_FOLDER = "meta";
+
+        /// <summary>
         /// A tree that organizes all types.
         /// </summary>
         public ModelTree Models { get; private set; }
@@ -29,6 +42,10 @@ namespace Docshark.Core
         /// Path to .csproj.
         /// </summary>
         public string ProjectPath { get; set; }
+
+        string RootPath => Path.Combine(OutputPath, DOCSHARK_CORE_ROOT_FOLDER);
+        string ProjectSrcPath => Path.Combine(RootPath, PROJECT_SRC_FOLDER);
+        string MetadataPath => Path.Combine(RootPath, META_FOLDER);
 
         /// <summary>
         /// Contains all reflection based metadata.
@@ -88,7 +105,8 @@ namespace Docshark.Core
 
         public void Make()
         {
-            Models.SaveModels(OutputPath);
+            Models.SaveModels(ProjectSrcPath);
+            TypeMetaMapper.SaveTypes(MetadataPath);                
         }    
 
         public void Dispose()

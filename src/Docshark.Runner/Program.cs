@@ -8,8 +8,8 @@ namespace Docshark.Runner
     {        
         static void Main(string[] args)
         {
-            Run(csProjFile: args[0],
-                outputPath: args[1]);
+            //Run(csProjFile: args[0],
+            //    outputPath: args[1]);
 
             //var docs = Charper.From(
             //    csProjPath: @"C:\Dev\Charp.Core\src\Charp.Core\Charp.Core.csproj",
@@ -23,16 +23,13 @@ namespace Docshark.Runner
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
 
             // Test test library
-            //Run(csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
-            //    outputPath: @"C:\Users\Chase Roth\Desktop");
+            Run(csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
+                outputPath: @"C:\Users\Chase Roth\Desktop");
 
             // Test test library
             //Run(csProjFile: @"C:\Dev\Docshark.Core\src\Docshark.Core\Docshark.Core.csproj",
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
 
-            // Test test library
-            //Run(csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Standard\Docshark.Test.Standard.csproj",
-            //    outputPath: @"C:\Users\Chase Roth\Desktop");
         }
 
         static void Run(string csProjFile, string outputPath)
