@@ -10,11 +10,6 @@
             if (Types.ContainsKey(info.ToString()))
                 return;
 
-            if (info.Name.Contains("Dictionary"))
-            {
-                Console.WriteLine();
-            }
-
             if (info.ContainsGenericParameters)
                 return;
             AddTypeRecursive(info);
