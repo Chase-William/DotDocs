@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docshark.Core.Transitive
+namespace Docshark.Test.TypeMapper.Data
 {
-    public static class Mapper
-    {
-    }
+    internal class ParentClass { }
 }

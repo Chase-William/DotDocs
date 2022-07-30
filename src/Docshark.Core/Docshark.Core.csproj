@@ -12,4 +12,8 @@
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Docshark.Core.TypeMapper\Docshark.Core.TypeMapper.csproj" />
+  </ItemGroup>
+
 </Project>

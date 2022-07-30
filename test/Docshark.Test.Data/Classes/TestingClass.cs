@@ -14,5 +14,7 @@ namespace Docshark.Test.Data.Classes
         public Action<string> SingleTypedType { get; set; }
         public Action<string, TestingClass, int, Boat> FourTypeArgumentType { get; set; }
         public Action<string, TestingClass, int, Action<double, string>> FourTypeNestedArgumentType { get; set; }
+
+        public Dictionary<string, TestingClass> DictionaryExample { get; set; }
     }
 }

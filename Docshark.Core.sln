@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docshark.Test", "test\Docsh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docshark.Test.Data", "test\Docshark.Test.Data\Docshark.Test.Data.csproj", "{97364CB2-DA93-4DE9-9608-E09E28306D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docshark.Core.TypeMapper", "src\Docshark.Core.TypeMapper\Docshark.Core.TypeMapper.csproj", "{FE814AA2-64CD-4646-8591-FF1C8714A3CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docshark.Test.TypeMapper", "test\Docshark.Test.TypeMapper\Docshark.Test.TypeMapper.csproj", "{7CA05279-0B9E-493E-8DF0-19F2A33D41C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97364CB2-DA93-4DE9-9608-E09E28306D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE814AA2-64CD-4646-8591-FF1C8714A3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE814AA2-64CD-4646-8591-FF1C8714A3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE814AA2-64CD-4646-8591-FF1C8714A3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE814AA2-64CD-4646-8591-FF1C8714A3CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA05279-0B9E-493E-8DF0-19F2A33D41C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA05279-0B9E-493E-8DF0-19F2A33D41C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA05279-0B9E-493E-8DF0-19F2A33D41C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA05279-0B9E-493E-8DF0-19F2A33D41C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
