@@ -66,8 +66,7 @@ namespace Docshark.Core.Models.Lang.Members
         /// </summary>
         public bool IsVirtual 
             => (!(Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false)) ||
-               (!(Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));
-        public MethodAttributes? Test => Meta.GetMethod?.Attributes;
+               (!(Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));        
         /// <summary>
         /// Determines if the propert is abstract if either of it's methods are abstract themselves.
         /// </summary>

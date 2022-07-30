@@ -7,17 +7,32 @@ using System.Threading.Tasks;
 using System.Reflection;
 using LoxSmoke.DocXml;
 using Docshark.Core.Models.Lang;
+using System.Linq.Expressions;
 
 namespace Docshark.Core.Models.Lang.Members
 {
     public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional, IAccessible
     {
-        public override string Type => "method";
+        public override string Type => GetSignature(Meta, this);
         public string ReturnType => Meta.ReturnType.ToString();
         public Parameter[] Parameters { get; set; }
         public bool IsVirtual => Meta.IsVirtual && !IsAbstract;        
         public bool IsAbstract => Meta.IsAbstract;
         public bool IsStatic => Meta.IsStatic;
+
+        static string GetSignature(MethodInfo methodInfo, object target)
+        {
+            Func<Type[], Type> getType;
+            var types = methodInfo.GetParameters().Select(p => p.ParameterType);
+            if (methodInfo.ReturnType.FullName == typeof(void).FullName)            
+                getType = Expression.GetActionType;            
+            else
+            {
+                getType = Expression.GetFuncType;
+                types = types.Concat(new[] { methodInfo.ReturnType });
+            }
+            return getType(types.ToArray()).ToString();
+        }
 
         #region IAccessible
         public bool IsPublic => Meta.IsPublic;        
