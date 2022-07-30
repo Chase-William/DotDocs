@@ -10,6 +10,11 @@
             if (Types.ContainsKey(info.ToString()))
                 return;
 
+            if (info.Name.Contains("Dictionary"))
+            {
+                Console.WriteLine();
+            }
+
             if (info.ContainsGenericParameters)
                 return;
             AddTypeRecursive(info);
@@ -20,9 +25,6 @@
             if (info.ContainsGenericParameters)
                 return;            
 
-            // The current type definition instance for the given type info
-            TypeDefinition type;
-
             /**
              * Create a new type definition
              * Add the type defintion to the dictionary of types
@@ -31,7 +33,7 @@
              */
             if (!Types.ContainsKey(info.ToString()))
             {
-                type = TypeDefinition.From(info);
+                TypeDefinition type = TypeDefinition.From(info);
                 Types.Add(info.ToString(), type);
                 if (parentId == null)
                     parentId = type.Parent;

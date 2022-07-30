@@ -24,7 +24,7 @@ namespace Docshark.Core.TypeMapper
                 Namespace = info.Namespace,
                 TypeName = info.Name,
                 Parent = info.BaseType?.ToString(),
-                Module = info.Module.FullyQualifiedName
+                Module = info.Module.FullyQualifiedName             
             };
     }
 }

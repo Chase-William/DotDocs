@@ -16,5 +16,7 @@ namespace Docshark.Test.Data.Classes
         public Action<string, TestingClass, int, Action<double, string>> FourTypeNestedArgumentType { get; set; }
 
         public Dictionary<string, TestingClass> DictionaryExample { get; set; }
+
+        public Action<string, Dictionary<int, Func<string, bool, TestingClass>>> TripleNestedTypeArguments { get; set; }
     }
 }
