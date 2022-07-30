@@ -43,8 +43,15 @@ namespace Docshark.Test.Data.Classes
 
     }
 
-    public class ArgumentedSuperBaseClass
-    {
+    public class ArgumentedSuperBaseClass : ArgumentedSuperBaseClass1 { }
+    public class ArgumentedSuperBaseClass1 : ArgumentedSuperBaseClass2 { }
+    public class ArgumentedSuperBaseClass2 : ArgumentedSuperBaseClass3 { }
+    public class ArgumentedSuperBaseClass3 : ArgumentedSuperBaseClass4 { }
+    public class ArgumentedSuperBaseClass4 : ArgumentedSuperBaseClass5 { }
+    public class ArgumentedSuperBaseClass5 : ArgumentedSuperBaseClass6 { }
+    public class ArgumentedSuperBaseClass6 : ArgumentedSuperBaseClass7 { }
+    public class ArgumentedSuperBaseClass7 : ArgumentedSuperBaseClass8 { }
+    public class ArgumentedSuperBaseClass8 { }
 
-    }
+
 }
