@@ -10,6 +10,7 @@ namespace Docshark.Test.TypeMapper.Interfaces
     {
         void DirectTypeArgumentsAddedToDictionary();
         void TypeArgumentsAddedToArgumentList();
-        void InDirectTypeArgumentsAddedToDictionary();        
+        void InDirectTypeArgumentsAddedToDictionary();
+        void TypeArgumentNotDuplicated();
     }
 }

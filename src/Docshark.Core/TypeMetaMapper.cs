@@ -30,7 +30,7 @@ namespace Docshark.Core
         }
 
         public static void Add(DelegateModel model)
-            => AddSelfAndParent(model.Meta);        
+            => map.AddType(model.Meta);        
 
         /// <summary>
         /// Adds various types of an element that inherits and implements the contraints.
@@ -39,44 +39,38 @@ namespace Docshark.Core
         /// <param name="model">Instance of model.</param>
         public static void Add<T>(T model) where T : TypeMember<TypeInfo, TypeComments>, IMemberContainable
         {
-            AddSelfAndParent(model.Meta);
+            map.AddType(model.Meta);
             AddMembers(model);
         }
 
         static void AddMembers(IMemberContainable model)
         {
-            foreach (var mem in model.Properties)            
-                AddSelfAndParent(mem.Meta.PropertyType);
+            foreach (var mem in model.Properties)
+                map.AddType(mem.Meta.PropertyType);
             AddFields(model.Fields);
             foreach (var mem in model.Events)
-                AddSelfAndParent(mem.Meta.EventHandlerType);
+                map.AddType(mem.Meta.EventHandlerType);
             foreach (var mem in model.Methods)
             {
-                AddSelfAndParent(mem.Meta.ReturnType);
+                map.AddType(mem.Meta.ReturnType);
+                if (mem.MethodType != null)
+                    map.AddType(mem.MethodType);
                 var parameters = mem.Meta.GetParameters();
-                foreach (var param in parameters)                
-                    AddSelfAndParent(param.ParameterType);                
+                foreach (var param in parameters)
+                    map.AddType(param.ParameterType);                
             }
         }
 
         public static void Add(EnumModel model)
         {
-            AddSelfAndParent(model.Meta);
+            map.AddType(model.Meta);
             AddFields(model.Fields);
         }
 
         static void AddFields(FieldModel[] fields)
         {
             foreach (var mem in fields)
-                AddSelfAndParent(mem.Meta.FieldType);
-        }
-
-        static void AddSelfAndParent(Type info)
-        {
-            map.AddType(info);
-
-            //if (info.BaseType != null)
-            //    AddType(info.BaseType);
-        }                
+                map.AddType(mem.Meta.FieldType);
+        }              
     } 
 }

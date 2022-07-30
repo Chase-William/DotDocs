@@ -13,8 +13,8 @@ namespace Docshark.Core.TypeMapper
         public string? Parent { get; set; }
         public List<string> TypeArguments { get; set; } = new();
         public string Namespace { get; set; }
+        public string Module { get; set; }
         public string TypeName { get; set; }
-        public string AssemblyName { get; set; }
         public CommonComments Comments { get; set; }        
 
         public static TypeDefinition From(Type info)
@@ -23,8 +23,8 @@ namespace Docshark.Core.TypeMapper
                 Id = info.ToString(),
                 Namespace = info.Namespace,
                 TypeName = info.Name,
-                AssemblyName = info.Assembly.FullName,
-                Parent = info.BaseType?.ToString()
+                Parent = info.BaseType?.ToString(),
+                Module = info.Module.FullyQualifiedName
             };
     }
 }
