@@ -14,7 +14,7 @@ namespace Docshark.Test.Data.Classes
 
     }  
 
-    public class ArgumentedBaseClass<T, K> : ArgumentedSuperBaseClass
+    public class ArgumentedBaseClass<T, K> : ArgumentedSuperBaseClass<T, K>
         where T : LeftBaseArgument
         where K : RightBaseArgument<LeftArgumentLeftArgument, RightArgumentRightArgument>
     {
@@ -43,7 +43,11 @@ namespace Docshark.Test.Data.Classes
 
     }
 
-    public class ArgumentedSuperBaseClass : ArgumentedSuperBaseClass1 { }
+    public class ArgumentedSuperBaseClass<T, K> : ArgumentedSuperBaseClass1
+        where T : LeftBaseArgument
+        where K : RightBaseArgument<LeftArgumentLeftArgument, RightArgumentRightArgument>
+    { }
+
     public class ArgumentedSuperBaseClass1 : ArgumentedSuperBaseClass2 { }
     public class ArgumentedSuperBaseClass2 : ArgumentedSuperBaseClass3 { }
     public class ArgumentedSuperBaseClass3 : ArgumentedSuperBaseClass4 { }
