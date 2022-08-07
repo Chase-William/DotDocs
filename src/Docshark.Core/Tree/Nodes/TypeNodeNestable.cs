@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Docshark.Core.Tree
+namespace Docshark.Core.Tree.Nodes
 {
     /// <summary>
     /// A type that can contain other types.
@@ -56,7 +56,7 @@ namespace Docshark.Core.Tree
                 type = (TypeNodeNestable)Types[typeName];
             types = types[1..types.Count];
             type.AddType(types, member);
-        }        
+        }
 
         /// <summary>
         /// Iterate through <see cref="Types"/> defined in this type and save them, along with
@@ -69,7 +69,7 @@ namespace Docshark.Core.Tree
         {
             nestables.Push(GetName());
 
-            base.WriteInfo(outputPath, namespaces, nestables);            
+            base.WriteInfo(outputPath, namespaces, nestables);
 
             foreach (var type in Types)
                 type.Value.Save(outputPath, namespaces, nestables);
@@ -83,7 +83,7 @@ namespace Docshark.Core.Tree
         /// <param name="types">Type trace.</param>
         /// <returns>Information about the target type.</returns>
         public TypeMember<TypeInfo, TypeComments> FindType(ArraySegment<string> types)
-        {            
+        {
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
                 return Member;
@@ -97,7 +97,7 @@ namespace Docshark.Core.Tree
         /// <param name="types">Type trace.</param>
         /// <returns>Information about the target field.</returns>
         public Model<FieldInfo, CommonComments> FindField(ArraySegment<string> types)
-        {            
+        {
             // Base case for when we have finally found the desired type
             if (types.Count == 1)
                 return ((IFieldable)Member).Fields.FirstOrDefault(f => f.Name.Equals(types[0]));

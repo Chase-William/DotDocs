@@ -5,7 +5,7 @@ using Docshark.Core.Models.Lang;
 using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Tree
+namespace Docshark.Core.Tree.Nodes
 {
     /// <summary>
     /// Represents a type that can contain other type definitions internally.

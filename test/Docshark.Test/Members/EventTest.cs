@@ -73,7 +73,7 @@ namespace Docshark.Test.Members
             => GetEvent(nameof(Boat), eventName);
 
         public EventModel GetEvent(string className, string eventName)
-            => (Docs.Builder.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]

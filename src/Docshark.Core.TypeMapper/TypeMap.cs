@@ -19,7 +19,7 @@
         {
             if (info.ContainsGenericParameters)
                 return;            
-
+            
             /**
              * Create a new type definition
              * Add the type defintion to the dictionary of types
@@ -30,6 +30,7 @@
             {
                 TypeDefinition type = TypeDefinition.From(info);
                 Types.Add(info.ToString(), type);
+                // type.IsDefinedInUserProject = CheckNamespace.Invoke(type.Namespace);
                 if (parentId == null)
                     parentId = type.Parent;
                 // Process all type dependencies recursively for this type
@@ -40,9 +41,7 @@
                 // If this type uses type arguments ...<...> process those recursively too
                 if (parameters.Length > 0)
                     AddTypeArgumentsRecursive(parameters, type);
-            }
-            //else // Get a ref to the existing type definition     
-            //    type = Types[info.ToString()];                        
+            }                    
         }
 
         void AddTypeArgumentsRecursive(Type[] parameters, TypeDefinition type)

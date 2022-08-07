@@ -19,7 +19,7 @@ namespace Docshark.Test.Types
         }
 
         public static InterfaceModel GetInterfaceModel(string interfaceName)
-            => Docs.Builder.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Interfaces"]

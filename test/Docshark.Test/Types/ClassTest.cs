@@ -199,7 +199,7 @@ namespace Docshark.Test.Types
         //        .Member as ClassModel;
 
         public static ClassModel GetClassModel(string className)
-            => (ClassModel)(Docs.Builder.Models.Root
+            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Models.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]

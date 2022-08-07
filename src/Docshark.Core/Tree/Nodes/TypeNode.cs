@@ -7,13 +7,13 @@ using System.Text.Json;
 using Docshark.Core.Models.Lang.Types;
 using LoxSmoke.DocXml;
 
-namespace Docshark.Core.Tree
+namespace Docshark.Core.Tree.Nodes
 {
     /// <summary>
     /// A class that represents a defined type.
     /// </summary>
     public class TypeNode : Node
-    {        
+    {
         /// <summary>
         /// Information about the type this <see cref="TypeNode"/> represents.
         /// </summary>
@@ -25,7 +25,7 @@ namespace Docshark.Core.Tree
         /// <param name="parent">Parent node of this node.</param>
         /// <param name="member">Information about this type.</param>
         public TypeNode(Node parent, TypeMember<TypeInfo, TypeComments> member) : base(parent)
-            => Member = member;                    
+            => Member = member;
 
         /// <summary>
         /// Gets the short name of the current type.

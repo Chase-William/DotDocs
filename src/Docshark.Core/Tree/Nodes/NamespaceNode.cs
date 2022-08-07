@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using LoxSmoke.DocXml;
 using Docshark.Core.Models.Lang;
 using Docshark.Core.Models.Lang.Types;
+using coredep;
 
-namespace Docshark.Core.Tree
+namespace Docshark.Core.Tree.Nodes
 {
     /// <summary>
     /// Represents a namespace as a node.
@@ -35,7 +36,7 @@ namespace Docshark.Core.Tree
         /// <param name="parent">Node this node branches off of.</param>
         /// <param name="_namespace">Name as a string for this node.</param>
         public NamespaceNode(NamespaceNode parent, string _namespace) : base(parent)
-            => this._namespace = _namespace;        
+            => this._namespace = _namespace;
 
         /// <summary>
         /// Gets the namespace name.
@@ -90,7 +91,7 @@ namespace Docshark.Core.Tree
                 }
                 var typeNode = new TypeNodeNestable(this, member);
                 Types.Add(name, typeNode);
-               // Now iterate through nested type chain
+                // Now iterate through nested type chain
                 typeNode.AddType(segments[1..segments.Count], member);
                 return;
             }
@@ -102,6 +103,8 @@ namespace Docshark.Core.Tree
             segments = segments[1..segments.Count];
             Namespaces[name].AddType(segments, member);
         }
+
+        // public Class1 test;
 
         /// <summary>
         /// Begins the process of writing this <see cref="NamespaceNode"/> and all its <see cref="Namespaces"/> & <see cref="Types"/> to file.
@@ -119,13 +122,26 @@ namespace Docshark.Core.Tree
 
             // Create directory if needed
             Directory.CreateDirectory(Path.Combine(outputPath, JoinNamespaces(namespaces)));
-                    
+            var easy = Types.Values;
+            Node mnode;
             // Save namespaces recursively
             foreach (NamespaceNode node in Namespaces.Values)
                 node.Save(outputPath, namespaces, nestables);
-            // Save types recursively
-            foreach (Node node in Types.Values)
-                node.Save(outputPath, namespaces, nestables);
+            try
+            {
+                // Save types recursively
+                foreach (Node node in Types.Values)
+                {
+                    mnode = node;
+                    node.Save(outputPath, namespaces, nestables);
+                }
+            }            
+            catch (Exception ex)
+            {
+                // reading in types that are not in this assembly will mess things up homie as they've already been loaded
+                // maybe.. make and save this before doing it sub dependencies? idk
+                Console.WriteLine();
+            }
 
             // Pop this namespace when leaving as we are traversing back up the tree                   
             namespaces.Pop();

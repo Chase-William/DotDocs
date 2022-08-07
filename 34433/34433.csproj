@@ -2,15 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>_34433</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LoxSmoke.DocXml" Version="3.4.5" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\34433\34433.csproj" />
-    <ProjectReference Include="..\TransDep\TransDep.csproj" />
+    <ProjectReference Include="..\testsssss\testsssss.csproj" />
   </ItemGroup>
 </Project>

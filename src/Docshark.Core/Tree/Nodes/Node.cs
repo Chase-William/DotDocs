@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Docshark.Core.Models;
 using System.Reflection;
 
-namespace Docshark.Core.Tree
+namespace Docshark.Core.Tree.Nodes
 {
     /// <summary>
     /// The most basic building block of all node types.
@@ -35,7 +35,7 @@ namespace Docshark.Core.Tree
         /// <param name="outputPath">Location to write the node to.</param>
         /// <param name="namespaces">Namespace trace of this node.</param>
         /// <param name="nestables">Nestable trace of this node.</param>
-        public abstract void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables);       
+        public abstract void Save(string outputPath, Stack<string> namespaces, Stack<string> nestables);
 
         /// <summary>
         /// Joins namespaces into a path.
@@ -43,7 +43,7 @@ namespace Docshark.Core.Tree
         /// <param name="namespaces">To be joined.</param>
         /// <returns>Joined namespaces.</returns>
         protected static string JoinNamespaces(Stack<string> namespaces)
-            => string.Join('\\', namespaces.ToArray().Reverse());        
+            => string.Join('\\', namespaces.ToArray().Reverse());
 
         /// <summary>
         /// Joins nestables into a valid filename.

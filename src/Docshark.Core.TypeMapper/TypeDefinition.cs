@@ -15,8 +15,8 @@ namespace Docshark.Core.TypeMapper
         public string Namespace { get; set; }
         public string Module { get; set; }
         public string TypeName { get; set; }
-        public CommonComments Comments { get; set; }        
-
+        public CommonComments Comments { get; set; }
+        public bool IsDefinedInUserProject { get; set; }
         public static TypeDefinition From(Type info)
             => new()
             {

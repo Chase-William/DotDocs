@@ -56,6 +56,4 @@ namespace Docshark.Test.Data.Classes
     public class ArgumentedSuperBaseClass6 : ArgumentedSuperBaseClass7 { }
     public class ArgumentedSuperBaseClass7 : ArgumentedSuperBaseClass8 { }
     public class ArgumentedSuperBaseClass8 { }
-
-
 }

@@ -32,7 +32,7 @@ namespace Docshark.Test.Types
         }
 
         public static StructModel GetStructModel(string structName)
-            => Docs.Builder.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Structs"]

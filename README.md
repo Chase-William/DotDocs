@@ -87,6 +87,17 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 - Class HasGetter
 
 
-## Notes
+## Binlog Notes
 
-`Docshark.`
+### IncludeTransitiveProjectReferences
+
+This target allows the identification of which dependencies are transitive.
+
+### ResolveProjectReferences
+
+This target allows the idenficiation of which dependencies are based off local .csproj files. This is important because I can scope my documentation generation to only these assemblies. Therefore, all other sources of data can be classified as external and out of scope. Documentation for this external data will only have a comment for example and a link to another site where that documentation is located.
+
+### CoreCompile
+
+This target contains the directory to the .xml files and the .dll.
+

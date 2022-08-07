@@ -75,7 +75,7 @@ namespace Docshark.Test.Members
             => GetField(nameof(Boat), field);
 
         public FieldModel GetField(string className, string fieldName)
-            => (Docs.Builder.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]

@@ -1,5 +1,5 @@
 ﻿using Docshark.Core.Models.Lang.Types;
-using Docshark.Core.Tree;
+using Docshark.Core.Tree.Nodes;
 using Docshark.Test.Data.Delegates;
 using NUnit.Framework;
 using System;
@@ -46,7 +46,7 @@ namespace Docshark.Test.Types
         }
 
         public static DelegateModel GetDelegateModel(string delegateName)
-            => Docs.Builder.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Delegates"]
@@ -54,7 +54,7 @@ namespace Docshark.Test.Types
                 .Member as DelegateModel;
 
         public static DelegateModel GetNestedInClassDelegateModel(string className, string delegateName)
-         => (Docs.Builder.Models.Root
+         => (Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Delegates"]

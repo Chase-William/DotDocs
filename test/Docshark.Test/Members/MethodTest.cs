@@ -98,7 +98,7 @@ namespace Docshark.Test.Members
             => GetMethodModel(nameof(Data.Classes), nameof(Boat), methodName);        
 
         public MethodModel GetMethodModel(string _namespace, string className, string methodName)
-            => (Docs.Builder.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Models.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces[_namespace]

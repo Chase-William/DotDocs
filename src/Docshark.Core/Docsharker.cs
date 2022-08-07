@@ -1,6 +1,5 @@
 ﻿using System;
 using Docshark.Core.Exceptions;
-using Docshark.Core.Loaders;
 using Docshark.Core.Tree;
 
 namespace Docshark.Core
@@ -10,7 +9,7 @@ namespace Docshark.Core
     /// </summary>
     public class Docsharker : IDisposable
     {                
-        public Builder Builder { get; set; }       
+        public BuildManager Builder { get; set; }        
 
         /// <summary>
         /// Initializes a new instance of <see cref="Docshark"/> loaded with data.
@@ -18,18 +17,15 @@ namespace Docshark.Core
         /// <param name="csProjFile">csProject used for locating dependencies and dll/xml if needed.</param>
         /// <param name="outputPath">Location for JSON output.</param>
         public Docsharker(string csProjFile, string outputPath)
-            => Builder = new Builder(csProjFile, outputPath);                           
+            => Builder = new BuildManager(csProjFile, outputPath);                           
 
         /// <summary>
         /// Cleanup unmanaged resources linked with <see cref="Builder"/>.
         /// </summary>
         public void Dispose()
         {
-            if (Builder != null)
-            {
-                Builder.Dispose();
-                Builder = null;
-            }
+            Builder?.Dispose();
+            Builder = null;
         }
 
         public void Prepare()
