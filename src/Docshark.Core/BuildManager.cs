@@ -22,7 +22,7 @@ namespace Docshark.Core
         /// <summary>
         /// Folder that contains the project's namespace and type tree.
         /// </summary>
-        public const string PROJECT_STRUCTURE_FOLDER = "projects";
+        public const string PROJECT_STRUCTURE_FOLDER = "project";
         /// <summary>
         /// Folder that contains general metadata about the project.
         /// </summary>
