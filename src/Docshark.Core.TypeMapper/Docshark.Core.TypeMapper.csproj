@@ -9,8 +9,4 @@
   <ItemGroup>
     <PackageReference Include="LoxSmoke.DocXml" Version="3.4.5" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\34433\34433.csproj" />
-    <ProjectReference Include="..\TransDep\TransDep.csproj" />
-  </ItemGroup>
 </Project>

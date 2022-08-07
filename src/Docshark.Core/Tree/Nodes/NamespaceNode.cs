@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using LoxSmoke.DocXml;
 using Docshark.Core.Models.Lang;
 using Docshark.Core.Models.Lang.Types;
-using coredep;
 
 namespace Docshark.Core.Tree.Nodes
 {
@@ -103,8 +102,6 @@ namespace Docshark.Core.Tree.Nodes
             segments = segments[1..segments.Count];
             Namespaces[name].AddType(segments, member);
         }
-
-        // public Class1 test;
 
         /// <summary>
         /// Begins the process of writing this <see cref="NamespaceNode"/> and all its <see cref="Namespaces"/> & <see cref="Types"/> to file.

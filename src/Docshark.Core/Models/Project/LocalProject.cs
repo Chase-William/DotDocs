@@ -14,10 +14,25 @@ namespace Docshark.Core.Models.Project
     /// </summary>
     public sealed class LocalProject : Dependency, IDisposable
     {
+        /// <summary>
+        /// Just the project name with no extension.
+        /// </summary>
         public string ProjectName { get; set; }
+        /// <summary>
+        /// Directory where the .csproj file resides.
+        /// </summary>
         public string ProjectDirectory { get; set; }
+        /// <summary>
+        /// Just the file name.
+        /// </summary>
         public string ProjectFileName { get; set; }
+        /// <summary>
+        /// Just the file extension.
+        /// </summary>
         public string ProjectFileExt { get; set; }
+        /// <summary>
+        /// Entire path to file include name with extension.
+        /// </summary>
         public string ProjectPath { get; set; }        
 
         public ModelTree Models { get; set; }

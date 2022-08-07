@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\34433\34433.csproj" />
     <ProjectReference Include="..\..\src\Docshark.Core.TypeMapper\Docshark.Core.TypeMapper.csproj" />
   </ItemGroup>
 
