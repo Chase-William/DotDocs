@@ -1,5 +1,5 @@
-﻿using Docshark.Core.Models.Lang.Types;
-using Docshark.Core.Tree.Nodes;
+﻿using Docshark.Core.Mapper.Codebase.Nodes;
+using Docshark.Core.Models.Codebase.Types;
 using NUnit.Framework;
 
 namespace Docshark.Test.Types
@@ -87,7 +87,7 @@ namespace Docshark.Test.Types
         }
 
         public static ClassModel GetNestedPublicClassClassModel(string className)
-            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Codebase.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]
@@ -96,7 +96,7 @@ namespace Docshark.Test.Types
             .Types[className].Member;
 
         public static ClassModel GetNestedPrivateClassClassModel(string className)
-            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Codebase.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]

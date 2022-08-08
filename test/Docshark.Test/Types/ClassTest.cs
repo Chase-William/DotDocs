@@ -1,11 +1,6 @@
-﻿
-using NUnit.Framework;
-
-using Docshark.Core.Tree;
-using Docshark.Core.Models;
+﻿using NUnit.Framework;
 using Docshark.Test.Data.Classes;
-using System;
-using Docshark.Core.Models.Lang.Types;
+using Docshark.Core.Models.Codebase.Types;
 using Docshark.Test.Interfaces.Meta;
 
 namespace Docshark.Test.Types
@@ -199,7 +194,7 @@ namespace Docshark.Test.Types
         //        .Member as ClassModel;
 
         public static ClassModel GetClassModel(string className)
-            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (ClassModel)(Docs.Builder.ProjectManager.RootProject.Codebase.Root
                     .Namespaces["Test"]
                     .Namespaces["Data"]
                     .Namespaces["Classes"]

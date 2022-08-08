@@ -1,4 +1,4 @@
-﻿using Docshark.Core.Models.Lang.Types;
+﻿using Docshark.Core.Models.Codebase.Types;
 using Docshark.Test.Data.Structs;
 using NUnit.Framework;
 using System;
@@ -32,7 +32,7 @@ namespace Docshark.Test.Types
         }
 
         public static StructModel GetStructModel(string structName)
-            => Docs.Builder.ProjectManager.RootProject.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Structs"]

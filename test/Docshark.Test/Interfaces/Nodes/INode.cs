@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Docshark.Core.Tree.Nodes;
+using Docshark.Core.Mapper.Codebase.Nodes;
 
 namespace Docshark.Test.Interfaces.Nodes
 {

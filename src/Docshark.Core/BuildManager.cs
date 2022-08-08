@@ -1,15 +1,7 @@
-﻿using Docshark.Core.Exceptions;
-using Docshark.Core.Models.Project;
-using Docshark.Core.Tree;
-using Microsoft.Build.Logging.StructuredLogger;
+﻿using Docshark.Core.Models.Project;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Docshark.Core.Mapper.Codebase;
 
 namespace Docshark.Core
 {
@@ -36,7 +28,7 @@ namespace Docshark.Core
         /// <summary>
         /// A tree that contains all the local projects the root depends on.
         /// </summary>
-        public ProjectTree ProjectManager { get; private set; }
+        public ProjectMapper ProjectManager { get; private set; }
         
         public TypeMetaMapper TypeMapper { get; private set; }        
 
@@ -65,7 +57,7 @@ namespace Docshark.Core
 
         public void Prepare()
         {
-            ProjectManager = new ProjectTree();
+            ProjectManager = new ProjectMapper();
             // Prepare all .csproj files recursively
             ProjectManager.Prepare(rootProjectFile);
             // Build the project
@@ -75,12 +67,14 @@ namespace Docshark.Core
         public void Load()
         {            
             TypeMapper = new TypeMetaMapper();
-            ProjectManager.Load(ProjectManager.Assemblies, TypeMapper);          
+            ProjectManager.Load(ProjectManager.Assemblies, TypeMapper.AddType);
         }
 
         public void Make()
         {
-            ProjectManager.Save(ProjectStructureOutputDir);
+            Utility.CleanDirectory(ProjectStructureOutputDir);
+            Utility.CleanDirectory(MetadataPath);
+            ProjectManager.Save(ProjectStructureOutputDir, MetadataPath);
             TypeMapper.SaveTypes(MetadataPath);                
         }    
 

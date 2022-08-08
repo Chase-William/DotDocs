@@ -2,8 +2,8 @@
 using Docshark.Test.Data.Classes;
 using NUnit.Framework;
 using System.Linq;
-using Docshark.Core.Models.Lang.Members;
-using Docshark.Core.Models.Lang.Types;
+using Docshark.Core.Models.Codebase.Members;
+using Docshark.Core.Models.Codebase.Types;
 
 namespace Docshark.Test.Members
 {
@@ -270,7 +270,7 @@ namespace Docshark.Test.Members
             => GetPropertyModel(nameof(Data.Classes), nameof(Boat), prop);
 
         public PropertyModel GetPropertyModel(string _namespace, string className, string propName)
-            => (Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces[_namespace]

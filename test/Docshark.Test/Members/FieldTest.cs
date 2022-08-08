@@ -1,6 +1,6 @@
 ﻿using Docshark.Core.Models;
-using Docshark.Core.Models.Lang.Members;
-using Docshark.Core.Models.Lang.Types;
+using Docshark.Core.Models.Codebase.Members;
+using Docshark.Core.Models.Codebase.Types;
 using Docshark.Test.Data.Classes;
 using NUnit.Framework;
 using System;
@@ -75,7 +75,7 @@ namespace Docshark.Test.Members
             => GetField(nameof(Boat), field);
 
         public FieldModel GetField(string className, string fieldName)
-            => (Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]

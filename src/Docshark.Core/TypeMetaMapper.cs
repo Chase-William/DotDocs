@@ -1,16 +1,11 @@
-﻿using Docshark.Core.Models.Lang.Members;
-using Docshark.Core.Models.Lang.Types;
+﻿using Docshark.Core.Models.Codebase.Members;
+using Docshark.Core.Models.Codebase.Types;
 using LoxSmoke.DocXml;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Docshark.Core.TypeMapper;
-using Docshark.Core.Models.Lang;
+using Docshark.Core.Models.Codebase;
+using Docshark.Core.Global.Types;
 
 namespace Docshark.Core
 {
@@ -21,21 +16,25 @@ namespace Docshark.Core
     {
         public const string TYPE_META_MAPPER_FILENAME = "types.json";
 
-        TypeMap map = new TypeMap();
+        TypeMapper map = new TypeMapper();
 
         public TypeMetaMapper() { }
 
         public void SaveTypes(string outputPath)
-        {
-            Utility.CleanDirectory(outputPath);
+        {            
             using StreamWriter writer = new(Path.Combine(outputPath, TYPE_META_MAPPER_FILENAME));
             writer.Write(JsonSerializer.Serialize(map.Types.Values));
         }
 
-        public void Add(DelegateModel model)
-            => map.AddType(model.Meta);        
-
-        public void AddTypeMember<T>(T type) where T : TypeMember<TypeInfo, TypeComments>
+        /// <summary>
+        /// Adds given type and all dependent types to global type mapper if needed. 
+        /// IMPORTANT: This method will perform a deep analysis of all types used in any manner by this type. 
+        /// For example, types used in inheritance, encapsulated members, and even type arguments are analysed
+        /// and added to the type mapper if needed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
+        public void AddType<T>(T type) where T : TypeMember<TypeInfo, TypeComments>
         {
             if (type is IMemberContainable containable) // Class, Struct, Interface
             {                
@@ -51,17 +50,6 @@ namespace Docshark.Core
             }
             // Delegate
             map.AddType(type.Meta);
-        }
-
-        /// <summary>
-        /// Adds various types of an element that inherits and implements the contraints.
-        /// </summary>
-        /// <typeparam name="T">Type of model.</typeparam>
-        /// <param name="model">Instance of model.</param>
-        public void Add<T>(T model) where T : TypeMember<TypeInfo, TypeComments>, IMemberContainable
-        {
-            map.AddType(model.Meta);
-            AddMembers(model);
         }
 
         void AddMembers(IMemberContainable model)

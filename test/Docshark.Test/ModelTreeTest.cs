@@ -12,7 +12,7 @@ namespace Docshark.Test
         {
             Assert.AreEqual(
                 "IPowerable",
-                Docs.Builder.ProjectManager.RootProject.Models.Root
+                Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Interfaces"]
@@ -25,7 +25,7 @@ namespace Docshark.Test
         {
             Assert.AreEqual(
                 "EngineSize",
-                Docs.Builder.ProjectManager.RootProject.Models.Root
+                Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Enumerations"]

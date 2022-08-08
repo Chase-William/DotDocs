@@ -1,4 +1,4 @@
-﻿using Docshark.Core.Models.Lang.Types;
+﻿using Docshark.Core.Models.Codebase.Types;
 using Docshark.Test.Data.Interfaces;
 using NUnit.Framework;
 
@@ -19,7 +19,7 @@ namespace Docshark.Test.Types
         }
 
         public static InterfaceModel GetInterfaceModel(string interfaceName)
-            => Docs.Builder.ProjectManager.RootProject.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Interfaces"]

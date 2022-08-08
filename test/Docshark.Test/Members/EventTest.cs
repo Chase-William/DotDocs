@@ -1,8 +1,8 @@
 ﻿using Docshark.Test.Data.Classes;
 using NUnit.Framework;
 using System.Linq;
-using Docshark.Core.Models.Lang.Members;
-using Docshark.Core.Models.Lang.Types;
+using Docshark.Core.Models.Codebase.Members;
+using Docshark.Core.Models.Codebase.Types;
 
 namespace Docshark.Test.Members
 {
@@ -73,7 +73,7 @@ namespace Docshark.Test.Members
             => GetEvent(nameof(Boat), eventName);
 
         public EventModel GetEvent(string className, string eventName)
-            => (Docs.Builder.ProjectManager.RootProject.Models.Root
+            => (Docs.Builder.ProjectManager.RootProject.Codebase.Root
                 .Namespaces["Test"]
                 .Namespaces["Data"]
                 .Namespaces["Classes"]

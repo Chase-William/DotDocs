@@ -1,4 +1,4 @@
-﻿using Docshark.Core.Tree.Nodes;
+﻿using Docshark.Core.Mapper.Codebase.Nodes;
 using Docshark.Test.Interfaces.Nodes;
 using NUnit.Framework;
 using System;
@@ -117,7 +117,7 @@ namespace Docshark.Test
         //}
 
         public TypeNodeNestable GetNodeType(string name)
-            => Docs.Builder.ProjectManager.RootProject.Models.Root
+            => Docs.Builder.ProjectManager.RootProject.Codebase.Root
                .Namespaces["Test"]
                .Namespaces["Data"]
                .Namespaces["Classes"]

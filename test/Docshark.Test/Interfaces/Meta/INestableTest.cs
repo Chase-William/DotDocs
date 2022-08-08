@@ -1,4 +1,4 @@
-﻿using Docshark.Core.Models.Lang.Types;
+﻿using Docshark.Core.Models.Codebase.Types;
 using System;
 using System.Linq;
 using System.Reflection;
