@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Docshark.Core.Mapper.Codebase;
-using Docshark.Core.Models.Codebase;
 using Docshark.Core.Models.Codebase.Types;
 using LoxSmoke.DocXml;
 
@@ -31,18 +24,19 @@ namespace Docshark.Core.Models.Project
         /// </summary>
         public string ProjectFileName { get; set; }
         /// <summary>
-        /// Just the file extension.
-        /// </summary>
-        public string ProjectFileExt { get; set; }
-        /// <summary>
         /// Entire path to file include name with extension.
         /// </summary>
         public string ProjectPath { get; set; }
+        /// <summary>
+        /// Collection of all <see cref="LocalProject"/> dependencies.
+        /// </summary>   
+        public List<LocalProject> LocalProjects { get; set; }
 
         [JsonIgnore]
         public CodebaseMapper Codebase { get; set; }
 
-        public LocalProject[] LocalProjects { get; set; }
+
+        //ILocalProject[] ILocalProject.LocalProjects => throw new NotImplementedException();
 
         MetadataLoadContext mlc;
         bool isRendered;
@@ -76,15 +70,16 @@ namespace Docshark.Core.Models.Project
             if (mlc != null)
                 Dispose();
             mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
+            Assembly = mlc.LoadFromAssemblyPath(AssemblyLoadPath);
             Codebase = CodebaseMapper.Builder.Build(
-                mlc.LoadFromAssemblyPath(AssemblyPath), 
+                Assembly, 
                 DocumentationPath,
                 getTypeCallback);          
         }
 
         public void Save(string baseOutputPath)
         {
-            foreach (var proj in LocalProjects)            
+            foreach (var proj in LocalProjects)
                 proj.Save(baseOutputPath);                            
             if (!isRendered)
             {

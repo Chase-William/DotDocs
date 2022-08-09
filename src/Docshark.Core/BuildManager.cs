@@ -30,7 +30,7 @@ namespace Docshark.Core
         /// </summary>
         public ProjectMapper ProjectManager { get; private set; }
         
-        public TypeMetaMapper TypeMapper { get; private set; }        
+        public MetaManager TypeMapper { get; private set; }        
 
         /// <summary>
         /// Path to .csproj.
@@ -66,8 +66,9 @@ namespace Docshark.Core
 
         public void Load()
         {            
-            TypeMapper = new TypeMetaMapper();
+            TypeMapper = new MetaManager();
             ProjectManager.Load(ProjectManager.Assemblies, TypeMapper.AddType);
+            TypeMapper.AddProjects(ProjectManager.RootProject);
         }
 
         public void Make()
@@ -75,7 +76,7 @@ namespace Docshark.Core
             Utility.CleanDirectory(ProjectStructureOutputDir);
             Utility.CleanDirectory(MetadataPath);
             ProjectManager.Save(ProjectStructureOutputDir, MetadataPath);
-            TypeMapper.SaveTypes(MetadataPath);                
+            TypeMapper.Save(MetadataPath);                
         }    
 
         public void Dispose()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +12,8 @@ namespace Docshark.Core.Models.Project
     /// </summary>
     public class Dependency
     {
-        public string AssemblyName { get; set; }
-        public string AssemblyPath { get; set; }        
+        public Assembly Assembly { get; set; }
+        public string AssemblyLoadPath { get; set; }        
         public string? DocumentationPath { get; set; }
     }
 }

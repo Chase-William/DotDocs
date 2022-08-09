@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Docshark.Core.Global.Types\Docshark.Core.Global.Types.csproj" />
-    <ProjectReference Include="..\..\src\Docshark.Core.TypeMapper\Docshark.Core.Global.Types.csproj" />
+    <ProjectReference Include="..\..\src\Docshark.Core.Global.Projects\Docshark.Core.Global.csproj" />
+    <ProjectReference Include="..\..\src\Docshark.Core.Global\Docshark.Core.Global.csproj" />
   </ItemGroup>
 
 </Project>

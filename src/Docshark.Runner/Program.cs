@@ -26,6 +26,10 @@ namespace Docshark.Runner
             //Run(csProjFile: @"C:\Dev\Docshark.Core\test\Docshark.Test.Data\Docshark.Test.Data.csproj",
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
 
+            // Test for project tree serialization (has complex local project dependency setup)
+            //Run(@"C:\Dev\Docshark.Core\test\Docshark.Test.Mapper.Project.Data\ProjectA\ProjectA.csproj",
+            //    @"C:\Users\Chase Roth\Desktop");
+
             // Test test library
             Run(csProjFile: @"C:\Dev\Docshark.Core\src\Docshark.Core\Docshark.Core.csproj",
                 outputPath: @"C:\Users\Chase Roth\Desktop");

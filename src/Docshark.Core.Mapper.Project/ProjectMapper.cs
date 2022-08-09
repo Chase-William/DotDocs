@@ -19,7 +19,6 @@ namespace Docshark.Core.Models.Project
     {
         const string PROJECT_NAME = "ProjectName";
         const string PROJECT_DIR = "ProjectDir";
-        const string PROJECT_EXT = "ProjectExt";
         const string PROJECT_FILE_NAME = "ProjectFileName";
         const string PROJECT_PATH = "ProjectPath";
         const string TARGET_FILE_NAME = "TargetName";
@@ -44,13 +43,8 @@ namespace Docshark.Core.Models.Project
         /// <param name="projectOutPath">Base location for project model tree.</param>
         /// <param name="metadataOutPath">Location for project tree.</param>
         public void Save(string projectOutPath, string metadataOutPath)
-        {
-            using var writer = new StreamWriter(Path.Combine(metadataOutPath, "project-tree.json"));           
-            writer.Write(JsonSerializer.Serialize(this));
-                        
-            RootProject.Save(projectOutPath);
-        }
-
+            => RootProject.Save(projectOutPath);
+        
         /// <summary>
         /// Prepares given and all dependent .csproj files recursively for further processing.
         /// </summary>
@@ -225,8 +219,7 @@ namespace Docshark.Core.Models.Project
             {
                 return p.Name switch
                 {
-                    PROJECT_DIR or 
-                    PROJECT_EXT or 
+                    PROJECT_DIR or
                     PROJECT_FILE_NAME or 
                     PROJECT_PATH or 
                     TARGET_FILE_NAME or 
@@ -244,11 +237,9 @@ namespace Docshark.Core.Models.Project
             {
                 ProjectName = properties[PROJECT_NAME].Value,
                 ProjectDirectory = projDir,
-                ProjectFileExt = properties[PROJECT_EXT].Value,
                 ProjectFileName = properties[PROJECT_FILE_NAME].Value,
                 ProjectPath = properties[PROJECT_PATH].Value,
-                AssemblyName = properties[TARGET_FILE_NAME].Value,
-                AssemblyPath = properties[TARGET_PATH].Value,
+                AssemblyLoadPath = properties[TARGET_PATH].Value,
                 DocumentationPath = Path.Combine(projDir, properties[DOCUMENTATION_FILE].Value),
                 LocalProjects = GetLocalProjects(projectEval, existingProjects)
             };
@@ -261,12 +252,12 @@ namespace Docshark.Core.Models.Project
         /// <param name="projectEval">Current project.</param>
         /// <param name="existingProjects">Contains a collection of all already loaded <see cref="LocalProject"/> to prevent duplicate instances.</param>
         /// <returns>All <see cref="LocalProject"/> dependencies of the current.</returns>
-        LocalProject[] GetLocalProjects(ProjectEvaluation projectEval, List<LocalProject> existingProjects)
+        List<LocalProject> GetLocalProjects(ProjectEvaluation projectEval, List<LocalProject> existingProjects)
         {
             var items = projectEval.FindChild<Folder>("Items");
-            var addItems = items.FindChild<AddItem>("ProjectReference");            
+            var addItems = items.FindChild<AddItem>("ProjectReference");
             if (addItems == null || addItems.Children.Count == 0)
-                return Array.Empty<LocalProject>();
+                return new List<LocalProject>();
 
             IEnumerable<string> projectFileNames = addItems.Children.Cast<Item>().Select(p => p.Text[(p.Text.LastIndexOf('\\') + 1)..]);
             var eval = (TimedNode)projectEval.Parent;
@@ -301,7 +292,7 @@ namespace Docshark.Core.Models.Project
             //}
             //while ((current = msbuild.FindNextChild<Microsoft.Build.Logging.StructuredLogger.Project>(current)) != null);
 
-            return projects.ToArray();
+            return projects;
 
             //var task = target.FindChild<Microsoft.Build.Logging.StructuredLogger.Task>("MSBuild");
             //var projects = task.FindChildrenRecursive<Project>();
@@ -318,7 +309,7 @@ namespace Docshark.Core.Models.Project
             project.Load(assemblies, getTypeCallback);
             // Visit the lowest level assembly and load it's info before loading higher level assemblies
             foreach (var proj in project.LocalProjects)
-                LoadRecursive(proj, assemblies, getTypeCallback);            
+                LoadRecursive((LocalProject)proj, assemblies, getTypeCallback);            
         }
 
         /// <summary>
@@ -331,7 +322,7 @@ namespace Docshark.Core.Models.Project
             static void DisposeNext(LocalProject project)
             {
                 foreach (var proj in project.LocalProjects)
-                    DisposeNext(proj);
+                    DisposeNext((LocalProject)proj);
                 project.Dispose();
             }
         }

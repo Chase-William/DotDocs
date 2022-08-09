@@ -7,7 +7,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProjectG\ProjectG.csproj" />
-    <ProjectReference Include="..\ProjectH\ProjectH.csproj" />
+    <PackageReference Include="LoxSmoke.DocXml" Version="3.4.5" />
   </ItemGroup>
 </Project>

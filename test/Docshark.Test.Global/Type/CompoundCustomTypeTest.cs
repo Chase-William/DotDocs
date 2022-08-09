@@ -27,26 +27,26 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures direct parents of the compound types are added.")]
         public void DirectTypeParentAdded()
         {
-            Assert.NotNull(map.Types[argumentedClass.ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[argumentedClass.ToString()].Parent);
         }
 
         [Test(Description = "Ensures type dependencies of the compound type's parent are added. This excludes arguments.")]
         public void InDirectParentTypesAdded()
         {
-            Assert.IsTrue(map.Types.ContainsKey(typeof(object).ToString()));
+            Assert.IsTrue(map.MappedDefinitions.ContainsKey(typeof(object).ToString()));
         }
 
         [Test(Description = "Ensures indirect parents of the compound types are added.")]
         public void InDirectTypeParentsAdded()
         {
-            Assert.IsNull(map.Types[typeof(object).ToString()].Parent);
-            Assert.NotNull(map.Types[typeof(ParentClass).ToString()].Parent);
+            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[typeof(ParentClass).ToString()].Parent);
         }
 
         [Test(Description = "Ensures compound types themselves are added.")]
         public void TypeAdded()
         {
-            Assert.IsTrue(map.Types.ContainsKey(argumentedClass.ToString()));
+            Assert.IsTrue(map.MappedDefinitions.ContainsKey(argumentedClass.ToString()));
         }
 
         #endregion
@@ -56,29 +56,29 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures direct type arguments are added.")]
         public void DirectTypeArgumentsAddedToDictionary()
         {
-            Assert.NotNull(map.Types[typeof(LeftArgument).ToString()]);
-            Assert.NotNull(map.Types[typeof(RightArgument).ToString()]);
+            Assert.NotNull(map.MappedDefinitions[typeof(LeftArgument).ToString()]);
+            Assert.NotNull(map.MappedDefinitions[typeof(RightArgument).ToString()]);
         }
 
         [Test(Description = "Ensures type arguments are added to the type argument list of the respective compound type.")]
         public void TypeArgumentsAddedToArgumentList()
         {
-            Assert.NotNull(map.Types[argumentedClass.ToString()].TypeArguments.Contains(typeof(LeftArgument).ToString()));
-            Assert.NotNull(map.Types[argumentedClass.ToString()].TypeArguments.Contains(typeof(RightArgument).ToString()));
+            Assert.NotNull(map.MappedDefinitions[argumentedClass.ToString()].TypeArguments.Contains(typeof(LeftArgument).ToString()));
+            Assert.NotNull(map.MappedDefinitions[argumentedClass.ToString()].TypeArguments.Contains(typeof(RightArgument).ToString()));
         }
 
         [Test(Description = "Ensures indirect type arguments are added.")]
         public void InDirectTypeArgumentsAddedToDictionary()
         {
-            Assert.NotNull(map.Types[typeof(LeftArgumentParent).ToString()]);
-            Assert.NotNull(map.Types[typeof(object).ToString()]);
+            Assert.NotNull(map.MappedDefinitions[typeof(LeftArgumentParent).ToString()]);
+            Assert.NotNull(map.MappedDefinitions[typeof(object).ToString()]);
         }
 
         [Test(Description = "Ensures type arguments are not duplicated.")]
         public void TypeArgumentNotDuplicated()
         {
-            Assert.AreEqual(2, map.Types[argumentedClass.ToString()].TypeArguments.Count);
-            Assert.AreEqual(0, map.Types[childOfArgumentedClass.ToString()].TypeArguments.Count);
+            Assert.AreEqual(2, map.MappedDefinitions[argumentedClass.ToString()].TypeArguments.Count);
+            Assert.AreEqual(0, map.MappedDefinitions[childOfArgumentedClass.ToString()].TypeArguments.Count);
         }
 
         #endregion

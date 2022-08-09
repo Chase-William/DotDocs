@@ -6,7 +6,7 @@ This library is the supporting library for Docshark which provides .NET develope
 
 ```mermaid
 graph TD;
-Docshark.Core-->Docshark.Core.Global.Types;
+Docshark.Core-->Docshark.Core.Global;
 Docshark.Core-->Docshark.Core.Mapper.Project;
 Docshark.Core.Mapper.Project-->Docshark.Core.Models.Project;
 Docshark.Core.Models.Project-->Docshark.Core.Mapper.Codebase;
@@ -20,7 +20,7 @@ Docshark.Runner-->Docshark.Core;
 - `Docshark.Core.Models.Project` | Contains models that represent *.csproj* files and provides functionalities to interact with them *(in memory & on disk)*
 - `Docshark.Core.Mapper.Codebase` | Main hub for codebase representation and organizes the codebase models into a tree like data structure
 - `Docshark.Core.Models.Codebase` |  Contains models that represent the codebase's individual entities
-- `Docshark.Core.Global.Types` | Manages a global dictionary that contains all types from every project and provides lookup functionalities
+- `Docshark.Core.Global` | Manages a global system that link types, assemblies, and projects together.
 
 
 #### Types
