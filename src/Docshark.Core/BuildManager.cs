@@ -18,7 +18,7 @@ namespace Docshark.Core
         /// <summary>
         /// Folder that contains general metadata about the project.
         /// </summary>
-        public const string META_FOLDER = "meta";
+        public const string GLOBAL_META_FOLDER = "global";
 
         /// <summary>
         /// A tree that organizes all types by their namespaces / encapsulating type if nested.
@@ -39,7 +39,7 @@ namespace Docshark.Core
 
         string RootPath => Path.Combine(outputPath, DOCSHARK_CORE_ROOT_FOLDER);
         string ProjectStructureOutputDir => Path.Combine(RootPath, PROJECT_STRUCTURE_FOLDER);
-        string MetadataPath => Path.Combine(RootPath, META_FOLDER);
+        string MetadataPath => Path.Combine(RootPath, GLOBAL_META_FOLDER);
 
         /// <summary>
         /// Contains all reflection based metadata.
