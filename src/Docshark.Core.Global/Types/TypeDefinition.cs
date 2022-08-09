@@ -13,8 +13,7 @@ namespace Docshark.Core.Global.Types
     /// Represents a type in a codebase that is linked to a specific project.
     /// </summary>
     public class TypeDefinition : Definition
-    {
-        public override string PrimaryKey => TypeDescription;
+    {        
         /// <summary>
         /// A primary key identifying the parent type.
         /// </summary>
@@ -30,8 +29,7 @@ namespace Docshark.Core.Global.Types
         /// <summary>
         /// Comments written about this type.
         /// </summary>
-        public CommonComments Comments { get; set; }
-        [JsonIgnore]
+        public CommonComments Comments { get; set; }        
         /// <summary>
         /// The namespace to the type with the type name and all type arguments if present.
         /// </summary>
@@ -67,5 +65,11 @@ namespace Docshark.Core.Global.Types
                 AssemblyForeignKey = info.Assembly.GetPrimaryKey()
             };
         }
+
+        public override string GetPrimaryKey() 
+            => TypeDescription;
+
+        internal static string GetPrimaryKeyMemberName()
+            => nameof(TypeDescription);
     }
 }

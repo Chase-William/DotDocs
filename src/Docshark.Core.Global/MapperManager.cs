@@ -16,11 +16,31 @@ namespace Docshark.Core.Global
         public AssemblyMapper AssemblyMap { get; init; }
         public ProjectMapper ProjectMap { get; init; }
 
+        /// <summary>
+        /// A map of the primary keys for each type.
+        /// </summary>
+        PrimaryKeyMap[] PrimaryKeyMap = new PrimaryKeyMap[3];
+
         public MapperManager()
         {
             AssemblyMap = new();
             TypeMap = new(AssemblyMap);
             ProjectMap = new(AssemblyMap);
+            PrimaryKeyMap[0] = new PrimaryKeyMap
+            {
+                DefinitionTypeName = nameof(TypeDefinition),
+                PrimaryKeyName = TypeDefinition.GetPrimaryKeyMemberName()
+            };
+            PrimaryKeyMap[1] = new PrimaryKeyMap
+            {
+                DefinitionTypeName = nameof(AssemblyDefinition),
+                PrimaryKeyName = AssemblyDefinition.GetPrimaryKeyMemberName()
+            };
+            PrimaryKeyMap[2] = new PrimaryKeyMap
+            {
+                DefinitionTypeName = nameof(ProjectDefinition),
+                PrimaryKeyName = ProjectDefinition.GetPrimaryKeyMemberName()
+            };
         }
 
         public void Save(string baseOutputPath)
@@ -37,6 +57,9 @@ namespace Docshark.Core.Global
                 baseOutputPath,
                 ProjectMapper.PROJECT_MAPPER_FILENAME,
                 ProjectMap.MappedDefinitions.Values);
+            // Save map for primary keys
+            using var writer = new StreamWriter(Path.Combine(baseOutputPath, "_keys.json"));
+            writer.Write(JsonSerializer.Serialize(PrimaryKeyMap));
         }
     }
 }

@@ -71,9 +71,9 @@ namespace Docshark.Core.Global.Types
             foreach (var param in parameters)
             {
                 // Ensure each one and it's dependencies are accounted for
-                AddTypeRecursive(param, type.PrimaryKey);
+                AddTypeRecursive(param, type.GetPrimaryKey());
                 // Once accounted for, add the type to the list of arguments for the given type
-                type.TypeArguments.Add(MappedDefinitions[param.GetPrimaryKey()].PrimaryKey);
+                type.TypeArguments.Add(MappedDefinitions[param.GetPrimaryKey()].GetPrimaryKey());
             }
         }
     }

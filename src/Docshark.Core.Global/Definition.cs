@@ -14,6 +14,6 @@ namespace Docshark.Core.Global
         /// <summary>
         /// The primary identifer (id) for a <see cref="Definition"/>.
         /// </summary>
-        public abstract string PrimaryKey { get; }
+        public abstract string GetPrimaryKey();
     }
 }

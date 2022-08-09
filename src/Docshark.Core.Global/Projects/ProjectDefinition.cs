@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Docshark.Core.Global.Projects
@@ -14,7 +15,6 @@ namespace Docshark.Core.Global.Projects
     /// </summary>
     public class ProjectDefinition : Definition
     {
-        public override string PrimaryKey => ProjectName;
         /// <summary>
         /// The name of the project.
         /// </summary>
@@ -51,8 +51,14 @@ namespace Docshark.Core.Global.Projects
                 LocalProjectDependencies = projectDependencyNames
             };
             // Update the assembly this project produces to link back to this project using its key
-            asmMapper.MappedDefinitions[assembly.GetPrimaryKey()].ProjectForeignKey = proj.PrimaryKey;
+            asmMapper.MappedDefinitions[assembly.GetPrimaryKey()].ProjectForeignKey = proj.GetPrimaryKey();
             return proj;
         }
+
+        public override string GetPrimaryKey() 
+            => ProjectName;
+
+        internal static string GetPrimaryKeyMemberName()
+            => nameof(ProjectName);
     }
 }

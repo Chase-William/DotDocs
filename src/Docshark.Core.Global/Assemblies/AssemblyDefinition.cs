@@ -9,16 +9,20 @@ using System.Threading.Tasks;
 namespace Docshark.Core.Global.Assemblies
 {
     public class AssemblyDefinition : Definition
-    {
-        public override string PrimaryKey => Name;
-        [JsonIgnore]
-        public string Name { get; set; }
+    {          
+        public string AssemblyName { get; set; }
         public string ProjectForeignKey { get; set; }
 
         public static AssemblyDefinition From(Assembly assembly, string? name = null)
             => new()
             {
-                Name = name ?? assembly.GetPrimaryKey()
+                AssemblyName = name ?? assembly.GetPrimaryKey()
             };
+
+        public override string GetPrimaryKey() 
+            => AssemblyName;
+
+        internal static string GetPrimaryKeyMemberName()
+            => nameof(AssemblyName);
     }
 }
