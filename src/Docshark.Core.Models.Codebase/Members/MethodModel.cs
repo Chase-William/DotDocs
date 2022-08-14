@@ -65,7 +65,7 @@ namespace Docshark.Core.Models.Codebase.Members
             Parameters = ((IFunctional)this).GetParameters(member);
 
             MethodType = GetSignature(Meta);
-            SetType(MethodType);   
+            Type = TypeKey.From(MethodType);
         }       
     }
 }

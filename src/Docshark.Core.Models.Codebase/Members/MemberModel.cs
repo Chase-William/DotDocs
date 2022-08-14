@@ -7,20 +7,8 @@ namespace Docshark.Core.Models.Codebase.Members
         where T1 : MemberInfo
         where T2 : CommonComments
     {        
-        public TypeKey Type { get; private set; }
+        public TypeKey Type { get; protected set; }
 
-        protected MemberModel(T1 member) : base(member) { }
-        
-        protected void SetType(Type info)
-        {
-            Type = new TypeKey
-            {
-                ForeignKey = info.GetPrimaryKey()
-            };
-
-            // If the type is generic, mark the typekey as generic
-            if (info.IsGenericTypeDefinition)
-                Type.IsGeneric = true;            
-        }
+        protected MemberModel(T1 member) : base(member) { }        
     }
 }

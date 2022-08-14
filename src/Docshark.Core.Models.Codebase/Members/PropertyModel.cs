@@ -95,7 +95,7 @@ namespace Docshark.Core.Models.Codebase.Members
 
         public PropertyModel(PropertyInfo prop) : base(prop)
         {
-            SetType(prop.PropertyType);
+            Type = TypeKey.From(prop.PropertyType);
         }
     }
 }

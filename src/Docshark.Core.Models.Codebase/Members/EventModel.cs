@@ -20,7 +20,7 @@ namespace Docshark.Core.Models.Codebase.Members
 
         public EventModel(EventInfo member) : base(member)
         {
-            SetType(member.EventHandlerType);
+            Type = TypeKey.From(member.EventHandlerType);
         }
     }
 }

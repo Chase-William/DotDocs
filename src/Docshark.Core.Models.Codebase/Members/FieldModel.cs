@@ -19,7 +19,7 @@ namespace Docshark.Core.Models.Codebase.Members
 
         public FieldModel(FieldInfo member) : base(member)
         {
-            SetType(member.FieldType);
+            Type = TypeKey.From(member.FieldType);
         }
     }
 }
