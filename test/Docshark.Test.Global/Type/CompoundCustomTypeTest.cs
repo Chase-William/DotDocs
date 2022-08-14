@@ -27,7 +27,7 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures direct parents of the compound types are added.")]
         public void DirectTypeParentAdded()
         {
-            Assert.NotNull(map.MappedDefinitions[argumentedClass.ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[argumentedClass.ToString()].BaseType);
         }
 
         [Test(Description = "Ensures type dependencies of the compound type's parent are added. This excludes arguments.")]
@@ -39,8 +39,8 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures indirect parents of the compound types are added.")]
         public void InDirectTypeParentsAdded()
         {
-            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(ParentClass).ToString()].Parent);
+            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(ParentClass).ToString()].BaseType);
         }
 
         [Test(Description = "Ensures compound types themselves are added.")]

@@ -1,13 +1,14 @@
 ﻿using System.Reflection;
 using Docshark.Core.Models.Codebase;
 using LoxSmoke.DocXml;
+using Docshark.Core.Models;
 
 namespace Docshark.Core.Models.Codebase.Members
 {
     /// <summary>
     /// 
     /// </summary>
-    public class PropertyModel : Model<PropertyInfo, CommonComments>, IAccessible
+    public class PropertyModel : MemberModel<PropertyInfo, CommonComments>, IAccessible
     {
         #region Individual Get & Set Info
         public bool HasGetter => Meta.CanRead;
@@ -53,7 +54,6 @@ namespace Docshark.Core.Models.Codebase.Members
                 return Meta.SetMethod.IsAssembly || Meta.SetMethod.IsFamilyOrAssembly;
             }
         }
-        //public MethodInfo Test => Meta.GetMethod;
         #endregion            
 
         #region Overall Info
@@ -72,8 +72,7 @@ namespace Docshark.Core.Models.Codebase.Members
         /// </summary>
         public bool IsAbstract
             => ((Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.GetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false)) ||
-               ((Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));
-        public override string Type => Meta.PropertyType.ToString();
+               ((Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Abstract) ?? false) && (Meta.SetMethod?.Attributes.HasFlag(MethodAttributes.Virtual) ?? false));        
 
         #region IAccessible
         /// <summary>
@@ -94,6 +93,9 @@ namespace Docshark.Core.Models.Codebase.Members
         #endregion
         #endregion
 
-        public PropertyModel(PropertyInfo prop) : base(prop) { }
+        public PropertyModel(PropertyInfo prop) : base(prop)
+        {
+            SetType(prop.PropertyType);
+        }
     }
 }

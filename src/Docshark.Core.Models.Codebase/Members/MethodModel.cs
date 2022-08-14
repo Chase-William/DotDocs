@@ -11,21 +11,21 @@ using System.Linq.Expressions;
 
 namespace Docshark.Core.Models.Codebase.Members
 {
-    public class MethodModel : Model<MethodInfo, CommonComments>, IFunctional, IAccessible
+    public class MethodModel : MemberModel<MethodInfo, CommonComments>, IFunctional, IAccessible
     {
-        private bool triedToGetType;
-        public override string? Type
-        {
-            get
-            {
-                if (triedToGetType)
-                    return MethodType?.ToString();
+        //private bool triedToGetType;
+        //public override string? Type
+        //{
+        //    get
+        //    {
+        //        if (triedToGetType)
+        //            return MethodType?.ToString();
 
-                triedToGetType = true;
-                MethodType = GetSignature(Meta);
-                return MethodType?.ToString();
-            }
-        }
+        //        triedToGetType = true;
+        //        MethodType = GetSignature(Meta);
+        //        return MethodType?.ToString();
+        //    }
+        //}
         [System.Text.Json.Serialization.JsonIgnore]
         public Type? MethodType { get; private set; }
 
@@ -61,6 +61,11 @@ namespace Docshark.Core.Models.Codebase.Members
         #endregion
 
         public MethodModel(MethodInfo member) : base(member)
-            => Parameters = ((IFunctional)this).GetParameters(member);        
+        {
+            Parameters = ((IFunctional)this).GetParameters(member);
+
+            MethodType = GetSignature(Meta);
+            SetType(MethodType);   
+        }       
     }
 }

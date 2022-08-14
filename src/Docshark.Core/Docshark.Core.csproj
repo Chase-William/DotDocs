@@ -10,6 +10,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Docshark.Core.Global\Docshark.Core.Global.csproj" />
-    <ProjectReference Include="..\Docshark.Core.Mapper.Project\Docshark.Core.Mapper.Project.csproj" />
   </ItemGroup>
 </Project>

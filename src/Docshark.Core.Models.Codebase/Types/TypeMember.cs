@@ -33,6 +33,8 @@ namespace Docshark.Core.Models.Codebase.Types
         /// </summary>
         public string Parent => Meta.BaseType?.ToString();
 
+        public abstract string Type { get; }
+
         #region IAccessible
         /// <summary>
         /// Denotes if this type is public.

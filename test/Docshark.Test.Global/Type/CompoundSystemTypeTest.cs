@@ -47,17 +47,17 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures direct parents of the compound types are added.")]
         public void DirectTypeParentAdded()
         {
-            Assert.NotNull(map.MappedDefinitions[action.ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[func.ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[dict.ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[action.ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[func.ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[dict.ToString()].BaseType);
         }
 
         [Test(Description = "Ensures indirect parents of the compound types are added.")]
         public void InDirectTypeParentsAdded()
         {
-            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(Delegate).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(MulticastDelegate).ToString()].Parent);
+            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(Delegate).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(MulticastDelegate).ToString()].BaseType);
         }
 
         #endregion

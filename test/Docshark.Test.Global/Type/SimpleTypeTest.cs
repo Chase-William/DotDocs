@@ -34,15 +34,15 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures direct parent types are added.")]
         public void DirectTypeParentAdded()
         {
-            Assert.NotNull(map.MappedDefinitions[typeof(string).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(int).ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[typeof(string).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(int).ToString()].BaseType);
         }
 
         [Test(Description = "Ensures indirect parent types are added.")]
         public void InDirectTypeParentsAdded()
         {
-            Assert.NotNull(map.MappedDefinitions[typeof(ValueType).ToString()].Parent);
-            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[typeof(ValueType).ToString()].BaseType);
+            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].BaseType);
         }
     }
 }

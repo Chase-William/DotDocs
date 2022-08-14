@@ -1,4 +1,5 @@
 ﻿using Docshark.Core.Global.Assemblies;
+using Docshark.Core.Models;
 using System.Text.Json;
 
 namespace Docshark.Core.Global.Types
@@ -30,15 +31,15 @@ namespace Docshark.Core.Global.Types
             if (MappedDefinitions.ContainsKey(info.GetPrimaryKey()))
                 return;
 
-            if (info.ContainsGenericParameters)
-                return;
+            //if (info.ContainsGenericParameters)
+            //{
+            //    return;
+            //}
             AddTypeRecursive(info);
         }
 
         void AddTypeRecursive(Type info, string? parentId = null)
         {
-            if (info.ContainsGenericParameters)
-                return;
 
             var pk = info.GetPrimaryKey();
             /*
@@ -53,7 +54,7 @@ namespace Docshark.Core.Global.Types
                 mappedDefinitions.Add(pk, type);
                 // type.IsDefinedInUserProject = CheckNamespace.Invoke(type.Namespace);
                 if (parentId == null)
-                    parentId = type.Parent;
+                    parentId = type.BaseType;
                 // Process all type dependencies recursively for this type
                 if (info.BaseType != null)                
                     AddTypeRecursive(info.BaseType, info.BaseType.GetPrimaryKey());
@@ -70,6 +71,9 @@ namespace Docshark.Core.Global.Types
             // Process all type parameters defined
             foreach (var param in parameters)
             {
+                // Generic type params like T1 & T2 need to be handled differently
+                if (param.ContainsGenericParameters)
+                    return;
                 // Ensure each one and it's dependencies are accounted for
                 AddTypeRecursive(param, type.GetPrimaryKey());
                 // Once accounted for, add the type to the list of arguments for the given type

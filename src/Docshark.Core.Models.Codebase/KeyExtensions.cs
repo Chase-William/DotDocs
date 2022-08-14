@@ -5,9 +5,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docshark.Core.Global
+// in own library?
+
+namespace Docshark.Core.Models
 {
-    internal static class KeyExtensions
+    public static class KeyExtensions
     {
         public static string GetPrimaryKey(this Assembly assembly)
             => assembly.GetName().Name;

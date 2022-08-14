@@ -47,17 +47,17 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures indirect parents of the compound types are added.")]
         public void InDirectTypeParentsAdded()
         {
-            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(Delegate).ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[typeof(MulticastDelegate).ToString()].Parent);
+            Assert.IsNull(map.MappedDefinitions[typeof(object).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(Delegate).ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[typeof(MulticastDelegate).ToString()].BaseType);
         }
 
         [Test(Description = "Ensures direct parents of the compound types are added.")]
         public void DirectTypeParentAdded()
         {
-            Assert.NotNull(map.MappedDefinitions[action.ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[func.ToString()].Parent);
-            Assert.NotNull(map.MappedDefinitions[dict.ToString()].Parent);
+            Assert.NotNull(map.MappedDefinitions[action.ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[func.ToString()].BaseType);
+            Assert.NotNull(map.MappedDefinitions[dict.ToString()].BaseType);
         }
 
         #endregion
@@ -105,14 +105,14 @@ namespace Docshark.Test.Global.Types
         [Test(Description = "Ensures nested type arguments do not have duplicated type arguments.")]
         public void NestedTypeArgumentsNotDuplicated()
         {
-            Assert.AreEqual(2, map.MappedDefinitions[map.MappedDefinitions[action.ToString()].TypeArguments[1]].TypeArguments.Count);
+            Assert.AreEqual(2, map.MappedDefinitions[(string)map.MappedDefinitions[action.ToString()].TypeArguments[1]].TypeArguments.Count);
 
-            Assert.AreEqual(2, map.MappedDefinitions[map.MappedDefinitions[func.ToString()].TypeArguments[0]].TypeArguments.Count);
-            Assert.AreEqual(3, map.MappedDefinitions[map.MappedDefinitions[func.ToString()].TypeArguments[1]].TypeArguments.Count);
+            Assert.AreEqual(2, map.MappedDefinitions[(string)map.MappedDefinitions[func.ToString()].TypeArguments[0]].TypeArguments.Count);
+            Assert.AreEqual(3, map.MappedDefinitions[(string)map.MappedDefinitions[func.ToString()].TypeArguments[1]].TypeArguments.Count);
 
-            Assert.AreEqual(0, map.MappedDefinitions[map.MappedDefinitions[dict.ToString()].TypeArguments[0]].TypeArguments.Count); // string
-            Assert.AreEqual(2, map.MappedDefinitions[map.MappedDefinitions[dict.ToString()].TypeArguments[1]].TypeArguments.Count); // dictionary
-            Assert.AreEqual(3, map.MappedDefinitions[map.MappedDefinitions[map.MappedDefinitions[dict.ToString()].TypeArguments[1]].TypeArguments[1]].TypeArguments.Count); // func in nested dictionary
+            Assert.AreEqual(0, map.MappedDefinitions[(string)map.MappedDefinitions[dict.ToString()].TypeArguments[0]].TypeArguments.Count); // string
+            Assert.AreEqual(2, map.MappedDefinitions[(string)map.MappedDefinitions[dict.ToString()].TypeArguments[1]].TypeArguments.Count); // dictionary
+            Assert.AreEqual(3, map.MappedDefinitions[(string)map.MappedDefinitions[(string)map.MappedDefinitions[dict.ToString()].TypeArguments[1]].TypeArguments[1]].TypeArguments.Count); // func in nested dictionary
         }
 
         #endregion

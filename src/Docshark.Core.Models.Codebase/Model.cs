@@ -40,6 +40,6 @@ namespace Docshark.Core.Models.Codebase
         /// <summary>
         /// Returns the type of the type or member.
         /// </summary>
-        public abstract string Type { get; }        
+        // public abstract string Type { get; }        
     }   
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Docshark.Core.Global.Assemblies;
+using Docshark.Core.Models;
 
 namespace Docshark.Core.Global.Types
 {
@@ -15,13 +16,15 @@ namespace Docshark.Core.Global.Types
     public class TypeDefinition : Definition
     {        
         /// <summary>
-        /// A primary key identifying the parent type.
+        /// A primary key identifying the base type.
         /// </summary>
-        public string? Parent { get; set; }
+        public string? BaseType { get; set; }
         /// <summary>
-        /// A list of primary keys identifying the type arguments.
+        /// A collection of strings and/or some mix of <see cref="GenericTypeDefinition"/>s.
+        /// A string is a foreign key pointing to a type, a instance of <see cref="GenericTypeDefinition"/> is
+        /// a type argument defined in this type.
         /// </summary>
-        public List<string> TypeArguments { get; set; } = new();
+        public List<object> TypeArguments { get; set; } = new();
         /// <summary>
         /// The entire namespace leading to this types location.        
         /// </summary>
@@ -61,7 +64,7 @@ namespace Docshark.Core.Global.Types
             {
                 TypeDescription = info.GetPrimaryKey(),
                 Namespace = info.Namespace,
-                Parent = info.BaseType?.GetPrimaryKey(),
+                BaseType = info.BaseType?.GetPrimaryKey(),
                 AssemblyForeignKey = info.Assembly.GetPrimaryKey()
             };
         }

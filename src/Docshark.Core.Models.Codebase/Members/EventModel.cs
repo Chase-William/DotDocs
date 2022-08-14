@@ -4,9 +4,8 @@ using LoxSmoke.DocXml;
 
 namespace Docshark.Core.Models.Codebase.Members
 {
-    public class EventModel : Model<EventInfo, CommonComments>, IAccessible
+    public class EventModel : MemberModel<EventInfo, CommonComments>, IAccessible
     {
-        public override string Type => Meta.EventHandlerType?.ToString();
 
         public bool IsVirtual => ((Meta.AddMethod?.IsVirtual ?? false) || (Meta.RemoveMethod?.IsVirtual ?? false)) && !IsAbstract;        
         public bool IsAbstract => (Meta.AddMethod?.IsAbstract ?? false) || (Meta.RemoveMethod?.IsAbstract ?? false);
@@ -19,6 +18,9 @@ namespace Docshark.Core.Models.Codebase.Members
         public bool IsInternal => (Meta.AddMethod?.IsAssembly ?? true) || (Meta.RemoveMethod?.IsFamilyOrAssembly ?? true);
         #endregion
 
-        public EventModel(EventInfo member) : base(member) { }
+        public EventModel(EventInfo member) : base(member)
+        {
+            SetType(member.EventHandlerType);
+        }
     }
 }
