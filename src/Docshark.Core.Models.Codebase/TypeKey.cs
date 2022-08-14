@@ -10,8 +10,8 @@ namespace Docshark.Core.Models
 {
     public class TypeKey
     {
-        public string ForeignKey { get; internal set; }
-        public bool IsGeneric { get; internal set; }
+        public string ForeignKey { get; set; }
+        public bool IsGenericParameter { get; set; }
 
         public static TypeKey? From(Type? info)
         {
@@ -24,9 +24,8 @@ namespace Docshark.Core.Models
                 ForeignKey = info.GetPrimaryKey()
             };
 
-            // If the type is generic, mark the typekey as generic
-            if (info.IsGenericTypeDefinition)
-                key.IsGeneric = true;
+            // Save whether this is a generic type parameter or not
+            key.IsGenericParameter = info.IsGenericParameter;
 
             return key;
         }

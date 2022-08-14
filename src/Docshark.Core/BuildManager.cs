@@ -30,7 +30,7 @@ namespace Docshark.Core
         /// </summary>
         public ProjectMapper ProjectManager { get; private set; }
         
-        public MetaManager TypeMapper { get; private set; }        
+        public CodebaseManager TypeMapper { get; private set; }        
 
         /// <summary>
         /// Path to .csproj.
@@ -66,7 +66,7 @@ namespace Docshark.Core
 
         public void Load()
         {            
-            TypeMapper = new MetaManager();
+            TypeMapper = new CodebaseManager();
             ProjectManager.Load(ProjectManager.Assemblies, TypeMapper.AddType);
             TypeMapper.AddProjects(ProjectManager.RootProject);
         }

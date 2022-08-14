@@ -11,30 +11,26 @@ namespace Docshark.Core.Models.Codebase
         /// <summary>
         /// Return type of the function signature.
         /// </summary>
-        public string ReturnType { get; }
+        public TypeKey ReturnType { get; }
 
         /// <summary>
         /// Parameters used in the function signature.
         /// </summary>
-        public Parameter[] Parameters { get; }
+        public TypeKeyParameter[] Parameters { get; }
 
         /// <summary>
         /// Gets all the parameter information and organizes it before returning it.
         /// </summary>
         /// <param name="info">Information about the method.</param>
         /// <returns>Collection of parameters.</returns>
-        public Parameter[] GetParameters(MethodInfo info)
+        public TypeKeyParameter[] GetParameters(MethodInfo info)
         {
             var _params = info.GetParameters();
             if (_params.Length == 0)
-                return Array.Empty<Parameter>();
-            var tempParam = new Parameter[_params.Length];
+                return Array.Empty<TypeKeyParameter>();
+            var tempParam = new TypeKeyParameter[_params.Length];
             for (int i = 0; i < _params.Length; i++)
-                tempParam[i] = new Parameter
-                {
-                    Name = _params[i].Name,
-                    Type = _params[i].ParameterType.ToString()
-                };
+                tempParam[i] = TypeKeyParameter.From(_params[i]);
             return tempParam;
         }
     }

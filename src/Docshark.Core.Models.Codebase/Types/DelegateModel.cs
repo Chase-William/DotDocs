@@ -21,18 +21,14 @@ namespace Docshark.Core.Models.Codebase.Types
         /// Identifier for determining type used by json parsers.
         /// </summary>
         public override string Type => DELEGATE_TYPE_STRING;
-
-        // public new FunctionalDocumentation Docs => (FunctionalDocumentation)base.Docs;
-
         /// <summary>
         /// Return type of this <see cref="DelegateModel"/> as a string.
         /// </summary>
-        public string ReturnType { get; init; }
+        public TypeKey ReturnType { get; init; }
         /// <summary>
         /// Parameters expect of this <see cref="DelegateModel"/>.
         /// </summary>
-        public Parameter[] Parameters { get; init; }
-
+        public TypeKeyParameter[] Parameters { get; init; }
         /// <summary>
         /// Initializes a new instance of <see cref="DelegateModel"/>.
         /// </summary>
@@ -40,7 +36,7 @@ namespace Docshark.Core.Models.Codebase.Types
         public DelegateModel(TypeInfo member) : base(member)
         {
             var info = member.GetMethod("Invoke");
-            ReturnType = info.ReturnType.ToString();
+            ReturnType = TypeKey.From(info.ReturnType);
             Parameters = ((IFunctional)this).GetParameters(info);
         }
     }

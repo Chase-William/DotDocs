@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Docshark.Core.Global
 {
-    internal interface IMapper<T> where T : Definition
+    internal interface IMapper<T> 
+        where T : Definition
     {
         IReadOnlyDictionary<string, T> MappedDefinitions { get; }
 

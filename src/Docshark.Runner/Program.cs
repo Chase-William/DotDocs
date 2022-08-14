@@ -33,6 +33,9 @@ namespace Docshark.Runner
             // Test test library
             Run(csProjFile: @"C:\Dev\Docshark.Core\src\Docshark.Core\Docshark.Core.csproj",
                 outputPath: @"C:\Users\Chase Roth\Desktop");
+
+            //Run(csProjFile: @"C:\Dev\Docshark.Core\src\SimpleProject\SimpleProject.csproj",
+            //    outputPath: @"C:\Users\Chase Roth\Desktop");
         }
 
         static void Run(string csProjFile, string outputPath)

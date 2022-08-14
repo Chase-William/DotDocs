@@ -29,13 +29,13 @@ namespace Docshark.Core.Models.Codebase.Members
         [System.Text.Json.Serialization.JsonIgnore]
         public Type? MethodType { get; private set; }
 
-        public string ReturnType => Meta.ReturnType.ToString();
-        public Parameter[] Parameters { get; set; }
+        public TypeKey ReturnType { get; private set; }
+        public TypeKeyParameter[] Parameters { get; set; }
         public bool IsVirtual => Meta.IsVirtual && !IsAbstract;        
         public bool IsAbstract => Meta.IsAbstract;
         public bool IsStatic => Meta.IsStatic;
         
-        Type GetSignature(MethodInfo methodInfo)
+        static Type GetSignature(MethodInfo methodInfo)
         {
             Func<Type[], Type> getType;
             var types = methodInfo.GetParameters().Select(p => p.ParameterType);
@@ -66,6 +66,7 @@ namespace Docshark.Core.Models.Codebase.Members
 
             MethodType = GetSignature(Meta);
             Type = TypeKey.From(MethodType);
+            ReturnType = TypeKey.From(Meta.ReturnType);
         }       
     }
 }

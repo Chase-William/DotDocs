@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Docshark.Core.Global.Assemblies;
 using Docshark.Core.Models;
+using Docshark.Core.Global.Types.Generic;
 
 namespace Docshark.Core.Global.Types
 {
@@ -24,7 +25,8 @@ namespace Docshark.Core.Global.Types
         /// A string is a foreign key pointing to a type, a instance of <see cref="GenericTypeDefinition"/> is
         /// a type argument defined in this type.
         /// </summary>
-        public List<object> TypeArguments { get; set; } = new();
+        public List<string> TypeArguments { get; set; } = new();
+        public List<string> TypeParameters { get; set; } = new();
         /// <summary>
         /// The entire namespace leading to this types location.        
         /// </summary>

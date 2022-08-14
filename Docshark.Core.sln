@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docshark.Core.Mapper.Projec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docshark.Core.Global", "src\Docshark.Core.Global\Docshark.Core.Global.csproj", "{E68A9CE1-7B3B-42B7-B783-1B9338E92A08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleProject", "src\SimpleProject\SimpleProject.csproj", "{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{E68A9CE1-7B3B-42B7-B783-1B9338E92A08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E68A9CE1-7B3B-42B7-B783-1B9338E92A08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E68A9CE1-7B3B-42B7-B783-1B9338E92A08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

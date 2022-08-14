@@ -14,11 +14,11 @@ namespace Docshark.Core
     /// <summary>
     /// Maps each type used in the target project.
     /// </summary>
-    public class MetaManager
+    public class CodebaseManager
     {        
         MapperManager mapManager = new MapperManager(); 
 
-        public MetaManager() { }
+        public CodebaseManager() { }
 
         public void Save(string outputPath)
             => mapManager.Save(outputPath);
