@@ -1,5 +1,5 @@
 ﻿using Docshark.Core.Global.Assemblies;
-using Docshark.Core.Global.Types.Generic;
+using Docshark.Core.Global.Parameters;
 using Docshark.Core.Models;
 using System.Reflection;
 
@@ -20,9 +20,9 @@ namespace Docshark.Core.Global.Types
         Dictionary<string, TypeDefinition> mappedDefinitions = new();
 
         AssemblyMapper? asmMapper;
-        GenericTypeMapper? genericMapper;
+        GenericParameterMapper? genericMapper;
 
-        public TypeMapper(GenericTypeMapper genericMapper = null, AssemblyMapper asmMapper = null)
+        public TypeMapper(GenericParameterMapper genericMapper = null, AssemblyMapper asmMapper = null)
         {
             this.genericMapper = genericMapper;
             this.asmMapper = asmMapper;
@@ -34,19 +34,12 @@ namespace Docshark.Core.Global.Types
             if (MappedDefinitions.ContainsKey(info.GetPrimaryKey()))
                 return;
 
-            //if (info.ContainsGenericParameters)
-            //{
-            //    return;
-            //}
             AddTypeRecursive(info);
         }
 
         void AddTypeRecursive(Type info, string? parentId = null)
         {
             var pk = info.GetPrimaryKey();                    
-
-            if (pk == "Docshark.Core.Models.Codebase.Model\u00602[T1,T2]")
-                Console.WriteLine();
 
             // Always prevent generic types from being added to the normal type list
             if (info.IsGenericParameter)
@@ -57,8 +50,6 @@ namespace Docshark.Core.Global.Types
                 return;
             }
 
-
-
             /*
              * Create a new type definition
              * Add the type defintion to the dictionary of types
@@ -66,9 +57,7 @@ namespace Docshark.Core.Global.Types
              * This will flush out all other types the current type definition depends on
              */
             if (!MappedDefinitions.ContainsKey(pk))
-            {              
-                if (pk == "T=Docshark.Core.Global.Definition")
-                    Console.WriteLine();
+            {
                 TypeDefinition type = TypeDefinition.From(info, asmMapper);
                 mappedDefinitions.Add(pk, type);
                 // type.IsDefinedInUserProject = CheckNamespace.Invoke(type.Namespace);
@@ -95,32 +84,21 @@ namespace Docshark.Core.Global.Types
         {
             foreach (var param in info.GenericTypeParameters)
             {
-                AddTypeRecursive(param, type.GetPrimaryKey());
-                // Generic type params like T1 & T2 need to be handled differently
-                // Therefore, implement them here
-                // Generic type arguments are defined in the typeArgument list so they're scoped to the class,
-                // whereas non-generic type arguments are defined in the global scope
-
-                // As of rule of thumb, generic type parameters cannot have their own type parameters..
-                // Therefore no recursion is needed, simply add define this always new argument to the
-                // typeArguments and continue...                    
-                type.TypeParameters.Add(param.GetPrimaryKey());
+                // Ensure the base type of this type is accounted for
+                if (param.BaseType != null)
+                    AddTypeRecursive(param.BaseType, type.GetPrimaryKey());           
+                type.TypeParameters.Add(TypeKey.From(param));
             }
         }
 
-        void AddTypeArgumentsRecursive(Type[] parameters, TypeDefinition type)
+        void AddTypeArgumentsRecursive(Type[] arguments, TypeDefinition type)
         {            
             // Process all type parameters defined
-            foreach (var param in parameters)
+            foreach (var arg in arguments)
             {                
                 // Ensure each one and it's dependencies are accounted for
-                AddTypeRecursive(param, type.GetPrimaryKey());
-                // Once accounted for, add the type to the list of arguments for the given type
-                // var def = MappedDefinitions[param.GetPrimaryKey()];
-                if (param.IsGenericType)
-                    type.TypeParameters.Add(param.GetPrimaryKey());
-                else
-                    type.TypeArguments.Add(param.GetPrimaryKey());                     
+                AddTypeRecursive(arg, type.GetPrimaryKey());
+                type.TypeArguments.Add(TypeKey.From(arg));                     
             }
         }
     }

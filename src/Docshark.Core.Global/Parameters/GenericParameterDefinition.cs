@@ -1,8 +1,8 @@
 ﻿using Docshark.Core.Models;
 
-namespace Docshark.Core.Global.Types
+namespace Docshark.Core.Global.Parameters
 {
-    public class GenericTypeDefinition : Definition
+    public class GenericParameterDefinition : Definition
     {
         public string? BaseType { get; set; }
         public string Name { get; set; }

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Docshark.Core.Global.Assemblies;
 using Docshark.Core.Models;
-using Docshark.Core.Global.Types.Generic;
+using Docshark.Core.Global.Parameters;
 
 namespace Docshark.Core.Global.Types
 {
@@ -21,12 +21,12 @@ namespace Docshark.Core.Global.Types
         /// </summary>
         public string? BaseType { get; set; }
         /// <summary>
-        /// A collection of strings and/or some mix of <see cref="GenericTypeDefinition"/>s.
-        /// A string is a foreign key pointing to a type, a instance of <see cref="GenericTypeDefinition"/> is
+        /// A collection of strings and/or some mix of <see cref="GenericParameterDefinition"/>s.
+        /// A string is a foreign key pointing to a type, a instance of <see cref="GenericParameterDefinition"/> is
         /// a type argument defined in this type.
         /// </summary>
-        public List<string> TypeArguments { get; set; } = new();
-        public List<string> TypeParameters { get; set; } = new();
+        public List<TypeKey> TypeArguments { get; set; } = new();
+        public List<TypeKey> TypeParameters { get; set; } = new();
         /// <summary>
         /// The entire namespace leading to this types location.        
         /// </summary>

@@ -17,7 +17,7 @@ namespace Docshark.Core.Models
         public static string GetPrimaryKey(this Type type)
         {
             if (type.IsGenericParameter)
-                return $"{type.Name}={type.BaseType}";
+                return $"{type.Name}{(type.BaseType == null ? "" : "|" + type.BaseType)}";
             return type.ToString();
         }
     }

@@ -1,27 +1,22 @@
 ﻿using Docshark.Core.Global.Assemblies;
 using Docshark.Core.Global.Projects;
 using Docshark.Core.Global.Types;
-using Docshark.Core.Global.Types.Generic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Docshark.Core.Global.Parameters;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Docshark.Core.Global
 {
     public class MapperManager
     {                        
         public TypeMapper TypeMap { get; init; }
-        public GenericTypeMapper GenericTypeMapper { get; init; }
+        public GenericParameterMapper GenericTypeMapper { get; init; }
         public AssemblyMapper AssemblyMap { get; init; }
         public ProjectMapper ProjectMap { get; init; }
 
         /// <summary>
         /// A map of the primary keys for each type.
         /// </summary>
-        PrimaryKeyMap[] PrimaryKeyMap = new PrimaryKeyMap[3];
+        PrimaryKeyMap[] PrimaryKeyMap = new PrimaryKeyMap[4];
         public MapperManager()
         {
             AssemblyMap = new();
@@ -31,17 +26,23 @@ namespace Docshark.Core.Global
             PrimaryKeyMap[0] = new PrimaryKeyMap
             {
                 DefinitionTypeName = nameof(TypeDefinition),
-                PrimaryKeyName = TypeDefinition.GetPrimaryKeyMemberName()
+                PrimaryKeyMemberName = TypeDefinition.GetPrimaryKeyMemberName()
             };
             PrimaryKeyMap[1] = new PrimaryKeyMap
             {
                 DefinitionTypeName = nameof(AssemblyDefinition),
-                PrimaryKeyName = AssemblyDefinition.GetPrimaryKeyMemberName()
+                PrimaryKeyMemberName = AssemblyDefinition.GetPrimaryKeyMemberName()
             };
             PrimaryKeyMap[2] = new PrimaryKeyMap
             {
                 DefinitionTypeName = nameof(ProjectDefinition),
-                PrimaryKeyName = ProjectDefinition.GetPrimaryKeyMemberName()
+                PrimaryKeyMemberName = ProjectDefinition.GetPrimaryKeyMemberName()
+            };
+            PrimaryKeyMap[3] = new PrimaryKeyMap
+            {
+                DefinitionTypeName = nameof(GenericParameterDefinition),
+                PrimaryKeyMemberName = GenericParameterDefinition.GetPrimaryKeyMemberName(),
+                IsComposite = true
             };
         }
 
@@ -51,9 +52,9 @@ namespace Docshark.Core.Global
                 baseOutputPath, 
                 TypeMapper.TYPE_MAPPER_FILENAME, 
                 TypeMap.MappedDefinitions.Values);
-            ((IMapper<GenericTypeDefinition>)GenericTypeMapper).Save(
+            ((IMapper<GenericParameterDefinition>)GenericTypeMapper).Save(
                 baseOutputPath,
-                GenericTypeMapper.GENERIC_TYPE_MAPPER_FILENAME,
+                GenericParameterMapper.GENERIC_TYPE_MAPPER_FILENAME,
                 GenericTypeMapper.MappedDefinitions.Values);
             ((IMapper<AssemblyDefinition>)AssemblyMap).Save(
                 baseOutputPath, 

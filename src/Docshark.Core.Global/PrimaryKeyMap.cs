@@ -9,6 +9,7 @@ namespace Docshark.Core.Global
     internal struct PrimaryKeyMap
     {
         public string DefinitionTypeName { get; set; }
-        public string PrimaryKeyName { get; set; }
+        public string PrimaryKeyMemberName { get; set; }
+        public bool IsComposite { get; set; }
     }
 }
