@@ -12,6 +12,6 @@ namespace Docshark.Core.Global.Parameters
             => NameWithBase;
 
         internal static string GetPrimaryKeyMemberName()
-            => nameof(NameWithBase);
+            => nameof(Name) + '+' + nameof(BaseType);
     }
 }
