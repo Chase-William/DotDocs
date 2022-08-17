@@ -1,28 +1,28 @@
 ﻿namespace SimpleProject
-{    
-    public class AnotherClass<T1> : MyClass<T1>
-        where T1 : MyNextClass
+{
+    public class TopLevelClass : GenericParameterizedClass<ArgumentClass, ArgumentClass>
     {
 
     }
 
-    public class MySemiDoneClass<T1> : MyClass<MyOtherClass>
+    //public class TopLevelGenericishClass<T1> : GenericParameterizedClass<ArgumentClass>
+    //{
+
+    //}
+
+    public class GenericParameterizedClass<T1, T2>
+        where T2 : ArgumentClass
     {
 
     }
 
-    public class MyClass<T1>
-        where T1 : MyOtherClass
+    public class SecondGenericParameterizedClass<T1, T2>
+       where T2 : ArgumentClass
     {
 
     }
 
-    public class MyNextClass : MyOtherClass
-    {
-
-    }
-
-    public class MyOtherClass
+    public class ArgumentClass
     {
 
     }
