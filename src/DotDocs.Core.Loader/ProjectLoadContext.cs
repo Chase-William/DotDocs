@@ -21,6 +21,7 @@ namespace DotDocs.Core.Models.Project
         /// </summary>
         public const string PROJECTS_FILE = "projects.json";
         public const string TYPES_FILE = "types.json";
+        public const string ASSEMBLIES_FILE = "assemblies.json";
 
         const string PROJECT_NAME = "ProjectName";
         const string PROJECT_DIR = "ProjectDir";
@@ -40,7 +41,7 @@ namespace DotDocs.Core.Models.Project
         public IReadOnlyDictionary<string, TypeModel> FullProjectTypeMap => fullProjectTypeMap;
 
         Dictionary<string, AssemblyModel> assemblies = new();
-        public List<AssemblyModel> Assemblies => assemblies.Values.ToList();
+        public IReadOnlyDictionary<string, AssemblyModel> Assemblies => assemblies;
 
 
         private string[] assembliesPaths { get; set; }
@@ -50,17 +51,15 @@ namespace DotDocs.Core.Models.Project
         
         public void Save(string outputPath)
         {
-            // save projects
-            using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))
-            {
-                writer.Write(JsonSerializer.Serialize(LocalProjects));
-            }
-
-            // Save full type map
-            using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))
-            {
-                writer.Write(JsonSerializer.Serialize(fullProjectTypeMap.Values));
-            }
+            // Save assemblies
+            using (var writer = new StreamWriter(Path.Combine(outputPath, ASSEMBLIES_FILE)))
+                writer.Write(JsonSerializer.Serialize(Assemblies.Values));
+            // Save projects
+            using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))            
+                writer.Write(JsonSerializer.Serialize(LocalProjects));            
+            // Save types
+            using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))            
+                writer.Write(JsonSerializer.Serialize(FullProjectTypeMap.Values));                        
         }
 
         /// <summary>
@@ -168,7 +167,7 @@ namespace DotDocs.Core.Models.Project
 
         public void LoadTypes()
         {
-            LoadRecursive(rootProject, assembliesPaths);
+            LoadRecursive(rootProject, assembliesPaths);            
         }
 
         /// <summary>
@@ -249,7 +248,7 @@ namespace DotDocs.Core.Models.Project
                 // Check to see if the project has already been loaded as a dependency elsewhere
                 var existingProject = localProjects.SingleOrDefault(p => p.ProjectFileName.Equals(projFileName));
                 if (existingProject != null) // Exist elsewhere so use existing instance
-                    projects.Add((LocalProjectContext)existingProject);
+                    projects.Add(existingProject);
                 else // Doesn't exist, create new
                 {
                     var project = GetLocalProjectInfo(projEval);
@@ -269,7 +268,11 @@ namespace DotDocs.Core.Models.Project
             project.Load(assemblies);           
             // Add types and their type dependencies to the collection of all types
             foreach (var type in project.DefinedTypes)
+            {
                 AddType(type);
+                // Add to assembly list for this type
+                AddAssembly(type);
+            }
         }
 
 
@@ -303,7 +306,6 @@ namespace DotDocs.Core.Models.Project
             foreach (var _event in typeModel.Events)            
                 if (_event.Info.EventHandlerType != null)
                     AddTypeRecursive(_event.Info.EventHandlerType);
-
         }
 
         void AddTypeRecursive(Type type)
@@ -314,8 +316,10 @@ namespace DotDocs.Core.Models.Project
             if (fullProjectTypeMap.ContainsKey(id))
                 return;
 
-            var model = new TypeModel(type);//, asmMapper);
-            fullProjectTypeMap.Add(id, model);            
+            var model = new TypeModel(type);
+            fullProjectTypeMap.Add(id, model);
+            // Add assembly if needed and not already added
+            AddAssembly(model);
 
             // Ensure all generic parameters are accounted for
             if (type.ContainsGenericParameters)
@@ -349,5 +353,13 @@ namespace DotDocs.Core.Models.Project
             foreach (var arg in arguments)        
                 AddTypeRecursive(arg);           
         }       
+
+        void AddAssembly(TypeModel model)
+        {
+            var id = model.Type.Assembly.GetAssemblyId();
+            // Add all needed assembly to the assemblies list
+            if (!assemblies.ContainsKey(id))
+                assemblies.Add(id, new AssemblyModel(model.Type.Assembly));
+        }
     }
 }
