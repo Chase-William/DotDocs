@@ -6,7 +6,7 @@ namespace DotDocs.Core.Models.Language.Members
     public class FieldModel : MemberModel<FieldInfo, CommonComments>
     {
         public bool IsReadonly => Info.IsInitOnly;
-        public bool IsConstant => Info.IsLiteral;
+        public bool IsLiteral => Info.IsLiteral;
         public bool IsStatic => Info.IsStatic;
 
         #region Accessiblity
@@ -16,7 +16,6 @@ namespace DotDocs.Core.Models.Language.Members
         public bool IsInternal => Info.IsAssembly || Info.IsFamilyOrAssembly;
         #endregion
 
-        public bool IsLiteral => Info.IsLiteral;
         public object? RawConstantValue => IsLiteral ? Info.GetRawConstantValue() : null;
 
         public string Type { get; init; }
