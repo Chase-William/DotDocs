@@ -16,8 +16,19 @@ namespace DotDocs.Core.Models.Language.Members
         public bool IsInternal => Info.IsAssembly || Info.IsFamilyOrAssembly;
         #endregion
 
-        public string Type => Info.FieldType.GetTypeId();
+        public bool IsLiteral => Info.IsLiteral;
+        public object? RawConstantValue => IsLiteral ? Info.GetRawConstantValue() : null;
 
-        public FieldModel(FieldInfo member) : base(member) { }
+        public string Type { get; init; }
+
+        public FieldModel(FieldInfo member) : base(member)
+        {
+            Type = member.FieldType.GetTypeId();
+        }
+
+        public FieldModel(FieldInfo member, Type underlyingType) : base(member)
+        {
+            Type = underlyingType.GetTypeId();
+        }
     }
 }

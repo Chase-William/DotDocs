@@ -1,5 +1,7 @@
 ﻿namespace SimpleProject
 {
+    public delegate Action<string, uint> TestType();
+
     public class TopLevelClass : GenericParameterizedClass<ArgumentClass, ArgumentClass>
     {
 
@@ -24,6 +26,12 @@
 
     public class ArgumentClass
     {
+        public string StringProperty;
+        public int IntProperty;
+    }
 
+    public enum TestEnum
+    {
+        
     }
 }

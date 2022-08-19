@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Core.Models.Language
 {
-    public class TypeModel
+    public class TypeModel : Model
     {
         [JsonIgnore]
         /// <summary>
@@ -25,13 +25,11 @@ namespace DotDocs.Core.Models.Language
 
         public string? Namespace => Type.Namespace;
 
-        public string Name => Type.Name;
+        public override string Name => Type.Name;
 
         public string? FullName => Type.FullName;
 
-        public CommonComments Comments { get; set; }
-
-        public string AssemblyName => Type.Assembly.GetAssemblyId();
+        public CommonComments Comments { get; set; }        
 
         #region Type Kind
         public bool IsClass => Type.IsClass;
@@ -51,11 +49,41 @@ namespace DotDocs.Core.Models.Language
 
         FieldModel[] fields;
         public FieldModel[] Fields
-            => fields ??= Type
-                    .GetRuntimeFields()
-                    .Where(_field => !_field.GetCustomAttributesData().Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
-                    .Select(_field => new FieldModel(_field))
-                    .ToArray();
+        {
+            get
+            {
+                if (fields == null)
+                {
+                    // When a type is an enum it's first property denotes the type of all members
+                    if (IsEnum)
+                    {
+                        var _fields = Type.GetRuntimeFields()
+                            .Where(_field => !_field
+                                .GetCustomAttributesData()
+                                .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
+                            .ToArray();
+                        var type = _fields[0].FieldType;
+                        var models = new FieldModel[_fields.Length - 1]; // Omit first field
+                        for (int i = 1; i < _fields.Length; i++)                        
+                            models[i - 1] = new FieldModel(_fields[i], type);                        
+                        fields = models;
+                    }
+                    else
+                    {
+                        fields = Type
+                            .GetRuntimeFields()
+                            .Where(_field => !_field
+                                .GetCustomAttributesData()
+                                .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) &&
+                            !_field.Attributes.HasFlag(FieldAttributes.SpecialName) &&
+                            !_field.Attributes.HasFlag(FieldAttributes.RTSpecialName))
+                            .Select(_field => new FieldModel(_field))
+                            .ToArray();
+                    }                    
+                }
+                return fields;
+            }
+        }
 
         PropertyModel[] properties;
         public PropertyModel[] Properties
@@ -108,7 +136,9 @@ namespace DotDocs.Core.Models.Language
 
         string? typeId;
         public string Id
-            => typeId ??= Type.GetTypeId();
+            => typeId ??= Type.GetTypeId();        
+
+        public string AssemblyId => Type.Assembly.GetAssemblyId();
 
         [JsonIgnore]
         public TypeInfo Type { get; init; }

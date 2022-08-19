@@ -15,8 +15,8 @@ namespace DotDocs.Core.Models
         public string FullName => Assembly.FullName;        
 
         string assemblyId;
-        public string AssemblyId
-            => assemblyId ??= Assembly.GetAssemblyId();
+        public string Id
+            => assemblyId ??= Assembly.GetAssemblyId();        
 
         [JsonIgnore]
         public Assembly Assembly { get; init; }

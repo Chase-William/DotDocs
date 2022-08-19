@@ -35,6 +35,10 @@ namespace DotDocs.Core.Models.Project
             .Select(project => project.GetProjectId())
             .ToArray();
 
+        public string AssemblyId { get; set; }
+
+        public string Id => this.GetProjectId();
+
         [JsonIgnore]
         /// <summary>
         /// Collection of all <see cref="LocalProjectModel"/> dependencies.

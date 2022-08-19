@@ -28,6 +28,7 @@ namespace DotDocs.Core.Models.Project
         const string PROJECT_FILE_NAME = "ProjectFileName";
         const string PROJECT_PATH = "ProjectPath";
         const string TARGET_FILE_NAME = "TargetName";
+        const string ASSEMBLY_NAME = "AssemblyName";
         const string TARGET_PATH = "TargetPath";
         const string DOCUMENTATION_FILE = "DocumentationFile";        
 
@@ -204,6 +205,7 @@ namespace DotDocs.Core.Models.Project
                     TARGET_FILE_NAME or
                     TARGET_PATH or
                     PROJECT_NAME or
+                    ASSEMBLY_NAME or
                     DOCUMENTATION_FILE => true,
                     _ => false,
                 };
@@ -214,6 +216,7 @@ namespace DotDocs.Core.Models.Project
 
             return new LocalProjectContext
             {
+                AssemblyId = properties[ASSEMBLY_NAME].Value,
                 ProjectName = properties[PROJECT_NAME].Value,
                 ProjectDirectory = projDir,
                 ProjectFileName = properties[PROJECT_FILE_NAME].Value,
