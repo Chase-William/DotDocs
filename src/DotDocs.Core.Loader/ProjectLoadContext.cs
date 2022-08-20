@@ -146,7 +146,7 @@ namespace DotDocs.Core.Loader
 
                 var projectName = csProjPath[(csProjPath.LastIndexOf('\\') + 1)..];
 
-                var mainBuild = build.FindLastChild<Microsoft.Build.Logging.StructuredLogger.Project>();
+                var mainBuild = build.FindLastChild<Project>();
                 var target = mainBuild
                     .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
                 assembliesPaths = target.Children.Select(item => ((Item)((AddItem)item).FirstChild).Text).ToArray();
@@ -315,7 +315,7 @@ namespace DotDocs.Core.Loader
                 AddType(type.BaseType);
 
             // Only pull member info from types defined in assemblies created locally from a local project
-            if (!model.IsFacade)
+            if (!model.IsDefinedInLocalProject)
             {
                 AddTypeInfo(
                     model.Properties.Select(prop => prop.Info),

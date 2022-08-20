@@ -42,7 +42,7 @@ namespace DotDocs.Core.Models.Language
         #region Members
         EventModel[] events;
         public EventModel[] Events
-            => events ??= IsFacade ? Array.Empty<EventModel>() : Type
+            => events ??= IsDefinedInLocalProject ? Array.Empty<EventModel>() : Type
                     .GetRuntimeEvents()
                     .Select(_event => new EventModel(_event))
                     .ToArray();
@@ -54,7 +54,7 @@ namespace DotDocs.Core.Models.Language
             {                
                 if (fields == null)
                 {
-                    if (IsFacade)
+                    if (IsDefinedInLocalProject)
                     {
                         fields = Array.Empty<FieldModel>();                       
                     }    
@@ -91,7 +91,7 @@ namespace DotDocs.Core.Models.Language
 
         PropertyModel[] properties;
         public PropertyModel[] Properties
-            => properties ??= IsFacade ? Array.Empty<PropertyModel>() : Type
+            => properties ??= IsDefinedInLocalProject ? Array.Empty<PropertyModel>() : Type
                     .GetDesiredProperties()
                     .Select(property => new PropertyModel(property))
                     .ToArray();
@@ -99,7 +99,7 @@ namespace DotDocs.Core.Models.Language
 
         MethodModel[] methods;
         public MethodModel[] Methods
-            => methods ??= IsFacade ? Array.Empty<MethodModel>() : Type
+            => methods ??= IsDefinedInLocalProject ? Array.Empty<MethodModel>() : Type
                     .GetDesiredMethods()
                     .Select(method => new MethodModel(method))
                     .ToArray();
@@ -130,12 +130,18 @@ namespace DotDocs.Core.Models.Language
         /// Indicates if this type is used as a generic parameter in a type definition or in a generic method definition.
         /// </summary>
         public bool IsGenericParameter => Type.IsGenericParameter;
-        /// <summary>
-        /// A token that is unique for each type, however constructed types and generic type definitions will share
-        /// the same token.
-        /// </summary>
+        
         public int MetadataToken => Type.MetadataToken;
         #endregion
+
+        /// <summary>
+        /// Denotes if this type is actually an array type.
+        /// </summary>
+        public bool IsArray => Type.IsArray;
+        /// <summary>
+        /// Denotes if this type is a by ref type.
+        /// </summary>
+        public bool IsByRef => Type.IsByRef;
 
         string? typeId;
         public string Id
@@ -145,19 +151,20 @@ namespace DotDocs.Core.Models.Language
 
         [JsonIgnore]
         public TypeInfo Type { get; init; }
-        
-        public bool IsFacade { get; init; }
 
-        public TypeModel(Type type, bool isFacade)
+        [JsonIgnore]
+        public bool IsDefinedInLocalProject { get; init; }
+
+        public TypeModel(Type type, bool isDefinedInLocalProject)
         {
             Type = type.GetTypeInfo();
-            IsFacade = isFacade;
+            IsDefinedInLocalProject = isDefinedInLocalProject;
         }
 
-        public TypeModel(TypeInfo typeInfo, bool isFacade)
+        public TypeModel(TypeInfo typeInfo, bool isDefinedInLocalProject)
         {
             Type = typeInfo;
-            IsFacade = isFacade;
+            IsDefinedInLocalProject = isDefinedInLocalProject;
         }
     }    
 }
