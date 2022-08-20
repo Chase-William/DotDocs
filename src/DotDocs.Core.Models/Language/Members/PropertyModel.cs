@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members
@@ -88,7 +89,7 @@ namespace DotDocs.Core.Models.Language.Members
         #endregion
         #endregion
 
-        public string Type => Info.PropertyType.GetTypeId();
+        public string Type => Info.PropertyType.GetTypeId();        
 
         public PropertyModel(PropertyInfo info) : base(info) { }
     }

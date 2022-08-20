@@ -42,7 +42,7 @@ namespace DotDocs.Core.Models.Language
         #region Members
         EventModel[] events;
         public EventModel[] Events
-            => events ??= Type
+            => events ??= IsFacade ? Array.Empty<EventModel>() : Type
                     .GetRuntimeEvents()
                     .Select(_event => new EventModel(_event))
                     .ToArray();
@@ -51,11 +51,15 @@ namespace DotDocs.Core.Models.Language
         public FieldModel[] Fields
         {
             get
-            {
+            {                
                 if (fields == null)
                 {
+                    if (IsFacade)
+                    {
+                        fields = Array.Empty<FieldModel>();                       
+                    }    
                     // When a type is an enum it's first property denotes the type of all members
-                    if (IsEnum)
+                    else if (IsEnum)
                     {
                         var _fields = Type.GetRuntimeFields()
                             .Where(_field => !_field
@@ -87,7 +91,7 @@ namespace DotDocs.Core.Models.Language
 
         PropertyModel[] properties;
         public PropertyModel[] Properties
-            => properties ??= Type
+            => properties ??= IsFacade ? Array.Empty<PropertyModel>() : Type
                     .GetDesiredProperties()
                     .Select(property => new PropertyModel(property))
                     .ToArray();
@@ -95,7 +99,7 @@ namespace DotDocs.Core.Models.Language
 
         MethodModel[] methods;
         public MethodModel[] Methods
-            => methods ??= Type
+            => methods ??= IsFacade ? Array.Empty<MethodModel>() : Type
                     .GetDesiredMethods()
                     .Select(method => new MethodModel(method))
                     .ToArray();
@@ -142,14 +146,19 @@ namespace DotDocs.Core.Models.Language
         [JsonIgnore]
         public TypeInfo Type { get; init; }
 
-        public TypeModel(Type type)
+        [JsonIgnore]
+        public bool IsFacade { get; init; }
+
+        public TypeModel(Type type, bool isFacade)
         {
             Type = type.GetTypeInfo();
+            IsFacade = isFacade;
         }
 
-        public TypeModel(TypeInfo typeInfo)
+        public TypeModel(TypeInfo typeInfo, bool isFacade)
         {
             Type = typeInfo;
+            IsFacade = isFacade;
         }
     }    
 }

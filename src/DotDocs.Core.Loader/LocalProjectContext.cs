@@ -47,7 +47,7 @@ namespace DotDocs.Core.Loader
                     type.IsPublic && !type.IsNestedFamORAssem);
 
             foreach (var type in typesOfInterest)            
-                DefinedTypes.Add(new TypeModel(type));            
+                DefinedTypes.Add(new TypeModel(type, false));            
         }
 
         //public void Save(string baseOutputPath, List<LocalProjectContext> saved)

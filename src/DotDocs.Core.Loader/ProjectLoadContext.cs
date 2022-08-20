@@ -172,9 +172,17 @@ namespace DotDocs.Core.Models.Project
         }
 
         public void LoadTypes()
-        {
+        {            
+            LoadRecursive(rootProject, assembliesPaths);
             assembliesOfInterest = localProjects.Select(proj => proj.Assembly).ToHashSet();
-            LoadRecursive(rootProject, assembliesPaths);            
+            // Add types and their type dependencies to the collection of all types
+            foreach (var project in localProjects)
+            {
+                foreach (var type in project.DefinedTypes)
+                {
+                    AddType(type.Type);                    
+                }
+            }            
         }
 
         /// <summary>
@@ -274,14 +282,7 @@ namespace DotDocs.Core.Models.Project
             // Visit the lowest level assembly and load it's info before loading higher level assemblies
             foreach (var proj in project.LocalProjectsAsObjects)
                 LoadRecursive((LocalProjectContext)proj, assemblies);
-            project.Load(assemblies);           
-            // Add types and their type dependencies to the collection of all types
-            foreach (var type in project.DefinedTypes)
-            {
-                AddType(type.Type);
-                // Add to assembly list for this type
-                AddAssembly(type);
-            }
+            project.Load(assemblies);            
         }
 
         void AddType(Type type)
@@ -291,53 +292,7 @@ namespace DotDocs.Core.Models.Project
                 return;
 
             // Add this model's type
-            AddTypeRecursive(type);
-
-            // Only pull member info from types defined in assemblies created locally from a local project
-            if (assembliesOfInterest.Contains(type.Assembly))
-            {
-                IEnumerable<FieldInfo> fields;
-                if (type.IsEnum)
-                    fields = type.GetEnumDesiredFields();
-                else
-                    fields = type.GetDesiredFields();
-                AddTypeInfo(
-                    type.GetDesiredProperties(),
-                    fields,
-                    type.GetDesiredMethods(),
-                    type.GetDesiredEvents());
-            }
-        }
-
-        void AddTypeInfo(
-            IEnumerable<PropertyInfo> properties, 
-            IEnumerable<FieldInfo> fields, 
-            IEnumerable<MethodInfo> methods, 
-            IEnumerable<EventInfo> events)
-        {            
-            // Add properties
-            foreach (var property in properties)
-                AddTypeRecursive(property.PropertyType);
-            // Add fields
-            foreach (var field in fields)
-                AddTypeRecursive(field.FieldType);
-            // Add methods
-            foreach (var method in methods)
-            {
-                AddTypeRecursive(method.ReturnType);
-                var parameters = method.GetParameters();
-                foreach (var parameter in parameters)
-                    AddTypeRecursive(parameter.ParameterType);
-            }
-            // Add events
-            foreach (var _event in events)
-                if (_event.EventHandlerType != null)
-                    AddTypeRecursive(_event.EventHandlerType);
-        }
-
-        void AddTypeRecursive(Type type)
-        {
-            var model = new TypeModel(type);
+            var model = new TypeModel(type, !assembliesOfInterest.Contains(type.Assembly));
             fullProjectTypeMap.Add(type.GetTypeId(), model);
             // Add assembly if needed and not already added
             AddAssembly(model);
@@ -353,7 +308,7 @@ namespace DotDocs.Core.Models.Project
             {
                 // Process generic parameters
                 AddTypeParameters(meta.GenericTypeParameters);
-            }            
+            }
 
             // Ensure all type argument types are accounted for
             if (type.GenericTypeArguments.Length > 0)
@@ -362,7 +317,43 @@ namespace DotDocs.Core.Models.Project
             // Ensure the base type is added too
             if (type.BaseType != null)
                 AddType(type.BaseType);
-        }        
+
+            // Only pull member info from types defined in assemblies created locally from a local project
+            if (!model.IsFacade)
+            {
+                AddTypeInfo(
+                    model.Properties.Select(prop => prop.Info),
+                    model.Fields.Select(field => field.Info),
+                    model.Methods.Select(method => method.Info),
+                    model.Events.Select(_event => _event.Info));
+            }
+        }
+
+        void AddTypeInfo(
+            IEnumerable<PropertyInfo> properties,
+            IEnumerable<FieldInfo> fields,
+            IEnumerable<MethodInfo> methods,
+            IEnumerable<EventInfo> events)
+        {            
+            // Add properties
+            foreach (var property in properties)
+                AddType(property.PropertyType);
+            // Add fields
+            foreach (var field in fields)            
+                AddType(field.FieldType);            
+            // Add methods
+            foreach (var method in methods)
+            {
+                AddType(method.ReturnType);
+                var parameters = method.GetParameters();
+                foreach (var parameter in parameters)
+                    AddType(parameter.ParameterType);
+            }
+            // Add events
+            foreach (var _event in events)
+                if (_event.EventHandlerType != null)
+                    AddType(_event.EventHandlerType);
+        }      
 
         void AddTypeParameters(Type[] parameters)
         {
