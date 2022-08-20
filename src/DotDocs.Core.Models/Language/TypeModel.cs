@@ -145,8 +145,7 @@ namespace DotDocs.Core.Models.Language
 
         [JsonIgnore]
         public TypeInfo Type { get; init; }
-
-        [JsonIgnore]
+        
         public bool IsFacade { get; init; }
 
         public TypeModel(Type type, bool isFacade)
