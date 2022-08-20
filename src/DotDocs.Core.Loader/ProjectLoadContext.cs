@@ -353,12 +353,7 @@ namespace DotDocs.Core.Models.Project
             {
                 // Process generic parameters
                 AddTypeParameters(meta.GenericTypeParameters);
-            }
-
-            // Prevent further examination of this type because it is not an assembly of interest.
-            // We only need the type definition provided, unless inherited
-            if (!assembliesOfInterest.Contains(type.Assembly))
-                return;
+            }            
 
             // Ensure all type argument types are accounted for
             if (type.GenericTypeArguments.Length > 0)
