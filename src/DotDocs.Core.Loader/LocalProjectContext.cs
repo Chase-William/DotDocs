@@ -1,5 +1,4 @@
-﻿using DotDocs.Core.Models.Project;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotDocs.Core.Models.Language;
 using System.Runtime.CompilerServices;
+using DotDocs.Core.Models;
 
 namespace DotDocs.Core.Loader
 {

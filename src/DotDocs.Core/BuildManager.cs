@@ -1,5 +1,4 @@
-﻿using DotDocs.Core.Models.Project;
-using System;
+﻿using System;
 using System.IO;
 using DotDocs.Core.Loader;
 

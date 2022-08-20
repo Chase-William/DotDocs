@@ -1,7 +1,7 @@
 ﻿using DotDocs.Core.Models.Language;
 using System.Text.Json.Serialization;
 
-namespace DotDocs.Core.Models.Project
+namespace DotDocs.Core.Models
 {
     /// <summary>
     /// Represents a local project with a .csproj file.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Core.Mapper.Project.Exceptions
+namespace DotDocs.Core.Loader.Exceptions
 {
     public class MissingProjectFileException : Exception
     {

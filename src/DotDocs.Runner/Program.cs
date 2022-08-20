@@ -1,6 +1,6 @@
 ﻿using System;
 using DotDocs.Core;
-using DotDocs.Core.Mapper.Project.Exceptions;
+using DotDocs.Core.Loader.Exceptions;
 
 namespace DotDocs.Runner
 {

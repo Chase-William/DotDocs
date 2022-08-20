@@ -1,4 +1,4 @@
-﻿using DotDocs.Core.Mapper.Project.Exceptions;
+﻿using DotDocs.Core.Loader.Exceptions;
 using DotDocs.Runner.Models.Errors;
 using System.Linq;
 using System.Text.Json;

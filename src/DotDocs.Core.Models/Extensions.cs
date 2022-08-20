@@ -1,5 +1,4 @@
 ﻿using DotDocs.Core.Models.Exceptions;
-using DotDocs.Core.Models.Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;

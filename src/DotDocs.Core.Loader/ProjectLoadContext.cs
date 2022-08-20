@@ -1,18 +1,14 @@
-﻿using DotDocs.Core.Mapper.Project.Exceptions;
-using DotDocs.Core.Loader;
-using LoxSmoke.DocXml;
-using Microsoft.Build.Logging.StructuredLogger;
+﻿using Microsoft.Build.Logging.StructuredLogger;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using DotDocs.Core.Models.Language;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Runtime.CompilerServices;
+using DotDocs.Core.Models;
+using DotDocs.Core.Loader.Exceptions;
 
-namespace DotDocs.Core.Models.Project
+namespace DotDocs.Core.Loader
 {
     public class ProjectLoadContext : IDisposable
     {
