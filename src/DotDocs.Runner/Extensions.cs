@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace DotDocs.Runner
 {
-    public static class Extension
+    public static class Extensions
     {
         public static string Stringify(this BuildException ex)
         {

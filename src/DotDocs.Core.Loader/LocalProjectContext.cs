@@ -12,10 +12,11 @@ namespace DotDocs.Core.Loader
 {
     internal sealed class LocalProjectContext : LocalProjectModel
     {
-        MetadataLoadContext mlc;
-        Assembly asm;
+        MetadataLoadContext mlc;        
 
         public string AssemblyLoadPath { get; set; }
+
+        public Assembly Assembly { get; set; }
 
         public string DocumentationPath { get; set; }
 
@@ -31,7 +32,7 @@ namespace DotDocs.Core.Loader
             if (mlc != null)
                 Dispose();
             mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
-            asm = mlc.LoadFromAssemblyPath(AssemblyLoadPath);
+            Assembly = mlc.LoadFromAssemblyPath(AssemblyLoadPath);
 
             /*
              * Do not add all types unless they are relevant to the custom types created by the developer(s)
@@ -39,7 +40,7 @@ namespace DotDocs.Core.Loader
              * to the type list. That said, if a type is public and available to be used by external libraries,
              * ensure that type is accounted for regardless if it's compiler generated.
              */
-            var typesOfInterest = asm.DefinedTypes
+            var typesOfInterest = Assembly.DefinedTypes
                 .Where(type => !type
                     .CustomAttributes
                     .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) || 

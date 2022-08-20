@@ -88,7 +88,7 @@ namespace DotDocs.Core.Models.Language
         PropertyModel[] properties;
         public PropertyModel[] Properties
             => properties ??= Type
-                    .GetRuntimeProperties()
+                    .GetDesiredProperties()
                     .Select(property => new PropertyModel(property))
                     .ToArray();
 
@@ -96,8 +96,7 @@ namespace DotDocs.Core.Models.Language
         MethodModel[] methods;
         public MethodModel[] Methods
             => methods ??= Type
-                    .GetRuntimeMethods()
-                    .Where(method => !method.IsSpecialName && !DEFAULT_OBJECT_METHODS.Any(name => name.Equals(method.Name)))
+                    .GetDesiredMethods()
                     .Select(method => new MethodModel(method))
                     .ToArray();
         #endregion

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,5 +38,33 @@ namespace DotDocs.Core.Models
 
         public static string GetProjectId(this LocalProjectModel project)
             => project.ProjectName;
+
+        public static IEnumerable<PropertyInfo> GetDesiredProperties(this Type type)
+            => type.GetRuntimeProperties();
+
+        public static IEnumerable<MethodInfo> GetDesiredMethods(this Type type)
+            => type.GetRuntimeMethods()
+                   .Where(method => !method.IsSpecialName && !typeof(object).GetRuntimeMethods().Any(name => name.Equals(method.Name)));
+
+        public static IEnumerable<EventInfo> GetDesiredEvents(this Type type)
+            => type.GetRuntimeEvents();
+
+        public static IEnumerable<FieldInfo> GetDesiredFields(this Type type)
+            => type.GetRuntimeFields()
+                   .Where(_field => !_field
+                       .GetCustomAttributesData()
+                       .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) &&
+                   !_field.Attributes.HasFlag(FieldAttributes.SpecialName) &&
+                   !_field.Attributes.HasFlag(FieldAttributes.RTSpecialName));
+
+        public static IEnumerable<FieldInfo> GetEnumDesiredFields(this Type type)
+        {
+            if (!type.IsEnum)
+                throw new ArgumentException($"The provided type {type.FullName} cannot be used because it is not an enumeration.");
+            return type.GetRuntimeFields()
+                   .Where(_field => !_field
+                       .GetCustomAttributesData()
+                       .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name));
+        }     
     }
 }

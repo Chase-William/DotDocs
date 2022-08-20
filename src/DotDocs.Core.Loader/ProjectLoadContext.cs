@@ -44,6 +44,11 @@ namespace DotDocs.Core.Models.Project
         Dictionary<string, AssemblyModel> assemblies = new();
         public IReadOnlyDictionary<string, AssemblyModel> Assemblies => assemblies;
 
+        /// <summary>
+        /// Assemblies that we want to capture member information from. Other types declared outside
+        /// of this assembly we will not capture.
+        /// </summary>
+        private HashSet<Assembly> assembliesOfInterest;
 
         private string[] assembliesPaths { get; set; }
 
@@ -168,6 +173,7 @@ namespace DotDocs.Core.Models.Project
 
         public void LoadTypes()
         {
+            assembliesOfInterest = localProjects.Select(proj => proj.Assembly).ToHashSet();
             LoadRecursive(rootProject, assembliesPaths);            
         }
 
@@ -272,69 +278,87 @@ namespace DotDocs.Core.Models.Project
             // Add types and their type dependencies to the collection of all types
             foreach (var type in project.DefinedTypes)
             {
-                AddType(type);
+                AddType(type.Type);
                 // Add to assembly list for this type
                 AddAssembly(type);
             }
         }
 
-
-        /// <summary>
-        /// Adds given type and all dependent types to global type mapper if needed. 
-        /// IMPORTANT: This method will perform a deep analysis of all types used in any manner by this type. 
-        /// For example, types used in inheritance, encapsulated members, and even type arguments are analysed
-        /// and added to the type mapper if needed.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="typeModel"></param>
-        void AddType(TypeModel typeModel)
+        void AddType(Type type)
         {
+            // Do not add if already accounted for
+            if (fullProjectTypeMap.ContainsKey(type.GetTypeId()))
+                return;
+
             // Add this model's type
-            AddTypeRecursive(typeModel.Type);
-            // Add properties
-            foreach (var property in typeModel.Properties)
-                AddTypeRecursive(property.Info.PropertyType);
-            // Add fields
-            foreach (var field in typeModel.Fields)
-                AddTypeRecursive(field.Info.FieldType);
-            // Add methods
-            foreach (var method in typeModel.Methods)
+            AddTypeRecursive(type);
+
+            // Only pull member info from types defined in assemblies created locally from a local project
+            if (assembliesOfInterest.Contains(type.Assembly))
             {
-                AddTypeRecursive(method.Info.ReturnType);
-                var parameters = method.Info.GetParameters();
-                foreach (var parameter in parameters)                
-                    AddTypeRecursive(parameter.ParameterType);                
+                IEnumerable<FieldInfo> fields;
+                if (type.IsEnum)
+                    fields = type.GetEnumDesiredFields();
+                else
+                    fields = type.GetDesiredFields();
+                AddTypeInfo(
+                    type.GetDesiredProperties(),
+                    fields,
+                    type.GetDesiredMethods(),
+                    type.GetDesiredEvents());
+            }
+        }
+
+        void AddTypeInfo(
+            IEnumerable<PropertyInfo> properties, 
+            IEnumerable<FieldInfo> fields, 
+            IEnumerable<MethodInfo> methods, 
+            IEnumerable<EventInfo> events)
+        {            
+            // Add properties
+            foreach (var property in properties)
+                AddTypeRecursive(property.PropertyType);
+            // Add fields
+            foreach (var field in fields)
+                AddTypeRecursive(field.FieldType);
+            // Add methods
+            foreach (var method in methods)
+            {
+                AddTypeRecursive(method.ReturnType);
+                var parameters = method.GetParameters();
+                foreach (var parameter in parameters)
+                    AddTypeRecursive(parameter.ParameterType);
             }
             // Add events
-            foreach (var _event in typeModel.Events)            
-                if (_event.Info.EventHandlerType != null)
-                    AddTypeRecursive(_event.Info.EventHandlerType);
+            foreach (var _event in events)
+                if (_event.EventHandlerType != null)
+                    AddTypeRecursive(_event.EventHandlerType);
         }
 
         void AddTypeRecursive(Type type)
         {
-            var id = type.GetTypeId();
-
-            // Do not add a new type if it has been added already
-            if (fullProjectTypeMap.ContainsKey(id))
-                return;
-
             var model = new TypeModel(type);
-            fullProjectTypeMap.Add(id, model);
+            fullProjectTypeMap.Add(type.GetTypeId(), model);
             // Add assembly if needed and not already added
             AddAssembly(model);
+
+            // There is a chance this type is a TypeInfo
+            // try to cast it.
+            var meta = type as TypeInfo;
+            // If cast failed, get TypeInfo manually
+            meta ??= type.GetTypeInfo();
 
             // Ensure all generic parameters are accounted for
             if (type.ContainsGenericParameters)
             {
-                // There is a chance this type is a TypeInfo
-                // try to cast it.
-                var meta = type as TypeInfo;
-                // If cast failed, get TypeInfo manually
-                meta ??= type.GetTypeInfo();
                 // Process generic parameters
                 AddTypeParameters(meta.GenericTypeParameters);
             }
+
+            // Prevent further examination of this type because it is not an assembly of interest.
+            // We only need the type definition provided, unless inherited
+            if (!assembliesOfInterest.Contains(type.Assembly))
+                return;
 
             // Ensure all type argument types are accounted for
             if (type.GenericTypeArguments.Length > 0)
@@ -342,19 +366,19 @@ namespace DotDocs.Core.Models.Project
 
             // Ensure the base type is added too
             if (type.BaseType != null)
-                AddTypeRecursive(type.BaseType);
-        }
+                AddType(type.BaseType);
+        }        
 
         void AddTypeParameters(Type[] parameters)
         {
             foreach (var param in parameters)
-                AddTypeRecursive(param);            
+                AddType(param);            
         }
 
         void AddTypeArguments(Type[] arguments)
         {
-            foreach (var arg in arguments)        
-                AddTypeRecursive(arg);           
+            foreach (var arg in arguments)
+                AddType(arg);           
         }       
 
         void AddAssembly(TypeModel model)
