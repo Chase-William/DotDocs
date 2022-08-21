@@ -42,7 +42,7 @@ namespace DotDocs.Core.Models.Language
         #region Members
         EventModel[] events;
         public EventModel[] Events
-            => events ??= IsDefinedInLocalProject ? Array.Empty<EventModel>() : Info
+            => events ??= TreatAsFacade ? Array.Empty<EventModel>() : Info
                     .GetRuntimeEvents()
                     .Select(_event => new EventModel(_event))
                     .ToArray();
@@ -54,7 +54,7 @@ namespace DotDocs.Core.Models.Language
             {                
                 if (fields == null)
                 {
-                    if (IsDefinedInLocalProject)
+                    if (TreatAsFacade)
                     {
                         fields = Array.Empty<FieldModel>();                       
                     }    
@@ -91,7 +91,7 @@ namespace DotDocs.Core.Models.Language
 
         PropertyModel[] properties;
         public PropertyModel[] Properties
-            => properties ??= IsDefinedInLocalProject ? Array.Empty<PropertyModel>() : Info
+            => properties ??= TreatAsFacade ? Array.Empty<PropertyModel>() : Info
                     .GetDesiredProperties()
                     .Select(property => new PropertyModel(property))
                     .ToArray();
@@ -99,7 +99,7 @@ namespace DotDocs.Core.Models.Language
 
         MethodModel[] methods;
         public MethodModel[] Methods
-            => methods ??= IsDefinedInLocalProject ? Array.Empty<MethodModel>() : Info
+            => methods ??= TreatAsFacade ? Array.Empty<MethodModel>() : Info
                     .GetDesiredMethods()
                     .Select(method => new MethodModel(method))
                     .ToArray();
@@ -151,6 +151,13 @@ namespace DotDocs.Core.Models.Language
 
         [JsonIgnore]
         public TypeInfo Info { get; init; }
+
+        /// <summary>
+        /// Denotes whether this type should be treated as a facade. Facade in this context means
+        /// to avoid retaining extra information and only keeping essentials like the type definition itself.
+        /// </summary>
+        [JsonIgnore]
+        public bool TreatAsFacade => IsArray || IsByRef || !IsDefinedInLocalProject || IsGenericParameter;
 
         /// <summary>
         /// Denotes whether this type was defined inside a local project.

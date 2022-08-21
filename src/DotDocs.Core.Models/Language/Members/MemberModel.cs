@@ -13,6 +13,15 @@ namespace DotDocs.Core.Models.Language.Members
 
         public T2? Comments { get; set; }
 
+        /// <summary>
+        /// The id of the delcaring type for this member. The declaring type is 
+        /// the type the member is defined in. For example, a custom class has a .Equals()
+        /// method, but until that custom class implements it's own. It will use the one defined
+        /// in it's parent that provides .Equals(). That same .Equals() will denote it's declaring type to
+        /// be that parent class as that parent is where it "resides".
+        /// </summary>
+        public string? DeclaringType => Info.DeclaringType?.GetTypeId();
+
         public override string Name => Info.Name;
 
         protected MemberModel(T1 info)

@@ -196,7 +196,7 @@ namespace DotDocs.Core.Loader
             assembliesOfInterest = localProjects.Select(proj => proj.Assembly).ToHashSet();
             // Add types and their type dependencies to the collection of all types
             foreach (var project in localProjects)
-                foreach (var type in project.DefinedTypes)
+                foreach (var type in project._DefinedTypes)
                     AddType(type.Info);
         }
 
@@ -256,7 +256,7 @@ namespace DotDocs.Core.Loader
                 DisposeNext(rootProject);
             static void DisposeNext(LocalProjectContext project)
             {
-                foreach (var proj in project.LocalProjectsAsObjects)
+                foreach (var proj in project._LocalProjects)
                     DisposeNext((LocalProjectContext)proj);
                 project.Dispose();
             }
@@ -299,7 +299,7 @@ namespace DotDocs.Core.Loader
                 ProjectPath = properties[PROJECT_PATH].Value,
                 AssemblyLoadPath = properties[TARGET_PATH].Value,
                 DocumentationPath = Path.Combine(projDir, properties[DOCUMENTATION_FILE].Value),
-                LocalProjectsAsObjects = GetLocalProjects(projectEval).ToList<LocalProjectModel>()
+                _LocalProjects = GetLocalProjects(projectEval).ToList<LocalProjectModel>()
             };
         }
 
@@ -347,7 +347,7 @@ namespace DotDocs.Core.Loader
         void LoadRecursive(LocalProjectContext project, string[] assemblies)
         {            
             // Visit the lowest level assembly and load it's info before loading higher level assemblies
-            foreach (var proj in project.LocalProjectsAsObjects)
+            foreach (var proj in project._LocalProjects)
                 LoadRecursive((LocalProjectContext)proj, assemblies);
             project.Load(assemblies);            
         }
@@ -364,7 +364,7 @@ namespace DotDocs.Core.Loader
                 return;
 
             // Add this model's type
-            var model = new TypeModel(type, !assembliesOfInterest.Contains(type.Assembly));
+            var model = new TypeModel(type, assembliesOfInterest.Contains(type.Assembly));
             types.Add(type.GetTypeId(), model);
             // Add assembly if needed and not already added
             AddAssembly(model);
@@ -388,7 +388,7 @@ namespace DotDocs.Core.Loader
                 AddType(type.BaseType);
 
             // Only pull member info from types defined in assemblies created locally from a local project
-            if (!model.IsDefinedInLocalProject)            
+            if (!model.TreatAsFacade)            
                 AddTypeInfo(
                     model.Properties.Select(prop => prop.Info),
                     model.Fields.Select(field => field.Info),
@@ -460,7 +460,7 @@ namespace DotDocs.Core.Loader
                 if (proj != null) // if a project exist for this assembly, create a bi-directional refernce
                 {
                     assembly.LocalProject = proj;
-                    proj.Assembly = assembly;
+                    proj._Assembly = assembly;
                 }                
                 assemblies.Add(id, assembly);
                 // Assembly ref Model

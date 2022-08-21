@@ -23,7 +23,7 @@ namespace DotDocs.Core.Models.Language.Members
         public bool IsVirtual => Info.IsVirtual && !IsAbstract;
         public bool IsAbstract => Info.IsAbstract;
         public bool IsStatic => Info.IsStatic;
-        
+
         public MethodModel(MethodInfo info) : base(info) { }
     }
 }

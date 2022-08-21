@@ -12,7 +12,7 @@ namespace DotDocs.Core.Models
         /// <summary>
         /// Contains all the projects declared in this project.
         /// </summary>
-        public List<TypeModel> DefinedTypes { get; } = new();
+        public List<TypeModel> _DefinedTypes { get; } = new();
         /// <summary>
         /// Just the project name with no extension.
         /// </summary>
@@ -34,7 +34,7 @@ namespace DotDocs.Core.Models
         /// Contains unique identifiers to local projects that are dependencies.
         /// </summary>
         public string[] LocalProjects 
-            => LocalProjectsAsObjects
+            => _LocalProjects
             .Select(project => project.GetProjectId())
             .ToArray();
 
@@ -52,10 +52,10 @@ namespace DotDocs.Core.Models
         /// <summary>
         /// Collection of all <see cref="LocalProjectModel"/> dependencies.
         /// </summary>   
-        public List<LocalProjectModel> LocalProjectsAsObjects { get; set; } = new();
+        public List<LocalProjectModel> _LocalProjects { get; set; } = new();
 
         [JsonIgnore]
-        public AssemblyModel Assembly { get; set; }
+        public AssemblyModel _Assembly { get; set; }
 
         /// <summary>
         /// Determines if a projectFile
@@ -65,7 +65,7 @@ namespace DotDocs.Core.Models
         /// <returns>A reference to the <see cref="LocalProjectModel"/> instance or null.</returns>
         public bool Exists(string projectFile)
         {
-            foreach (var proj in LocalProjectsAsObjects)
+            foreach (var proj in _LocalProjects)
             {
                 if (proj.ProjectPath == projectFile) // base case
                     return true;

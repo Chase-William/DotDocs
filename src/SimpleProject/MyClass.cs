@@ -1,37 +1,23 @@
 ﻿namespace SimpleProject
 {
-    public delegate Action<string, uint> TestType();
+    public class DerivedClass : MiddleClass
+    {
+        public override void TestMethod()
+        {
 
-    public class TopLevelClass : GenericParameterizedClass<ArgumentClass, ArgumentClass>
+        }
+    }
+
+    public class MiddleClass : BaseClass
     {
 
     }
 
-    //public class TopLevelGenericishClass<T1> : GenericParameterizedClass<ArgumentClass>
-    //{
-
-    //}
-
-    public class GenericParameterizedClass<T1, T2>
-        where T2 : ArgumentClass
+    public class BaseClass
     {
+        public virtual void TestMethod()
+        {
 
-    }
-
-    public class SecondGenericParameterizedClass<T1, T2>
-       where T2 : ArgumentClass
-    {
-
-    }
-
-    public class ArgumentClass
-    {
-        public string StringProperty;
-        public int IntProperty;
-    }
-
-    public enum TestEnum
-    {
-        
+        }
     }
 }
