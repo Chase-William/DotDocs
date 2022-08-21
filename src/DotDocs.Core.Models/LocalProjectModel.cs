@@ -30,13 +30,22 @@ namespace DotDocs.Core.Models
         /// </summary>
         public string ProjectPath { get; set; }
 
+        /// <summary>
+        /// Contains unique identifiers to local projects that are dependencies.
+        /// </summary>
         public string[] LocalProjects 
             => LocalProjectsAsObjects
             .Select(project => project.GetProjectId())
             .ToArray();
 
+        /// <summary>
+        /// A unique identifier to the assembly this project produces.
+        /// </summary>
         public string AssemblyId { get; set; }
 
+        /// <summary>
+        /// A unique idenfitier for this project.
+        /// </summary>
         public string Id => this.GetProjectId();
 
         [JsonIgnore]
@@ -44,6 +53,9 @@ namespace DotDocs.Core.Models
         /// Collection of all <see cref="LocalProjectModel"/> dependencies.
         /// </summary>   
         public List<LocalProjectModel> LocalProjectsAsObjects { get; set; } = new();
+
+        [JsonIgnore]
+        public AssemblyModel Assembly { get; set; }
 
         /// <summary>
         /// Determines if a projectFile

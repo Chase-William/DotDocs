@@ -7,14 +7,15 @@ using DotDocs.Core.Models.Language;
 using System.Text.Json;
 using DotDocs.Core.Models;
 using DotDocs.Core.Loader.Exceptions;
+using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Loader
 {
+    /// <summary>
+    /// A class that provides a means to build and load a project with all its local project dependencies, assemblies, and types.
+    /// </summary>
     public class ProjectLoadContext : IDisposable
-    {
-        /// <summary>
-        /// Folder that contains the project's namespace and type tree.
-        /// </summary>
+    {       
         public const string PROJECTS_FILE = "projects.json";
         public const string TYPES_FILE = "types.json";
         public const string ASSEMBLIES_FILE = "assemblies.json";
@@ -29,15 +30,27 @@ namespace DotDocs.Core.Loader
         const string DOCUMENTATION_FILE = "DocumentationFile";        
 
         private List<LocalProjectContext> localProjects = new();
+        /// <summary>
+        /// All local projects involved in the build process.
+        /// </summary>
         public List<LocalProjectModel> LocalProjects => localProjects.ToList<LocalProjectModel>();
 
         LocalProjectContext rootProject;
+        /// <summary>
+        /// The root project all others stem from.
+        /// </summary>
         public LocalProjectModel RootProject => rootProject;
 
-        Dictionary<string, TypeModel> fullProjectTypeMap = new();
-        public IReadOnlyDictionary<string, TypeModel> FullProjectTypeMap => fullProjectTypeMap;
+        Dictionary<string, TypeModel> types = new();
+        /// <summary>
+        /// Types needed by the root project and it's dependencies.
+        /// </summary>
+        public IReadOnlyDictionary<string, TypeModel> Types => types;
 
         Dictionary<string, AssemblyModel> assemblies = new();
+        /// <summary>
+        /// Assemblies needed by the root project and it's dependencies.
+        /// </summary>
         public IReadOnlyDictionary<string, AssemblyModel> Assemblies => assemblies;
 
         /// <summary>
@@ -46,11 +59,17 @@ namespace DotDocs.Core.Loader
         /// </summary>
         private HashSet<Assembly> assembliesOfInterest;
 
+        /// <summary>
+        /// Used internally by the <see cref="MetadataLoadContext"/> to load assemblies that are needed for reflection.
+        /// </summary>
         private string[] assembliesPaths { get; set; }
 
         public ProjectLoadContext() { }
 
-        
+        /// <summary>
+        /// Writes the <see cref="Assemblies"/>, <see cref="LocalProjects"/>, and <see cref="Types"/> collections to file.
+        /// </summary>
+        /// <param name="outputPath">The location to place all files within.</param>
         public void Save(string outputPath)
         {
             // Save assemblies
@@ -61,7 +80,7 @@ namespace DotDocs.Core.Loader
                 writer.Write(JsonSerializer.Serialize(LocalProjects));            
             // Save types
             using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))            
-                writer.Write(JsonSerializer.Serialize(FullProjectTypeMap.Values));                        
+                writer.Write(JsonSerializer.Serialize(Types.Values));                        
         }
 
         /// <summary>
@@ -116,11 +135,12 @@ namespace DotDocs.Core.Loader
         }
 
 
-        /*
-         * 
-         * Gather all .dlls for each assembly.
-         * 
-         */
+        /// <summary>
+        /// Build the project and either report the error if the build fails or if it succeeds gather information
+        /// from the build like projects local projects needed and assemblies required.
+        /// </summary>
+        /// <param name="csProjPath">The project to build.</param>
+        /// <exception cref="BuildException">The build error.</exception>
         public void BuildProject(string csProjPath)
         {
             try
@@ -167,19 +187,65 @@ namespace DotDocs.Core.Loader
             }
         }
 
+        /// <summary>
+        /// Load all types used by the root project and it's project dependencies.
+        /// </summary>
         public void LoadTypes()
         {            
             LoadRecursive(rootProject, assembliesPaths);
             assembliesOfInterest = localProjects.Select(proj => proj.Assembly).ToHashSet();
             // Add types and their type dependencies to the collection of all types
             foreach (var project in localProjects)
-            {
                 foreach (var type in project.DefinedTypes)
-                {
-                    AddType(type.Type);                    
-                }
-            }            
+                    AddType(type.Info);
         }
+
+        /// <summary>
+        /// Loads the comments associated with each type. This function depends on <see cref="Assemblies"/>
+        /// as it iterates through the types reference in the <see cref="AssemblyModel.Types"/>. Therefore, it can load
+        /// the documentation file associated with that assembly once and apply comments it to all types. Other approaches
+        /// would result in more redundent file loading.
+        /// </summary>
+        public void LoadDocumentation()
+        {
+            foreach (var assembly in Assemblies.Values)
+            {
+                DocXmlReader docReader;
+
+                var proj = assembly.LocalProject as LocalProjectContext;
+                if (proj != null) // Use the project's documentation path to load the documentation .xml                
+                    docReader = new DocXmlReader(proj.DocumentationPath);
+                else // Use the assemblies's exact file path, just change the extension to .xml
+                {
+                    string asmPath = assembly.Assembly.Location;
+                    string docFilePath = asmPath[..asmPath.LastIndexOf('.')] + ".xml";
+                    if (File.Exists(docFilePath)) // Ensure this doc file exist
+                        docReader = new DocXmlReader(docFilePath);
+                    else // Doesn't exist so documentation for this assembly's types
+                        continue;
+                }
+                // Process all types
+                foreach (var type in assembly.Types)
+                {
+                    // Get comments for type
+                    type.Comments = docReader.GetTypeComments(type.Info);                    
+                    // Get comments for methods
+                    foreach (var method in type.Methods)
+                        method.Comments = docReader.GetMethodComments(method.Info, true);
+                    // Get comments for properties
+                    foreach (var property in type.Properties)
+                        property.Comments = docReader.GetMemberComments(property.Info);
+                    // Get comments for fields
+                    foreach (var field in type.Fields)
+                        field.Comments = docReader.GetMemberComments(field.Info);
+                    // Get comments for events
+                    foreach (var _event in type.Events)
+                        _event.Comments = docReader.GetMemberComments(_event.Info);
+                }
+            }
+        }
+
+        
 
         /// <summary>
         /// Disposes all <see cref="LocalProjectModel"/> within <see cref="rootProject"/> recursively.
@@ -273,6 +339,11 @@ namespace DotDocs.Core.Loader
             return projects;
         }
 
+        /// <summary>
+        /// Loads all local projects recursively.
+        /// </summary>
+        /// <param name="project">Project to start loading from.</param>
+        /// <param name="assemblies">Assemblies that may be needed by <see cref="MetadataLoadContext"/>.</param>
         void LoadRecursive(LocalProjectContext project, string[] assemblies)
         {            
             // Visit the lowest level assembly and load it's info before loading higher level assemblies
@@ -281,15 +352,20 @@ namespace DotDocs.Core.Loader
             project.Load(assemblies);            
         }
 
+        /// <summary>
+        /// Add a type itself to the type map and specific types used by members
+        /// within the type. Types that are already added to the type map will be ignored.
+        /// </summary>
+        /// <param name="type">Type to add.</param>
         void AddType(Type type)
         {
             // Do not add if already accounted for
-            if (fullProjectTypeMap.ContainsKey(type.GetTypeId()))
+            if (types.ContainsKey(type.GetTypeId()))
                 return;
 
             // Add this model's type
             var model = new TypeModel(type, !assembliesOfInterest.Contains(type.Assembly));
-            fullProjectTypeMap.Add(type.GetTypeId(), model);
+            types.Add(type.GetTypeId(), model);
             // Add assembly if needed and not already added
             AddAssembly(model);
 
@@ -300,11 +376,8 @@ namespace DotDocs.Core.Loader
             meta ??= type.GetTypeInfo();
 
             // Ensure all generic parameters are accounted for
-            if (type.ContainsGenericParameters)
-            {
-                // Process generic parameters
-                AddTypeParameters(meta.GenericTypeParameters);
-            }
+            if (type.ContainsGenericParameters) // Process generic parameters            
+                AddTypeParameters(meta.GenericTypeParameters);            
 
             // Ensure all type argument types are accounted for
             if (type.GenericTypeArguments.Length > 0)
@@ -315,16 +388,21 @@ namespace DotDocs.Core.Loader
                 AddType(type.BaseType);
 
             // Only pull member info from types defined in assemblies created locally from a local project
-            if (!model.IsDefinedInLocalProject)
-            {
+            if (!model.IsDefinedInLocalProject)            
                 AddTypeInfo(
                     model.Properties.Select(prop => prop.Info),
                     model.Fields.Select(field => field.Info),
                     model.Methods.Select(method => method.Info),
-                    model.Events.Select(_event => _event.Info));
-            }
+                    model.Events.Select(_event => _event.Info));            
         }
 
+        /// <summary>
+        /// Ensures all member information for types are added to the type map.
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="fields"></param>
+        /// <param name="methods"></param>
+        /// <param name="events"></param>
         void AddTypeInfo(
             IEnumerable<PropertyInfo> properties,
             IEnumerable<FieldInfo> fields,
@@ -357,18 +435,47 @@ namespace DotDocs.Core.Loader
                 AddType(param);            
         }
 
+
         void AddTypeArguments(Type[] arguments)
         {
             foreach (var arg in arguments)
                 AddType(arg);           
         }       
 
+        /// <summary>
+        /// Adds an assembly to the <see cref="Assemblies"/> collection if it is not already added.
+        /// Creates a bi-directional reference between an assembly and it's types.
+        /// Creates a bi-directional reference between an assembly and it's project.
+        /// </summary>
+        /// <param name="model">Model that uses a assembly.</param>
         void AddAssembly(TypeModel model)
         {
-            var id = model.Type.Assembly.GetAssemblyId();
+            var id = model.Info.Assembly.GetAssemblyId();
+            AssemblyModel assembly;
             // Add all needed assembly to the assemblies list
             if (!assemblies.ContainsKey(id))
-                assemblies.Add(id, new AssemblyModel(model.Type.Assembly));
+            {
+                assembly = new AssemblyModel(model.Info.Assembly);
+                var proj = LocalProjects.SingleOrDefault(proj => proj.AssemblyId == id);
+                if (proj != null) // if a project exist for this assembly, create a bi-directional refernce
+                {
+                    assembly.LocalProject = proj;
+                    proj.Assembly = assembly;
+                }                
+                assemblies.Add(id, assembly);
+                // Assembly ref Model
+                assembly.Types.Add(model);
+                // Model ref Assembly
+                model.Assembly = assembly;
+            }
+            else
+            {
+                assembly = assemblies[id];
+                // Assembly ref Model
+                assembly.Types.Add(model);
+                // Model ref Assembly
+                model.Assembly = assembly;
+            }
         }
     }
 }

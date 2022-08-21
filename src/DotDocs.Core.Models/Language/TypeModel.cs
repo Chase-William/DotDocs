@@ -21,28 +21,28 @@ namespace DotDocs.Core.Models.Language
         /// </summary>
         static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
-        public string? BaseType => Type.BaseType?.GetTypeId();
+        public string? BaseType => Info.BaseType?.GetTypeId();
 
-        public string? Namespace => Type.Namespace;
+        public string? Namespace => Info.Namespace;
 
-        public override string Name => Type.Name;
+        public override string Name => Info.Name;
 
-        public string? FullName => Type.FullName;
+        public string? FullName => Info.FullName;
 
-        public CommonComments Comments { get; set; }        
+        public TypeComments? Comments { get; set; }        
 
         #region Type Kind
-        public bool IsClass => Type.IsClass;
-        public bool IsInterface => Type.IsInterface;
-        public bool IsValueType => Type.IsValueType;
-        public bool IsEnum => Type.IsEnum;
-        public bool IsDelegate => Type.BaseType?.FullName == "System.MulticastDelegate"; // Extra
+        public bool IsClass => Info.IsClass;
+        public bool IsInterface => Info.IsInterface;
+        public bool IsValueType => Info.IsValueType;
+        public bool IsEnum => Info.IsEnum;
+        public bool IsDelegate => Info.BaseType?.FullName == "System.MulticastDelegate"; // Extra
         #endregion
 
         #region Members
         EventModel[] events;
         public EventModel[] Events
-            => events ??= IsDefinedInLocalProject ? Array.Empty<EventModel>() : Type
+            => events ??= IsDefinedInLocalProject ? Array.Empty<EventModel>() : Info
                     .GetRuntimeEvents()
                     .Select(_event => new EventModel(_event))
                     .ToArray();
@@ -61,7 +61,7 @@ namespace DotDocs.Core.Models.Language
                     // When a type is an enum it's first property denotes the type of all members
                     else if (IsEnum)
                     {
-                        var _fields = Type.GetRuntimeFields()
+                        var _fields = Info.GetRuntimeFields()
                             .Where(_field => !_field
                                 .GetCustomAttributesData()
                                 .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name))
@@ -74,7 +74,7 @@ namespace DotDocs.Core.Models.Language
                     }
                     else
                     {
-                        fields = Type
+                        fields = Info
                             .GetRuntimeFields()
                             .Where(_field => !_field
                                 .GetCustomAttributesData()
@@ -91,7 +91,7 @@ namespace DotDocs.Core.Models.Language
 
         PropertyModel[] properties;
         public PropertyModel[] Properties
-            => properties ??= IsDefinedInLocalProject ? Array.Empty<PropertyModel>() : Type
+            => properties ??= IsDefinedInLocalProject ? Array.Empty<PropertyModel>() : Info
                     .GetDesiredProperties()
                     .Select(property => new PropertyModel(property))
                     .ToArray();
@@ -99,7 +99,7 @@ namespace DotDocs.Core.Models.Language
 
         MethodModel[] methods;
         public MethodModel[] Methods
-            => methods ??= IsDefinedInLocalProject ? Array.Empty<MethodModel>() : Type
+            => methods ??= IsDefinedInLocalProject ? Array.Empty<MethodModel>() : Info
                     .GetDesiredMethods()
                     .Select(method => new MethodModel(method))
                     .ToArray();
@@ -109,61 +109,67 @@ namespace DotDocs.Core.Models.Language
         /// <summary>
         /// Contains the primary keys to each type's definition.
         /// </summary>
-        public string[] GenericTypeArguments => Type.GenericTypeArguments.Select(t => t.GetTypeId()).ToArray();
+        public string[] GenericTypeArguments => Info.GenericTypeArguments.Select(t => t.GetTypeId()).ToArray();
         /// <summary>
         /// Contains the primary keys to each type's definition.
         /// </summary>
-        public string[] GenericTypeParameters => Type.GenericTypeParameters.Select(t => t.GetTypeId()).ToArray();
+        public string[] GenericTypeParameters => Info.GenericTypeParameters.Select(t => t.GetTypeId()).ToArray();
         /// <summary>
         /// Denotes if this type is constructed from a generic type.
         /// </summary>
-        public bool IsConstructedGenericType => Type.IsConstructedGenericType;
+        public bool IsConstructedGenericType => Info.IsConstructedGenericType;
         /// <summary>
         /// Denotes if this type is generic, meaning can be a generic type definition, open constructed type or closed constructed type.
         /// </summary>
-        public bool IsGenericType => Type.IsGenericType;
+        public bool IsGenericType => Info.IsGenericType;
         /// <summary>
         /// Denotes that this type defines a generic type and can be used to create constructed types.
         /// </summary>
-        public bool IsGenericTypeDefinition => Type.IsGenericTypeDefinition;
+        public bool IsGenericTypeDefinition => Info.IsGenericTypeDefinition;
         /// <summary>
         /// Indicates if this type is used as a generic parameter in a type definition or in a generic method definition.
         /// </summary>
-        public bool IsGenericParameter => Type.IsGenericParameter;
+        public bool IsGenericParameter => Info.IsGenericParameter;
         
-        public int MetadataToken => Type.MetadataToken;
+        public int MetadataToken => Info.MetadataToken;
         #endregion
 
         /// <summary>
         /// Denotes if this type is actually an array type.
         /// </summary>
-        public bool IsArray => Type.IsArray;
+        public bool IsArray => Info.IsArray;
         /// <summary>
         /// Denotes if this type is a by ref type.
         /// </summary>
-        public bool IsByRef => Type.IsByRef;
+        public bool IsByRef => Info.IsByRef;
 
         string? typeId;
         public string Id
-            => typeId ??= Type.GetTypeId();        
+            => typeId ??= Info.GetTypeId();        
 
-        public string AssemblyId => Type.Assembly.GetAssemblyId();
-
-        [JsonIgnore]
-        public TypeInfo Type { get; init; }
+        public string AssemblyId => Info.Assembly.GetAssemblyId();
 
         [JsonIgnore]
+        public TypeInfo Info { get; init; }
+
+        /// <summary>
+        /// Denotes whether this type was defined inside a local project.
+        /// </summary>
+        [JsonIgnore]        
         public bool IsDefinedInLocalProject { get; init; }
+
+        [JsonIgnore]
+        public AssemblyModel Assembly { get; set; }
 
         public TypeModel(Type type, bool isDefinedInLocalProject)
         {
-            Type = type.GetTypeInfo();
+            Info = type.GetTypeInfo();
             IsDefinedInLocalProject = isDefinedInLocalProject;
         }
 
         public TypeModel(TypeInfo typeInfo, bool isDefinedInLocalProject)
         {
-            Type = typeInfo;
+            Info = typeInfo;
             IsDefinedInLocalProject = isDefinedInLocalProject;
         }
     }    

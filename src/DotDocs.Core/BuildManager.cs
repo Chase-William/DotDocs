@@ -55,6 +55,7 @@ namespace DotDocs.Core
         public void Load()
         {
             ProjectContext.LoadTypes();
+            ProjectContext.LoadDocumentation();
         }
 
         public void Make()

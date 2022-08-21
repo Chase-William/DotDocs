@@ -5,7 +5,7 @@ using DotDocs.Core.Models.Language.Interfaces;
 
 namespace DotDocs.Core.Models.Language.Members
 {
-    public class MethodModel : MemberModel<MethodInfo, CommonComments>, IHaveSignature
+    public class MethodModel : MemberModel<MethodInfo, MethodComments>, IHaveSignature
     {
         public bool IsPublic => Info.IsPublic;
         public bool IsProtected => Info.IsFamily || Info.IsFamilyOrAssembly || Info.IsFamilyAndAssembly;
