@@ -1,94 +1,20 @@
+<p align="center">
+  <img src="./resources/media/.docs.core-purple-1024x.png" style="width: 450px;margin-left: auto;margin-right: auto;">
+</p>
 
-# Docshark.Core 
-This library is the supporting library for Docshark which provides .NET developers with a means to generate documentation seamlessly from their codebase.
+# DotDocs.Core *(.Docs.Core)* 
+This is a supporting library for the [.Docs](https://github.com/Chase-William/.Docs) project. `DocDocs.Core` builds a *.csproj* and it's dependencies and extracts, organizes and exports types, assemblies, and project metadata to `JSON` files.
 
 ## Project Structure
 
 ```mermaid
 graph TD;
-Docshark.Core-->Docshark.Core.Global;
-Docshark.Core-->Docshark.Core.Mapper.Project;
-Docshark.Core.Mapper.Project-->Docshark.Core.Models.Project;
-Docshark.Core.Models.Project-->Docshark.Core.Mapper.Codebase;
-Docshark.Core.Mapper.Codebase-->Docshark.Core.Models.Codebase;
 Docshark.Runner-->Docshark.Core;
+Docshark.Core-->Docshark.Core.Loader;
+Docshark.Core.Loader-->Docshark.Core.Models;
 ```
 
-- `Docshark.Runner` | Executeable entry point called by Node.js project to use this project
-- `Docshark.Core` | Main library to be used directly by others
-- `Docshark.Core.Mapper.Project` | Main hub for configuring *.csproj* files & building them
-- `Docshark.Core.Models.Project` | Contains models that represent *.csproj* files and provides functionalities to interact with them *(in memory & on disk)*
-- `Docshark.Core.Mapper.Codebase` | Main hub for codebase representation and organizes the codebase models into a tree like data structure
-- `Docshark.Core.Models.Codebase` |  Contains models that represent the codebase's individual entities
-- `Docshark.Core.Global` | Manages a global system that link types, assemblies, and projects together.
-
-
-#### Types
-
-- `Class`
-  - IsPublic
-  - IsPrivate
-  - IsInternal
-  - IsProtected
-  - IsAbstract
-  - IsSealed
-  - IsStatic
-  - Parent
-- `Struct`
-  - IsPublic
-  - IsPrivate
-  - IsInternal
-  - IsProtected
-  - Parent
-- `Interface`
-  - IsPublic
-  - IsPrivate
-  - IsInternal
-  - IsProtected
-- `Delegate`
-  - IsPublic
-  - IsPrivate
-  - IsInternal
-  - IsProtected
-  - Parent
-
-#### Members
-
-- `Event`
-  - IsPublic
-  - IsStatic
-  - IsProtected
-  - IsInternal
-  - IsAbstract
-  - IsVirtual
-- `Field`
-  - IsPublic
-  - IsReadonly
-  - IsConstant
-  - IsStatic
-  - IsProtected
-  - IsInternal
-- `Property`
-  - HasGetter
-  - HasSetter
-  - IsGetPublic
-  - IsSetPublic
-  - IsGetProtected
-  - IsSetProtected
-  - IsGetInternal
-  - IsSetInternal
-  - IsAbstract
-  - IsVirtual
-  - IsStatic
-  - IsPublic
-  - IsProtected
-  - IsInternal
-- `Method`
-  - IsPublic
-  - IsAbstract
-  - IsVirtual
-  - IsStatic
-  - ReturnType
-  - Parameters
-  - IsInternal
-  - IsProtected
+- `DotDocs.Core.Runner`, Executeable entry point called by `.Docs` a *Node.js* project
+- `DotDocs.Core`, Main library that contains high level commands for using dependencies
+- `DotDocs.Core.Loader`, Contains logic for preparing, building, analyizing projects *(.csproj files)* 
+- `DotDocs.Core.Models`, Contains models for projects, assemblies, types, and members etc.
