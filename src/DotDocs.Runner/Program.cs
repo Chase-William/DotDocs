@@ -49,7 +49,7 @@ namespace DotDocs.Runner
 
                 docs.Prepare();
                 docs.Load();
-                docs.Make();
+                docs.Render();
             }
             catch (BuildException ex)
             {

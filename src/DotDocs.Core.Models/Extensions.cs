@@ -9,8 +9,16 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Core.Models
 {
+    /// <summary>
+    /// A static class that exists purely to contain extension methods.
+    /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// Gets a unique identifier for a type.
+        /// </summary>
+        /// <param name="type">The type to get an id for.</param>
+        /// <returns>A string that is the id.</returns>
         public static string GetTypeId(this Type type)
         {
             /*
@@ -26,7 +34,12 @@ namespace DotDocs.Core.Models
              */
             return type.MetadataToken + "-" + type.ToString();
         }
-
+        /// <summary>
+        /// Gets a unique idi for an assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to get an id for.</param>
+        /// <returns>A string that is the id.</returns>
+        /// <exception cref="RequiredAssemblyPropertyNullException">Occurs when an assembly doesn't have a name.</exception>
         public static string GetAssemblyId(this Assembly assembly)
         {
             var name = assembly.GetName();
@@ -34,20 +47,42 @@ namespace DotDocs.Core.Models
                 throw new RequiredAssemblyPropertyNullException(assembly, nameof(name.Name));
             return name.Name;
         }
-
+        /// <summary>
+        /// Gets a unique idenfier for a local project.
+        /// </summary>
+        /// <param name="project">The project to get a id for.</param>
+        /// <returns>A string that is the id.</returns>
         public static string GetProjectId(this LocalProjectModel project)
             => project.ProjectName;
-
+        /// <summary>
+        /// Gets a list of the desired properties that DotDocs will only filter down further as needed.
+        /// </summary>
+        /// <param name="type">The type to get property infos from.</param>
+        /// <returns>Desired properties from the type.</returns>
         public static IEnumerable<PropertyInfo> GetDesiredProperties(this Type type)
             => type.GetRuntimeProperties();
-
+        /// <summary>
+        /// Gets a list of desired methods that DotDocs will only filter down further as needed. 
+        /// This method will prevent the returning of generates methods for property getter and setters.
+        /// </summary>
+        /// <param name="type">The type to get the method infos from.</param>
+        /// <returns>Desired methods from the type.</returns>
         public static IEnumerable<MethodInfo> GetDesiredMethods(this Type type)
             => type.GetRuntimeMethods()
                    .Where(method => !method.IsSpecialName && !typeof(object).GetRuntimeMethods().Any(name => name.Equals(method.Name)));
-
+        /// <summary>
+        /// Gets a list of desired events that DotDocs will only filter down further as needed.
+        /// </summary>
+        /// <param name="type">The type to get the event infos from.</param>
+        /// <returns>Desired events from the type.</returns>
         public static IEnumerable<EventInfo> GetDesiredEvents(this Type type)
             => type.GetRuntimeEvents();
-
+        /// <summary>
+        /// Gets a list of the desired fields that DotDocs will only filter down further as needed.
+        /// This method will prevent the returning of generates fields for properties.
+        /// </summary>
+        /// <param name="type">The type to get the fields from.</param>
+        /// <returns>Desired fields from the type.</returns>
         public static IEnumerable<FieldInfo> GetDesiredFields(this Type type)
             => type.GetRuntimeFields()
                    .Where(_field => !_field
@@ -55,7 +90,13 @@ namespace DotDocs.Core.Models
                        .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) &&
                    !_field.Attributes.HasFlag(FieldAttributes.SpecialName) &&
                    !_field.Attributes.HasFlag(FieldAttributes.RTSpecialName));
-
+        /// <summary>
+        /// Gets a list of desired enums that DotDocs will only filter down further as needed.
+        /// This methid will prevent the returning of any compiler generates fields.
+        /// </summary>
+        /// <param name="type">The type to get the fields from.</param>
+        /// <returns>Desired fields from the type.</returns>
+        /// <exception cref="ArgumentException">Raised when this method has been called on a type that is not an enum.</exception>
         public static IEnumerable<FieldInfo> GetEnumDesiredFields(this Type type)
         {
             if (!type.IsEnum)

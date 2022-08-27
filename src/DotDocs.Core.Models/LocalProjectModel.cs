@@ -8,10 +8,10 @@ namespace DotDocs.Core.Models
     /// </summary>
     public class LocalProjectModel
     {
-        [JsonIgnore]
         /// <summary>
         /// Contains all the projects declared in this project.
         /// </summary>
+        [JsonIgnore]
         public List<TypeModel> _DefinedTypes { get; } = new();
         /// <summary>
         /// Just the project name with no extension.
@@ -29,7 +29,6 @@ namespace DotDocs.Core.Models
         /// Entire path to file include name with extension.
         /// </summary>
         public string ProjectPath { get; set; }
-
         /// <summary>
         /// Contains unique identifiers to local projects that are dependencies.
         /// </summary>
@@ -37,31 +36,29 @@ namespace DotDocs.Core.Models
             => _LocalProjects
             .Select(project => project.GetProjectId())
             .ToArray();
-
         /// <summary>
         /// A unique identifier to the assembly this project produces.
         /// </summary>
         public string AssemblyId { get; set; }
-
         /// <summary>
         /// A unique idenfitier for this project.
         /// </summary>
         public string Id => this.GetProjectId();
-
-        [JsonIgnore]
         /// <summary>
         /// Collection of all <see cref="LocalProjectModel"/> dependencies.
         /// </summary>   
+        [JsonIgnore]
         public List<LocalProjectModel> _LocalProjects { get; set; } = new();
-
+        /// <summary>
+        /// The assembly model instance this project generates.
+        /// </summary>
         [JsonIgnore]
         public AssemblyModel _Assembly { get; set; }
-
         /// <summary>
-        /// Determines if a projectFile
+        /// Determines if a projectFile exists recursively from here down into other projects.
         /// Uses a depth-first-search (DFS) approach.
         /// </summary>
-        /// <param name="projectName">Name of project to find.</param>
+        /// <param name="projectFile">The project file in question.</param>
         /// <returns>A reference to the <see cref="LocalProjectModel"/> instance or null.</returns>
         public bool Exists(string projectFile)
         {

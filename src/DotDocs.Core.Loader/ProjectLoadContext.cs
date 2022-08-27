@@ -29,43 +29,51 @@ namespace DotDocs.Core.Loader
         const string TARGET_PATH = "TargetPath";
         const string DOCUMENTATION_FILE = "DocumentationFile";        
 
+        /// <summary>
+        /// The underlying list of projects needed by the root project and it's dependencies recursively.
+        /// </summary>
         private List<LocalProjectContext> localProjects = new();
         /// <summary>
         /// All local projects involved in the build process.
         /// </summary>
         public List<LocalProjectModel> LocalProjects => localProjects.ToList<LocalProjectModel>();
-
+        /// <summary>
+        /// The undelying field for the root project.
+        /// </summary>
         LocalProjectContext rootProject;
         /// <summary>
         /// The root project all others stem from.
         /// </summary>
         public LocalProjectModel RootProject => rootProject;
-
+        /// <summary>
+        /// The underlying dictionary for all types.
+        /// </summary>
         Dictionary<string, TypeModel> types = new();
         /// <summary>
         /// Types needed by the root project and it's dependencies.
         /// </summary>
         public IReadOnlyDictionary<string, TypeModel> Types => types;
-
+        /// <summary>
+        /// The underlying dictionary for all assemblies.
+        /// </summary>
         Dictionary<string, AssemblyModel> assemblies = new();
         /// <summary>
         /// Assemblies needed by the root project and it's dependencies.
         /// </summary>
         public IReadOnlyDictionary<string, AssemblyModel> Assemblies => assemblies;
-
         /// <summary>
         /// Assemblies that we want to capture member information from. Other types declared outside
         /// of this assembly we will not capture.
         /// </summary>
         private HashSet<Assembly> assembliesOfInterest;
-
         /// <summary>
         /// Used internally by the <see cref="MetadataLoadContext"/> to load assemblies that are needed for reflection.
         /// </summary>
         private string[] assembliesPaths { get; set; }
-
+        /// <summary>
+        /// Creates a new instance of the <see cref="ProjectLoadContext"/> class.
+        /// </summary>
         public ProjectLoadContext() { }
-
         /// <summary>
         /// Writes the <see cref="Assemblies"/>, <see cref="LocalProjects"/>, and <see cref="Types"/> collections to file.
         /// </summary>
@@ -82,7 +90,6 @@ namespace DotDocs.Core.Loader
             using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))            
                 writer.Write(JsonSerializer.Serialize(Types.Values));                        
         }
-
         /// <summary>
         /// Prepares given and all dependent .csproj files recursively for further processing.
         /// </summary>
@@ -133,8 +140,6 @@ namespace DotDocs.Core.Loader
             using var stream = File.Open(projectFile, FileMode.Create);
             docFile.Save(stream);
         }
-
-
         /// <summary>
         /// Build the project and either report the error if the build fails or if it succeeds gather information
         /// from the build like projects local projects needed and assemblies required.
@@ -186,7 +191,6 @@ namespace DotDocs.Core.Loader
                 throw;
             }
         }
-
         /// <summary>
         /// Load all types used by the root project and it's project dependencies.
         /// </summary>
@@ -199,7 +203,6 @@ namespace DotDocs.Core.Loader
                 foreach (var type in project._DefinedTypes)
                     AddType(type.Info);
         }
-
         /// <summary>
         /// Loads the comments associated with each type. This function depends on <see cref="Assemblies"/>
         /// as it iterates through the types reference in the <see cref="AssemblyModel.Types"/>. Therefore, it can load
@@ -243,10 +246,7 @@ namespace DotDocs.Core.Loader
                         _event.Comments = docReader.GetMemberComments(_event.Info);
                 }
             }
-        }
-
-        
-
+        }       
         /// <summary>
         /// Disposes all <see cref="LocalProjectModel"/> within <see cref="rootProject"/> recursively.
         /// </summary>
@@ -261,7 +261,6 @@ namespace DotDocs.Core.Loader
                 project.Dispose();
             }
         }
-
         /// <summary>
         /// Gets the local project's information and calls <see cref="GetLocalProjects(ProjectEvaluation)"/> to recursively aquire
         /// all sub projects too.
@@ -302,7 +301,6 @@ namespace DotDocs.Core.Loader
                 _LocalProjects = GetLocalProjects(projectEval).ToList<LocalProjectModel>()
             };
         }
-
         /// <summary>
         /// Gets all <see cref="LocalProject"/> dependencies of the given project evaluation.
         /// Operates in a depth-first-search mode.
@@ -338,7 +336,6 @@ namespace DotDocs.Core.Loader
             }
             return projects;
         }
-
         /// <summary>
         /// Loads all local projects recursively.
         /// </summary>
@@ -351,7 +348,6 @@ namespace DotDocs.Core.Loader
                 LoadRecursive((LocalProjectContext)proj, assemblies);
             project.Load(assemblies);            
         }
-
         /// <summary>
         /// Add a type itself to the type map and specific types used by members
         /// within the type. Types that are already added to the type map will be ignored.
@@ -395,7 +391,6 @@ namespace DotDocs.Core.Loader
                     model.Methods.Select(method => method.Info),
                     model.Events.Select(_event => _event.Info));            
         }
-
         /// <summary>
         /// Ensures all member information for types are added to the type map.
         /// </summary>
@@ -428,20 +423,24 @@ namespace DotDocs.Core.Loader
                 if (_event.EventHandlerType != null)
                     AddType(_event.EventHandlerType);
         }      
-
+        /// <summary>
+        /// Ensures all type parameters are added.
+        /// </summary>
+        /// <param name="parameters">Parameters to be added.</param>
         void AddTypeParameters(Type[] parameters)
         {
             foreach (var param in parameters)
                 AddType(param);            
         }
-
-
+        /// <summary>
+        /// Ensures all type arguments are accounted for.
+        /// </summary>
+        /// <param name="arguments">Arguments to be added.</param>
         void AddTypeArguments(Type[] arguments)
         {
             foreach (var arg in arguments)
                 AddType(arg);           
         }       
-
         /// <summary>
         /// Adds an assembly to the <see cref="Assemblies"/> collection if it is not already added.
         /// Creates a bi-directional reference between an assembly and it's types.

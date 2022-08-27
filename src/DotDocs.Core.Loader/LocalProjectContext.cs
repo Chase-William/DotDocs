@@ -10,16 +10,27 @@ using DotDocs.Core.Models;
 
 namespace DotDocs.Core.Loader
 {
+    /// <summary>
+    /// A class that extends <see cref="LocalProjectModel"/> to add project information loading functionalities.
+    /// </summary>
     internal sealed class LocalProjectContext : LocalProjectModel
     {
+        /// <summary>
+        /// The context used for loading in an assembly in a reflection-only manner.
+        /// </summary>
         MetadataLoadContext mlc;        
-
+        /// <summary>
+        /// The location of the assembly to be loaded.
+        /// </summary>
         public string AssemblyLoadPath { get; set; }
-
+        /// <summary>
+        /// The reflection-only assembly once loaded.
+        /// </summary>
         public Assembly Assembly { get; set; }
-
-        public string DocumentationPath { get; set; }
-
+        /// <summary>
+        /// The path of the documentation if available.
+        /// </summary>
+        public string? DocumentationPath { get; set; }
         /// <summary>
         /// Disposes of unmanaged resources for this <see cref="LocalProject"/> only.
         /// Does not dispose of children projects in <see cref="LocalProjects"/>.
@@ -27,13 +38,17 @@ namespace DotDocs.Core.Loader
         public void Dispose()
             => mlc?.Dispose();
 
+        /// <summary>
+        /// Loads the project's assembly and processes it's types.
+        /// </summary>
+        /// <param name="assemblies">Supporting assemblies of the project's assembly.</param>
         public void Load(string[] assemblies)
         {
             if (mlc != null)
                 Dispose();
             mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
             Assembly = mlc.LoadFromAssemblyPath(AssemblyLoadPath);
-
+            
             /*
              * Do not add all types unless they are relevant to the custom types created by the developer(s)
              * or if they are public. All types used in some way by the developer(s')('s) types will be added

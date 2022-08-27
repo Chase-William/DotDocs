@@ -3,10 +3,13 @@
 namespace DotDocs.Core
 {
     /// <summary>
-    /// The main hub for Charp.Core.
+    /// The entry-point for .Docs.Core.
     /// </summary>
     public class Docsharker : IDisposable
     {                
+        /// <summary>
+        /// The main hub for controlling preparing, loading, rendering.
+        /// </summary>
         public BuildManager Builder { get; set; }        
 
         /// <summary>
@@ -26,13 +29,20 @@ namespace DotDocs.Core
             Builder = null;
         }
 
+        /// <summary>
+        /// <inheritdoc cref="BuildManager.Prepare"/>
+        /// </summary>
         public void Prepare()
             => Builder.Prepare();
-
+        /// <summary>
+        /// <inheritdoc cref="BuildManager.Load"/>
+        /// </summary>
         public void Load()
             => Builder.Load();
-
-        public void Make()
-            => Builder.Make();
+        /// <summary>
+        /// <inheritdoc cref="BuildManager.Render"/>
+        /// </summary>
+        public void Render()
+            => Builder.Render();
     }
 }

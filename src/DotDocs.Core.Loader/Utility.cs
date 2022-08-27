@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Core.Loader
 {    
+    /// <summary>
+    /// Contains utility functionalities needed by this project.
+    /// </summary>
     public static class Utility
     {
         /// <summary>

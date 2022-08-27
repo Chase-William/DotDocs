@@ -14,12 +14,12 @@ namespace DotDocs.Core.Models.Language
 {
     public class TypeModel : Model
     {
-        [JsonIgnore]
+        //[JsonIgnore]
         /// <summary>
         /// Collection of members always present in an object.
         /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
         /// </summary>
-        static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
+        //static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
         public string? BaseType => Info.BaseType?.GetTypeId();
 
