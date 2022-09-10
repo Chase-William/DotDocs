@@ -15,6 +15,12 @@ namespace DotDocs.Core.Models
     public static class Extensions
     {
         /// <summary>
+        /// Collection of members always present in an object.
+        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// </summary>
+        static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
+
+        /// <summary>
         /// Gets a unique identifier for a type.
         /// </summary>
         /// <param name="type">The type to get an id for.</param>
@@ -69,7 +75,7 @@ namespace DotDocs.Core.Models
         /// <returns>Desired methods from the type.</returns>
         public static IEnumerable<MethodInfo> GetDesiredMethods(this Type type)
             => type.GetRuntimeMethods()
-                   .Where(method => !method.IsSpecialName && !typeof(object).GetRuntimeMethods().Any(name => name.Equals(method.Name)));
+                   .Where(method => !method.IsSpecialName && !DEFAULT_OBJECT_METHODS.Any(name => name == method.Name));
         /// <summary>
         /// Gets a list of desired events that DotDocs will only filter down further as needed.
         /// </summary>
