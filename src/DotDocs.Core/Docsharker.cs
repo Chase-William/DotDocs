@@ -29,19 +29,13 @@ namespace DotDocs.Core
             Builder = null;
         }
 
-        /// <summary>
         /// <inheritdoc cref="BuildManager.Prepare"/>
-        /// </summary>
         public void Prepare()
             => Builder.Prepare();
-        /// <summary>
         /// <inheritdoc cref="BuildManager.Load"/>
-        /// </summary>
         public void Load()
             => Builder.Load();
-        /// <summary>
         /// <inheritdoc cref="BuildManager.Render"/>
-        /// </summary>
         public void Render()
             => Builder.Render();
     }

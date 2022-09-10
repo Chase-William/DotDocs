@@ -135,6 +135,10 @@ namespace DotDocs.Core.Models.Language
         #endregion
 
         /// <summary>
+        /// Denotes the element type that supports the current type
+        /// </summary>
+        public string? ElementTypeId => Info.GetElementType()?.GetTypeId();
+        /// <summary>
         /// Denotes if this type is actually an array type.
         /// </summary>
         public bool IsArray => Info.IsArray;

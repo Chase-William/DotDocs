@@ -1,23 +1,9 @@
 ﻿namespace SimpleProject
 {
-    public class DerivedClass : MiddleClass
+    public class TestModel { }
+
+    public class Program
     {
-        public override void TestMethod()
-        {
-
-        }
-    }
-
-    public class MiddleClass : BaseClass
-    {
-
-    }
-
-    public class BaseClass
-    {
-        public virtual void TestMethod()
-        {
-
-        }
+        public TestModel[] GeneratesContructedType { get; set; }
     }
 }

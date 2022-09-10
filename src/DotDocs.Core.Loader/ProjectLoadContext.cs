@@ -354,7 +354,7 @@ namespace DotDocs.Core.Loader
         /// </summary>
         /// <param name="type">Type to add.</param>
         void AddType(Type type)
-        {
+        {                            
             // Do not add if already accounted for
             if (types.ContainsKey(type.GetTypeId()))
                 return;
@@ -389,7 +389,14 @@ namespace DotDocs.Core.Loader
                     model.Properties.Select(prop => prop.Info),
                     model.Fields.Select(field => field.Info),
                     model.Methods.Select(method => method.Info),
-                    model.Events.Select(_event => _event.Info));            
+                    model.Events.Select(_event => _event.Info));
+
+            // Ensure the element type for a arrays are accounted for
+            if (type.IsArray && type.HasElementType)
+            {
+                var t = type.GetElementType() ?? throw new Exception($"The element type of {type.FullName} was null.");
+                AddType(t);
+            }
         }
         /// <summary>
         /// Ensures all member information for types are added to the type map.
