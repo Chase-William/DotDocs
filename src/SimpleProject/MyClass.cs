@@ -1,9 +1,8 @@
 ﻿namespace SimpleProject
 {
-    public class TestModel { }
-
-    public class Program
+    public interface IExample { }
+    public class Test : IExample
     {
-        public TestModel[] GeneratesContructedType { get; set; }
+
     }
 }

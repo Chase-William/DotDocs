@@ -111,6 +111,8 @@ namespace DotDocs.Core.Models
                    .Where(_field => !_field
                        .GetCustomAttributesData()
                        .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name));
-        }     
+        }
+        public static IEnumerable<Type> GetDesiredInterfaces(this Type type)
+            => type.GetInterfaces();
     }
 }

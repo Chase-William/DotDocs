@@ -397,6 +397,8 @@ namespace DotDocs.Core.Loader
                 var t = type.GetElementType() ?? throw new Exception($"The element type of {type.FullName} was null.");
                 AddType(t);
             }
+
+            AddImplementedInterfaces(type);
         }
         /// <summary>
         /// Ensures all member information for types are added to the type map.
@@ -429,7 +431,15 @@ namespace DotDocs.Core.Loader
             foreach (var _event in events)
                 if (_event.EventHandlerType != null)
                     AddType(_event.EventHandlerType);
-        }      
+        }
+        void AddImplementedInterfaces(Type type)
+        {
+            var interfaces = type.GetDesiredInterfaces();
+            foreach (var _interface in interfaces)
+            {
+                AddType(_interface);
+            }
+        }
         /// <summary>
         /// Ensures all type parameters are added.
         /// </summary>

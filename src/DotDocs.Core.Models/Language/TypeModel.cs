@@ -12,15 +12,14 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Core.Models.Language
 {
+    /// <summary>
+    /// Represents a <see cref="Type"/> as a serializeable model.
+    /// </summary>
     public class TypeModel : Model
-    {
-        //[JsonIgnore]
+    {        
         /// <summary>
-        /// Collection of members always present in an object.
-        /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
+        /// A unique identifier to the base type which is basically like a foreign key.
         /// </summary>
-        //static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
-
         public string? BaseType => Info.BaseType?.GetTypeId();
 
         public string? Namespace => Info.Namespace;
@@ -28,7 +27,9 @@ namespace DotDocs.Core.Models.Language
         public override string Name => Info.Name;
 
         public string? FullName => Info.FullName;
-
+        /// <summary>
+        /// Contains the developer documentation associated with this type if it is provided.
+        /// </summary>
         public TypeComments? Comments { get; set; }        
 
         #region Type Kind
@@ -134,6 +135,16 @@ namespace DotDocs.Core.Models.Language
         public int MetadataToken => Info.MetadataToken;
         #endregion
 
+        string[] interfaces;
+        /// <summary>
+        /// A collection of foreign keys to implemented interfaces in this type.
+        /// </summary>
+        public string[] InterfaceIds
+            => interfaces ??= Info
+            .GetDesiredInterfaces()
+            .Select(_interface => _interface.GetTypeId())
+            .ToArray();
+
         /// <summary>
         /// Denotes the element type that supports the current type
         /// </summary>
@@ -148,12 +159,19 @@ namespace DotDocs.Core.Models.Language
         public bool IsByRef => Info.IsByRef;
 
         string? typeId;
+        /// <summary>
+        /// A unique identifier for this type that is basically a primary key.
+        /// </summary>
         public string Id
             => typeId ??= Info.GetTypeId();        
-
+        /// <summary>
+        /// A unique identifier for this assembly that is basically a foreign key to it's containing assembly.
+        /// </summary>
         public string AssemblyId => Info.Assembly.GetAssemblyId();
-
-        [JsonIgnore]
+        /// <summary>
+        /// A reference to the actual <see cref="Type"/> instance for this <see cref="TypeModel"/>.
+        /// </summary>
+        [JsonIgnore]        
         public TypeInfo Info { get; init; }
 
         /// <summary>
@@ -168,7 +186,9 @@ namespace DotDocs.Core.Models.Language
         /// </summary>
         [JsonIgnore]        
         public bool IsDefinedInLocalProject { get; init; }
-
+        /// <summary>
+        /// A reference to the assembly instance this type resides in.
+        /// </summary>
         [JsonIgnore]
         public AssemblyModel Assembly { get; set; }
 
