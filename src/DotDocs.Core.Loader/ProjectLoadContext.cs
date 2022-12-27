@@ -8,18 +8,20 @@ using System.Text.Json;
 using DotDocs.Core.Models;
 using DotDocs.Core.Loader.Exceptions;
 using LoxSmoke.DocXml;
+using System.IO.Compression;
+using System.Xml;
+using SharpCompress.Common;
+using System.Text.RegularExpressions;
+using MongoDB.Driver;
+using ZstdSharp.Unsafe;
 
 namespace DotDocs.Core.Loader
 {
     /// <summary>
     /// A class that provides a means to build and load a project with all its local project dependencies, assemblies, and types.
     /// </summary>
-    public class ProjectLoadContext : IDisposable
+    public partial class ProjectLoadContext : IDisposable
     {       
-        public const string PROJECTS_FILE = "projects.json";
-        public const string TYPES_FILE = "types.json";
-        public const string ASSEMBLIES_FILE = "assemblies.json";
-
         const string PROJECT_NAME = "ProjectName";
         const string PROJECT_DIR = "ProjectDir";
         const string PROJECT_FILE_NAME = "ProjectFileName";
@@ -40,7 +42,7 @@ namespace DotDocs.Core.Loader
         /// <summary>
         /// The undelying field for the root project.
         /// </summary>
-        LocalProjectContext rootProject;
+        LocalProjectContext? rootProject;
         /// <summary>
         /// The root project all others stem from.
         /// </summary>
@@ -65,31 +67,49 @@ namespace DotDocs.Core.Loader
         /// Assemblies that we want to capture member information from. Other types declared outside
         /// of this assembly we will not capture.
         /// </summary>
-        private HashSet<Assembly> assembliesOfInterest;
+        private HashSet<Assembly>? assembliesOfInterest;
         /// <summary>
         /// Used internally by the <see cref="MetadataLoadContext"/> to load assemblies that are needed for reflection.
         /// </summary>
-        private string[] assembliesPaths { get; set; }
+        private string[]? assembliesPaths { get; set; }
+
+        IMongoDatabase commentsDatabase;
+
+        public string GitHash { get; set; }
+
         /// <summary>
         /// Creates a new instance of the <see cref="ProjectLoadContext"/> class.
         /// </summary>
-        public ProjectLoadContext() { }
+        public ProjectLoadContext(IMongoDatabase commentDatabase)
+            => this.commentsDatabase = commentDatabase;      
+
         /// <summary>
         /// Writes the <see cref="Assemblies"/>, <see cref="LocalProjects"/>, and <see cref="Types"/> collections to file.
         /// </summary>
         /// <param name="outputPath">The location to place all files within.</param>
-        public void Save(string outputPath)
+        /// <param name="zip">Zip to embed file in.</param>
+        public void Document(ZipArchive zip)
         {
             // Save assemblies
-            using (var writer = new StreamWriter(Path.Combine(outputPath, ASSEMBLIES_FILE)))
-                writer.Write(JsonSerializer.Serialize(Assemblies.Values));
+            // using (var writer = new StreamWriter(Path.Combine(outputPath, ASSEMBLIES_FILE)))
+            // writer.Write(JsonSerializer.Serialize(Assemblies.Values));
             // Save projects
-            using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))            
-                writer.Write(JsonSerializer.Serialize(LocalProjects));            
-            // Save types
-            using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))            
-                writer.Write(JsonSerializer.Serialize(Types.Values));                        
+            // using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))            
+            // writer.Write(JsonSerializer.Serialize(LocalProjects));            
+            // Save types            
+
+            foreach (var type in Types.Values)
+            {
+                using var entryStream = zip.CreateEntry(type.Name + ".txt", CompressionLevel.Optimal).Open();
+                type.Document(entryStream);                
+                entryStream.Close();
+                return;
+            }
+            
+            //using (var writer = new StreamWriter(Path.Combine(outputPath, TYPES_FILE)))            
+            //    writer.Write(JsonSerializer.Serialize(Types.Values));                        
         }
+
         /// <summary>
         /// Prepares given and all dependent .csproj files recursively for further processing.
         /// </summary>
@@ -140,6 +160,7 @@ namespace DotDocs.Core.Loader
             using var stream = File.Open(projectFile, FileMode.Create);
             docFile.Save(stream);
         }
+
         /// <summary>
         /// Build the project and either report the error if the build fails or if it succeeds gather information
         /// from the build like projects local projects needed and assemblies required.
@@ -204,49 +225,125 @@ namespace DotDocs.Core.Loader
                     AddType(type.Info);
         }
         /// <summary>
-        /// Loads the comments associated with each type. This function depends on <see cref="Assemblies"/>
-        /// as it iterates through the types reference in the <see cref="AssemblyModel.Types"/>. Therefore, it can load
-        /// the documentation file associated with that assembly once and apply comments it to all types. Other approaches
-        /// would result in more redundent file loading.
+        /// Prepares documentation by ensuring the same documentation file version has been added to the database.
         /// </summary>
-        public void LoadDocumentation()
-        {
-            foreach (var assembly in Assemblies.Values)
+        public async System.Threading.Tasks.Task PrepareDocumentation()
+        {            
+            try
             {
-                DocXmlReader docReader;
+                var docs = commentsDatabase.GetCollection<ProjectDocumentationFile>("files");
+                
+                foreach (var assembly in Assemblies.Values)
+                {
+                    // 1. Check to see if assemblies documentation file is already in the database (exact version)
+                    // 2. If no, update the database to contain the newly needed documentation
+                    // 3. If yes, proceed
+                    // - Models will use a lazy approach for getting their documentation, to prevent uneeded queries
+                   
+                    // Determine if this assembly is actually a local project
+                    if (assembly.LocalProject is LocalProjectContext proj)             
+                    {
+                        // TODO: Will need a way to allow local projects to not be added to the database under this root project id
+                        // Therefore, allowing them to be uploaded seperately and identify with a different id
+                        
+                        if (docs.Find(x => x.GitHash == GitHash).FirstOrDefaultAsync() != null)
+                            continue; // Already documented
+                        if (proj.DocumentationPath == null)
+                            throw new Exception("Documentation filepath was null when it should exists.");
 
-                var proj = assembly.LocalProject as LocalProjectContext;
-                if (proj != null) // Use the project's documentation path to load the documentation .xml                
-                    docReader = new DocXmlReader(proj.DocumentationPath);
-                else // Use the assemblies's exact file path, just change the extension to .xml
-                {
-                    string asmPath = assembly.Assembly.Location;
-                    string docFilePath = asmPath[..asmPath.LastIndexOf('.')] + ".xml";
-                    if (File.Exists(docFilePath)) // Ensure this doc file exist
-                        docReader = new DocXmlReader(docFilePath);
-                    else // Doesn't exist so documentation for this assembly's types
-                        continue;
-                }
-                // Process all types
-                foreach (var type in assembly.Types)
-                {
-                    // Get comments for type
-                    type.Comments = docReader.GetTypeComments(type.Info);                    
-                    // Get comments for methods
-                    foreach (var method in type.Methods)
-                        method.Comments = docReader.GetMethodComments(method.Info, true);
-                    // Get comments for properties
-                    foreach (var property in type.Properties)
-                        property.Comments = docReader.GetMemberComments(property.Info);
-                    // Get comments for fields
-                    foreach (var field in type.Fields)
-                        field.Comments = docReader.GetMemberComments(field.Info);
-                    // Get comments for events
-                    foreach (var _event in type.Events)
-                        _event.Comments = docReader.GetMemberComments(_event.Info);
+                        ProcessComments(assembly, proj.DocumentationPath);
+
+                        // Mark this version of the project as accounted for
+                        await docs.InsertOneAsync(new ProjectDocumentationFile
+                        {
+                            FilePath = proj.DocumentationPath,
+                            GitHash = GitHash,
+                            // Version = proj.ver // TODO: Add version to project
+                        });
+                    }
+                    else // Use the assemblies's exact file path, just change the extension to .xml
+                    {
+                        var version = assembly.Assembly.GetName().Version;
+                        if (docs.Find(x => x.Version == version).FirstOrDefaultAsync() != null)
+                            continue;
+
+                        string asmPath = assembly.Assembly.Location;
+                        string docFilePath = asmPath[..asmPath.LastIndexOf('.')] + ".xml";
+                        if (!File.Exists(docFilePath)) // Ensure this doc file exist
+                            throw new Exception($"Documentation for assembly: {asmPath} doesn't exist.");
+
+                        ProcessComments(assembly, docFilePath);
+
+                        await docs.InsertOneAsync(new ProjectDocumentationFile
+                        {
+                            FilePath = docFilePath,
+                            Version = version
+                        });
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }           
         }       
+
+        private void ProcessComments(AssemblyModel assembly, string docPath)
+        {
+            DocXmlReader docReader = GetSanitizedDocumentationFile(docPath);
+            var methods = commentsDatabase.GetCollection<MethodComments>("methods");
+            var types = commentsDatabase.GetCollection<TypeComments>("types");
+            var common = commentsDatabase.GetCollection<CommonComments>("common");
+
+            // Process all types
+            foreach (var type in assembly.Types)
+            {
+                // Get comments for type
+                type.Comments = docReader.GetTypeComments(type.Info);
+                types.InsertOne(type.Comments);
+                // Get comments for methods
+                foreach (var method in type.Methods)
+                {
+                    method.Comments = docReader.GetMethodComments(method.Info, true);
+                    methods.InsertOne(method.Comments);
+                }
+                // Get comments for properties
+                foreach (var property in type.Properties)
+                {
+                    property.Comments = docReader.GetMemberComments(property.Info);
+                    common.InsertOne(property.Comments);
+                }
+                // Get comments for fields
+                foreach (var field in type.Fields)
+                {
+                    field.Comments = docReader.GetMemberComments(field.Info);
+                    common.InsertOne(field.Comments);
+                }
+                // Get comments for events
+                foreach (var _event in type.Events)
+                {
+                    _event.Comments = docReader.GetMemberComments(_event.Info);
+                    common.InsertOne(_event.Comments);
+                }
+            }
+        }
+
+        private DocXmlReader GetSanitizedDocumentationFile(string docFilePath)
+        {
+            string massive = "";
+            using (var reader = new StreamReader(docFilePath))
+            {
+                massive = SanitizeXML().Replace(reader.ReadToEnd(), "");
+            }
+
+            using (var writer = new StreamWriter(@"C:\Users\cxr69\Desktop\test.xml", false))
+            {
+                writer.Write(massive);
+            }
+
+            return new DocXmlReader(massive);
+        }
+
         /// <summary>
         /// Disposes all <see cref="LocalProjectModel"/> within <see cref="rootProject"/> recursively.
         /// </summary>
@@ -493,5 +590,8 @@ namespace DotDocs.Core.Loader
                 model.Assembly = assembly;
             }
         }
+
+        [GeneratedRegex("(<p>)|(<p .*?>)|(</?p>)|(<br/?>)")]
+        private static partial Regex SanitizeXML();
     }
 }

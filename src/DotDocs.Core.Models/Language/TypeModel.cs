@@ -203,5 +203,15 @@ namespace DotDocs.Core.Models.Language
             Info = typeInfo;
             IsDefinedInLocalProject = isDefinedInLocalProject;
         }
+
+        /// <summary>
+        /// Entry-point for rendering types to file stream.
+        /// </summary>
+        /// <param name="fileStream"></param>
+        public void Document(Stream fileStream)
+        {
+            fileStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello World!"));
+            // From here render all contents for type
+        }
     }    
 }

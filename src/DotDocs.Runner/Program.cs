@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using DotDocs.Core;
 using DotDocs.Core.Loader.Exceptions;
 
@@ -8,8 +10,8 @@ namespace DotDocs.Runner
     {        
         static void Main(string[] args)
         {
-            Run(csProjFile: args[0],
-                outputPath: args[1]);
+            //Run(csProjFile: args[0],
+            //    outputPath: args[1]);
 
             //var docs = Charper.From(
             //    csProjPath: @"C:\Dev\Charp.Core\src\Charp.Core\Charp.Core.csproj",
@@ -34,22 +36,43 @@ namespace DotDocs.Runner
             //Run(csProjFile: @"C:\Dev\DotDocs.Core\src\DotDocs.Core\DotDocs.Core.csproj",
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
 
-            //Run(csProjFile: @"C:\Dev\DotDocs.Core\src\SimpleProject\SimpleProject.csproj",
-            //    outputPath: @"C:\Users\Chase Roth\Desktop");
+            Run(csProjFile: @"C:\Dev\TestingLibrary\TestingLibrary\TestingLibrary.csproj",
+      outputPath: @"C:\Users\cxr69\Desktop");
         }
 
         static void Run(string csProjFile, string outputPath)
         {
             try
             {
-                using var docs = new Docsharker(
-                    csProjFile: csProjFile,
-                    outputPath: outputPath
-                );
+                // using var outStream = new MemoryStream();
+                // using var zipArchive = new ZipArchive(outStream, ZipArchiveMode.Create, true);
+                // var fileInArchive = zipArchive.CreateEntry("test.csv", CompressionLevel.Optimal);
+                // using var fileInArchiveStream = fileInArchive.Open();
+                // fileInArchiveStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello, World"));
+                // File.WriteAllBytes(Path.Combine(outputPath, "test.zip"), outStream.GetBuffer());
 
-                docs.Prepare();
-                docs.Load();
-                docs.Render();
+                //using var outStream = new MemoryStream();
+                //using var zipArchive = new ZipArchive(outStream, ZipArchiveMode.Create, true);
+                //var fileInArchive = zipArchive.CreateEntry("test.csv", CompressionLevel.Optimal);
+                //using var fileInArchiveStream = fileInArchive.Open();
+                //fileInArchiveStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello, World"));
+                //return File(outStream.GetBuffer(), "application/zip");
+
+                Core.DotDocs.Init();
+                var builder = Core.DotDocs.New(csProjFile);
+                builder.Prepare();
+                builder.Load();
+                //using var docs = new DotDocs(
+                //    csProjFile: csProjFile,
+                //    outputPath: outputPath
+                //);
+
+                //docs.Prepare();
+                //docs.Load();
+                //string temp = Path.Combine(outputPath, "test.zip");
+                //Console.WriteLine(temp);
+                //using var test = docs.Document();
+                //File.WriteAllBytes(temp, test.ToArray());
             }
             catch (BuildException ex)
             {
