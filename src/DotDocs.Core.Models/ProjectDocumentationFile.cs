@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Core.Models
 {
-    public class ProjectDocumentationFile
+    public record class ProjectDocumentationFile
     {
         public string? FilePath { get; set; }
         public string? GitHash { get; set; }

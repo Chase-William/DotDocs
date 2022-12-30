@@ -33,14 +33,14 @@ namespace DotDocs.Runner
             //    @"C:\Users\Chase Roth\Desktop");
 
             // Test test library
-            //Run(csProjFile: @"C:\Dev\DotDocs.Core\src\DotDocs.Core\DotDocs.Core.csproj",
-            //    outputPath: @"C:\Users\Chase Roth\Desktop");
+            Run(url: "https://github.com/Chase-William/.Docs.Core",
+                outputPath: @"C:\Users\Chase Roth\Desktop");
 
-            Run(csProjFile: @"C:\Dev\TestingLibrary\TestingLibrary\TestingLibrary.csproj",
-      outputPath: @"C:\Users\cxr69\Desktop");
+            //Run(csProjFile: @"C:\Dev\.Docs.Core - Copy\src\DotDocs.Core\DotDocs.Core.csproj",
+            //    outputPath: @"C:\Users\Chase Roth\Desktop");
         }
 
-        static void Run(string csProjFile, string outputPath)
+        static void Run(string url, string outputPath)
         {
             try
             {
@@ -59,9 +59,10 @@ namespace DotDocs.Runner
                 //return File(outStream.GetBuffer(), "application/zip");
 
                 Core.DotDocs.Init();
-                var builder = Core.DotDocs.New(csProjFile);
-                builder.Prepare();
-                builder.Load();
+                var builder = Core.DotDocs.New(url);
+                builder.Document();
+                //builder.Prepare();
+                //builder.Load();
                 //using var docs = new DotDocs(
                 //    csProjFile: csProjFile,
                 //    outputPath: outputPath

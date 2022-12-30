@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
+using DotDocs.Core.Models.Comments;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members
 {
-    public class PropertyModel : MemberModel<PropertyInfo, CommonComments>
+    public class PropertyModel : MemberModel<PropertyInfo, CommonCommentsModel<CommonComments>>
     {
         #region Individual Get & Set Info
         public bool HasGetter => Info.CanRead;

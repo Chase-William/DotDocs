@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
+using DotDocs.Core.Models.Comments;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members
 {
-    public class EventModel : MemberModel<EventInfo, CommonComments>
+    public class EventModel : MemberModel<EventInfo, CommonCommentsModel<CommonComments>>
     {
 
         public bool IsVirtual => ((Info.AddMethod?.IsVirtual ?? false) || (Info.RemoveMethod?.IsVirtual ?? false)) && !IsAbstract;

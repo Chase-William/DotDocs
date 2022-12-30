@@ -1,4 +1,5 @@
-﻿using LoxSmoke.DocXml;
+﻿using DotDocs.Core.Models.Comments;
+using LoxSmoke.DocXml;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -6,7 +7,7 @@ namespace DotDocs.Core.Models.Language.Members
 {
     public class MemberModel<T1, T2> : Model
         where T1 : MemberInfo
-        where T2 : CommonComments?
+        
     {
         [JsonIgnore]
         public T1 Info { get; set; }

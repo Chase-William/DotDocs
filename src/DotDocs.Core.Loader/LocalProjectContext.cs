@@ -22,7 +22,7 @@ namespace DotDocs.Core.Loader
         /// <summary>
         /// The location of the assembly to be loaded.
         /// </summary>
-        public string AssemblyLoadPath { get; set; }
+        public string AssemblyLoadPath { get; set; }        
         /// <summary>
         /// The reflection-only assembly once loaded.
         /// </summary>
@@ -30,7 +30,8 @@ namespace DotDocs.Core.Loader
         /// <summary>
         /// The path of the documentation if available.
         /// </summary>
-        public string? DocumentationPath { get; set; }
+        public string? DocumentationPath { get; set; }        
+
         /// <summary>
         /// Disposes of unmanaged resources for this <see cref="LocalProject"/> only.
         /// Does not dispose of children projects in <see cref="LocalProjects"/>.

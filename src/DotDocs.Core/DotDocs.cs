@@ -52,8 +52,8 @@ namespace DotDocs.Core
             //Console.WriteLine();
         }
 
-        public static Builder New(string projectFile)
-            => new(projectFile, commentsDatabase);
+        public static Builder New(string url)
+            => new(url, commentsDatabase);
 
         ///// <summary>
         ///// Cleanup unmanaged resources linked with <see cref="Builder"/>.

@@ -14,6 +14,7 @@ using SharpCompress.Common;
 using System.Text.RegularExpressions;
 using MongoDB.Driver;
 using ZstdSharp.Unsafe;
+using DotDocs.Core.Models.Comments;
 
 namespace DotDocs.Core.Loader
 {
@@ -73,15 +74,15 @@ namespace DotDocs.Core.Loader
         /// </summary>
         private string[]? assembliesPaths { get; set; }
 
-        IMongoDatabase commentsDatabase;
+        CommentService commentService;
 
         public string GitHash { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="ProjectLoadContext"/> class.
         /// </summary>
-        public ProjectLoadContext(IMongoDatabase commentDatabase)
-            => this.commentsDatabase = commentDatabase;      
+        public ProjectLoadContext(CommentService commentService)
+            => this.commentService = commentService;      
 
         /// <summary>
         /// Writes the <see cref="Assemblies"/>, <see cref="LocalProjects"/>, and <see cref="Types"/> collections to file.
@@ -169,6 +170,9 @@ namespace DotDocs.Core.Loader
         /// <exception cref="BuildException">The build error.</exception>
         public void BuildProject(string csProjPath)
         {
+            if (!File.Exists(csProjPath))
+                throw new FileNotFoundException($"Unable to locate the file: {csProjPath}.");
+
             try
             {
                 var cmd = new Process
@@ -212,6 +216,7 @@ namespace DotDocs.Core.Loader
                 throw;
             }
         }
+
         /// <summary>
         /// Load all types used by the root project and it's project dependencies.
         /// </summary>
@@ -224,14 +229,15 @@ namespace DotDocs.Core.Loader
                 foreach (var type in project._DefinedTypes)
                     AddType(type.Info);
         }
+
         /// <summary>
         /// Prepares documentation by ensuring the same documentation file version has been added to the database.
         /// </summary>
-        public async System.Threading.Tasks.Task PrepareDocumentation()
+        public void LoadDocumentation()
         {            
             try
             {
-                var docs = commentsDatabase.GetCollection<ProjectDocumentationFile>("files");
+                var docs = commentService.GetCommentSourceFileRecords();
                 
                 foreach (var assembly in Assemblies.Values)
                 {
@@ -251,10 +257,10 @@ namespace DotDocs.Core.Loader
                         if (proj.DocumentationPath == null)
                             throw new Exception("Documentation filepath was null when it should exists.");
 
-                        ProcessComments(assembly, proj.DocumentationPath);
+                        commentService.ProcessComments(assembly, proj.DocumentationPath);
 
                         // Mark this version of the project as accounted for
-                        await docs.InsertOneAsync(new ProjectDocumentationFile
+                        docs.InsertOne(new ProjectDocumentationFile
                         {
                             FilePath = proj.DocumentationPath,
                             GitHash = GitHash,
@@ -264,7 +270,7 @@ namespace DotDocs.Core.Loader
                     else // Use the assemblies's exact file path, just change the extension to .xml
                     {
                         var version = assembly.Assembly.GetName().Version;
-                        if (docs.Find(x => x.Version == version).FirstOrDefaultAsync() != null)
+                        if (docs.Find(x => x.Version == version).FirstOrDefault() != null)
                             continue;
 
                         string asmPath = assembly.Assembly.Location;
@@ -272,9 +278,9 @@ namespace DotDocs.Core.Loader
                         if (!File.Exists(docFilePath)) // Ensure this doc file exist
                             throw new Exception($"Documentation for assembly: {asmPath} doesn't exist.");
 
-                        ProcessComments(assembly, docFilePath);
+                        commentService.ProcessComments(assembly, docFilePath);
 
-                        await docs.InsertOneAsync(new ProjectDocumentationFile
+                        docs.InsertOne(new ProjectDocumentationFile
                         {
                             FilePath = docFilePath,
                             Version = version
@@ -286,63 +292,7 @@ namespace DotDocs.Core.Loader
             {
                 Console.WriteLine();
             }           
-        }       
-
-        private void ProcessComments(AssemblyModel assembly, string docPath)
-        {
-            DocXmlReader docReader = GetSanitizedDocumentationFile(docPath);
-            var methods = commentsDatabase.GetCollection<MethodComments>("methods");
-            var types = commentsDatabase.GetCollection<TypeComments>("types");
-            var common = commentsDatabase.GetCollection<CommonComments>("common");
-
-            // Process all types
-            foreach (var type in assembly.Types)
-            {
-                // Get comments for type
-                type.Comments = docReader.GetTypeComments(type.Info);
-                types.InsertOne(type.Comments);
-                // Get comments for methods
-                foreach (var method in type.Methods)
-                {
-                    method.Comments = docReader.GetMethodComments(method.Info, true);
-                    methods.InsertOne(method.Comments);
-                }
-                // Get comments for properties
-                foreach (var property in type.Properties)
-                {
-                    property.Comments = docReader.GetMemberComments(property.Info);
-                    common.InsertOne(property.Comments);
-                }
-                // Get comments for fields
-                foreach (var field in type.Fields)
-                {
-                    field.Comments = docReader.GetMemberComments(field.Info);
-                    common.InsertOne(field.Comments);
-                }
-                // Get comments for events
-                foreach (var _event in type.Events)
-                {
-                    _event.Comments = docReader.GetMemberComments(_event.Info);
-                    common.InsertOne(_event.Comments);
-                }
-            }
-        }
-
-        private DocXmlReader GetSanitizedDocumentationFile(string docFilePath)
-        {
-            string massive = "";
-            using (var reader = new StreamReader(docFilePath))
-            {
-                massive = SanitizeXML().Replace(reader.ReadToEnd(), "");
-            }
-
-            using (var writer = new StreamWriter(@"C:\Users\cxr69\Desktop\test.xml", false))
-            {
-                writer.Write(massive);
-            }
-
-            return new DocXmlReader(massive);
-        }
+        }                      
 
         /// <summary>
         /// Disposes all <see cref="LocalProjectModel"/> within <see cref="rootProject"/> recursively.
@@ -358,6 +308,7 @@ namespace DotDocs.Core.Loader
                 project.Dispose();
             }
         }
+
         /// <summary>
         /// Gets the local project's information and calls <see cref="GetLocalProjects(ProjectEvaluation)"/> to recursively aquire
         /// all sub projects too.
@@ -589,9 +540,6 @@ namespace DotDocs.Core.Loader
                 // Model ref Assembly
                 model.Assembly = assembly;
             }
-        }
-
-        [GeneratedRegex("(<p>)|(<p .*?>)|(</?p>)|(<br/?>)")]
-        private static partial Regex SanitizeXML();
+        }        
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
+using DotDocs.Core.Models.Comments;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members
 {
-    public class FieldModel : MemberModel<FieldInfo, CommonComments>
+    public class FieldModel : MemberModel<FieldInfo, CommonCommentsModel<CommonComments>>
     {
         public bool IsReadonly => Info.IsInitOnly;
         public bool IsLiteral => Info.IsLiteral;

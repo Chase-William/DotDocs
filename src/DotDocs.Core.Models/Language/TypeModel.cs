@@ -1,4 +1,5 @@
-﻿using DotDocs.Core.Models.Exceptions;
+﻿using DotDocs.Core.Models.Comments;
+using DotDocs.Core.Models.Exceptions;
 using DotDocs.Core.Models.Language.Members;
 using LoxSmoke.DocXml;
 using System;
@@ -30,7 +31,7 @@ namespace DotDocs.Core.Models.Language
         /// <summary>
         /// Contains the developer documentation associated with this type if it is provided.
         /// </summary>
-        public TypeComments? Comments { get; set; }        
+        public TypeCommentsModel? Comments { get; set; }        
 
         #region Type Kind
         public bool IsClass => Info.IsClass;

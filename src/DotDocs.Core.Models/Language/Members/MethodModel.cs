@@ -2,10 +2,11 @@
 using LoxSmoke.DocXml;
 using DotDocs.Core.Models.Language.Parameters;
 using DotDocs.Core.Models.Language.Interfaces;
+using DotDocs.Core.Models.Comments;
 
 namespace DotDocs.Core.Models.Language.Members
 {
-    public class MethodModel : MemberModel<MethodInfo, MethodComments>, IHaveSignature
+    public class MethodModel : MemberModel<MethodInfo, MethodCommentsModel>, IHaveSignature
     {
         public bool IsPublic => Info.IsPublic;
         public bool IsProtected => Info.IsFamily || Info.IsFamilyOrAssembly || Info.IsFamilyAndAssembly;
