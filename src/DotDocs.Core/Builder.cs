@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using DotDocs.Core.Loader;
+using DotDocs.Core.Loader.Services;
 using MongoDB.Driver;
 
 namespace DotDocs.Core
@@ -19,7 +22,7 @@ namespace DotDocs.Core
         /// <summary>
         /// A tree that contains all the local projects the root depends on.
         /// </summary>
-        public ProjectLoadContext projectContext;           
+        public ProjectBuilder repository;           
         /// <summary>
         /// The root path where DotDocs will output all documentation.
         /// </summary>
@@ -73,64 +76,53 @@ namespace DotDocs.Core
         {
             // https://github.com/Chase-William/.Docs.Core.git
             commentManager = new CommentService(commentDatabase);
-            projectContext = new ProjectLoadContext(commentManager);
+            // repository = new ProjectBuilder(commentManager);
+            // repository = new ProjectLoadContext(commentManager);
 
-            var repoDir = GitService.DownloadRepository(url);
-            projectContext.GitHash = GitService.GetGitHeadHash(repoDir);
+            // Create a repository from the url
+            // This 
+            Repository repo = new Repository(url)
+                .Download()
+                .RetrieveHashInfo()
+                .MakeProjectGraph()
+                .SetActiveProject()
+                .EnableDocumentationGeneration()
+                .Build()
+                .Document();
 
-            // Locate all solution and project files
-            var solutionFiles = Directory.GetFiles(repoDir, "*.sln", SearchOption.AllDirectories);
-            var projectFiles = Directory.GetFiles(repoDir, "*.csproj", SearchOption.AllDirectories);
+            // Take repo and return documentation
+
 
             // Returns the root node to all project structures
             // If there are multiple nodes here, we need to ask the user which tree to build for
             // Different trees are not related, therefore we do not build them into the documented output
-            var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
+            // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
             // Select project if multiple exists, otherwise the single existing project is selected.
-            ProjectDocument selectedProj = SelectProject(rootProjects);           
+            ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
+
+            repository
+                .EnableDocumentationGeneration();
+
 
             // Prepare all .csproj files recursively
-            projectContext.Prepare("");
-            // Build the project
-            projectContext.BuildProject("");
-            // Load type info
-            projectContext.LoadTypes();
-            // Load documentation
-            projectContext.LoadDocumentation();
+            //repository.Prepare("");
+            //// Build the project
+            //repository.BuildProject("");
+            //// Load type info
+            //repository.LoadTypes();
+            //// Load documentation
+            //repository.LoadDocumentation();
 
             // Utility.CleanDirectory(output);
             var baseOutStream = new MemoryStream();
             var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
-            projectContext.Document(zip);
-            projectContext.Dispose();
+            repository.Document(zip);
+            repository.Dispose();
             return baseOutStream;
-        }    
-
-        private ProjectDocument SelectProject(ProjectDocument[] rootProjects)
-        {
-            if (rootProjects.Length > 1)
-            {
-                while (true)
-                {
-                    Console.WriteLine("Multiple related project groups detected. Please choose one:");
-                    for (int i = 0; i < rootProjects.Length; i++)
-                        Console.WriteLine($"{i + 1} - {rootProjects[i].ProjectPath}");
-                    Console.Write(": ");
-                    // Valid input
-                    if (int.TryParse(Console.ReadLine(), out int index))
-                    {
-                        index--;
-                        // Valid index range
-                        if (index < rootProjects.Length && index > -1)
-                            return rootProjects[index];
-                    }
-                }
-            }
-            return rootProjects.First();
-        }
+        }                           
 
         /// <summary>
-        /// Use to cleanup unmanaged resources used by the <see cref="projectContext"/>.
+        /// Use to cleanup unmanaged resources used by the <see cref="repository"/>.
         /// </summary>
         //public void Dispose()
         //    => ProjectContext?.Dispose();        

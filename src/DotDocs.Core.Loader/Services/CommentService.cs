@@ -11,10 +11,10 @@ using MongoDB.Driver;
 using System.Xml.XPath;
 using System.Xml;
 
-namespace DotDocs.Core.Loader
+namespace DotDocs.Core.Loader.Services
 {
     public class CommentService
-    {        
+    {
         private IMongoDatabase db;
 
         public CommentService(IMongoDatabase database)
@@ -90,11 +90,11 @@ namespace DotDocs.Core.Loader
             //string massive = "";
             MemoryStream memStream;
             using (var reader = new StreamReader(docFilePath))
-            {                
+            {
                 memStream = new MemoryStream(
                     Encoding.UTF8.GetBytes(
                         new Regex("(<p>)|(<p .*?>)|(</?p>)|(<br/?>)").Replace(reader.ReadToEnd(), "")));
-                
+
             }
 
             // TODO: Remove in prod
@@ -102,11 +102,11 @@ namespace DotDocs.Core.Loader
             //{
             //    writer.Write(memStream);
             //}
-            
+
             return new DocXmlReader(new XPathDocument(XmlReader.Create(memStream)));
         }
 
         public IMongoCollection<ProjectDocumentationFile> GetCommentSourceFileRecords()
-            => db.GetCollection<ProjectDocumentationFile>("files");        
+            => db.GetCollection<ProjectDocumentationFile>("files");
     }
 }

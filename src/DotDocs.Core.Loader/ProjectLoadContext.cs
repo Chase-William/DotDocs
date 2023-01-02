@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using MongoDB.Driver;
 using ZstdSharp.Unsafe;
 using DotDocs.Core.Models.Comments;
+using DotDocs.Core.Loader.Services;
 
 namespace DotDocs.Core.Loader
 {
@@ -76,7 +77,7 @@ namespace DotDocs.Core.Loader
 
         CommentService commentService;
 
-        public string GitHash { get; set; }
+        // public string GitHash { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="ProjectLoadContext"/> class.
@@ -95,9 +96,9 @@ namespace DotDocs.Core.Loader
             // using (var writer = new StreamWriter(Path.Combine(outputPath, ASSEMBLIES_FILE)))
             // writer.Write(JsonSerializer.Serialize(Assemblies.Values));
             // Save projects
-            // using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))            
-            // writer.Write(JsonSerializer.Serialize(LocalProjects));            
-            // Save types            
+            // using (var writer = new StreamWriter(Path.Combine(outputPath, PROJECTS_FILE)))
+            // writer.Write(JsonSerializer.Serialize(LocalProjects));
+            // Save types
 
             foreach (var type in Types.Values)
             {
@@ -372,7 +373,7 @@ namespace DotDocs.Core.Loader
                 var projEval = eval.FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projFileName));
                 // Check to see if the project has already been loaded as a dependency elsewhere
                 var existingProject = localProjects.SingleOrDefault(p => p.ProjectFileName.Equals(projFileName));
-                if (existingProject != null) // Exist elsewhere so use existing instance
+                if (existingProject != null) // Does exists elsewhere, use existing instance
                     projects.Add(existingProject);
                 else // Doesn't exist, create new
                 {
@@ -448,6 +449,7 @@ namespace DotDocs.Core.Loader
 
             AddImplementedInterfaces(type);
         }
+
         /// <summary>
         /// Ensures all member information for types are added to the type map.
         /// </summary>
