@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace DotDocs.Core.Models.Comments
+namespace DotDocs.Core.Models.Mongo.Comments
 {
     /// <summary>
     /// Extension of <see cref="CommonCommentsModel{TComment}"/> for interacting with the database.

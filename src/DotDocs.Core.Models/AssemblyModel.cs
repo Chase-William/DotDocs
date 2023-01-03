@@ -21,7 +21,7 @@ namespace DotDocs.Core.Models
         /// <summary>
         /// <inheritdoc cref="Assembly.FullName"/>
         /// </summary>
-        public string FullName => Assembly.FullName;        
+        public string FullName => Assembly.FullName;
         /// <summary>
         /// The underlying field for <see cref="Id"/>.
         /// </summary>
@@ -30,7 +30,7 @@ namespace DotDocs.Core.Models
         /// The id for this assembly.
         /// </summary>
         public string Id
-            => assemblyId ??= Assembly.GetAssemblyId();        
+            => assemblyId ??= Assembly.GetAssemblyId();
         /// <summary>
         /// The underlying assembly instance from the runtime.
         /// </summary>
@@ -45,14 +45,14 @@ namespace DotDocs.Core.Models
         /// Contains all the types defined specifically in this assembly.
         /// </summary>
         [JsonIgnore]
-        public List<TypeModel> Types { get; set; } = new();
+        public List<UserTypeModel> Types { get; set; } = new();
         /// <summary>
         /// Creates a new instance of the <see cref="AssemblyModel"/> class.
         /// </summary>
         /// <param name="assembly">Assembly this model represents.</param>
         public AssemblyModel(Assembly assembly)
         {
-            Assembly = assembly;
+            Assembly = assembly;            
         }
     }
 }

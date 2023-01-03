@@ -22,7 +22,7 @@ namespace DotDocs.Core
         /// <summary>
         /// A tree that contains all the local projects the root depends on.
         /// </summary>
-        public ProjectBuilder repository;           
+        // public ProjectBuilder repository;           
         /// <summary>
         /// The root path where DotDocs will output all documentation.
         /// </summary>
@@ -36,7 +36,7 @@ namespace DotDocs.Core
         /// </summary>
         // string outputPath;
         IMongoDatabase commentDatabase;
-        private CommentService commentManager;
+        private CommentService comments;
 
         /// <summary>
         /// Instantiates a new instance of <see cref="Builder"/> which is ready to be used.
@@ -75,13 +75,13 @@ namespace DotDocs.Core
         public MemoryStream Document()
         {
             // https://github.com/Chase-William/.Docs.Core.git
-            commentManager = new CommentService(commentDatabase);
+            // comments = new CommentService(commentDatabase);
             // repository = new ProjectBuilder(commentManager);
             // repository = new ProjectLoadContext(commentManager);
 
             // Create a repository from the url
             // This 
-            Repository repo = new Repository(url)
+            using Repository repo = new Repository(url, new CommentService(commentDatabase))
                 .Download()
                 .RetrieveHashInfo()
                 .MakeProjectGraph()
@@ -89,6 +89,8 @@ namespace DotDocs.Core
                 .EnableDocumentationGeneration()
                 .Build()
                 .Document();
+
+            
 
             // Take repo and return documentation
 
@@ -98,10 +100,10 @@ namespace DotDocs.Core
             // Different trees are not related, therefore we do not build them into the documented output
             // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
             // Select project if multiple exists, otherwise the single existing project is selected.
-            ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
+            // ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
 
-            repository
-                .EnableDocumentationGeneration();
+            //repository
+            //    .EnableDocumentationGeneration();
 
 
             // Prepare all .csproj files recursively
@@ -116,8 +118,8 @@ namespace DotDocs.Core
             // Utility.CleanDirectory(output);
             var baseOutStream = new MemoryStream();
             var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
-            repository.Document(zip);
-            repository.Dispose();
+            // repository.Document(zip);
+            // repository.Dispose();
             return baseOutStream;
         }                           
 

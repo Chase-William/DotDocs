@@ -12,7 +12,7 @@ namespace DotDocs.Core.Models
         /// Contains all the projects declared in this project.
         /// </summary>
         [JsonIgnore]
-        public List<TypeModel> _DefinedTypes { get; } = new();
+        public List<UserTypeModel> _DefinedTypes { get; } = new();
         /// <summary>
         /// Just the project name with no extension.
         /// </summary>

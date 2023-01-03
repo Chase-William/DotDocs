@@ -1,5 +1,4 @@
-﻿using DotDocs.Core.Models.Comments;
-using LoxSmoke.DocXml;
+﻿using LoxSmoke.DocXml;
 using System.Reflection;
 using System.Text.Json.Serialization;
 

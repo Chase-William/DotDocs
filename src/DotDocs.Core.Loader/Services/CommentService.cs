@@ -1,6 +1,4 @@
-﻿using DotDocs.Core.Models.Comments;
-using DotDocs.Core.Models;
-using LoxSmoke.DocXml;
+﻿using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +8,73 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using System.Xml.XPath;
 using System.Xml;
+using DotDocs.Core.Models.Mongo.Comments;
+using DotDocs.Core.Models.Mongo;
+using DotDocs.Core.Models;
+using Microsoft.Build.Logging.StructuredLogger;
+using System.Xml.Linq;
+using System.Collections.Immutable;
+using DotDocs.Core.Loader.Build;
 
 namespace DotDocs.Core.Loader.Services
 {
     public class CommentService
     {
-        private IMongoDatabase db;
+        private readonly IMongoDatabase comments;
 
-        public CommentService(IMongoDatabase database)
-            => db = database;
+        public CommentService(IMongoDatabase comments)
+            => this.comments = comments;
 
-        public void ProcessComments(AssemblyModel assembly, string docPath)
+        public void UpdateDocumentation(Repository repo, ImmutableArray<ProjectBuildInstance> builds)
+        {
+            IMongoCollection<RepositoryModel> repos = GetRepositories();
+            IMongoCollection<Models.Mongo.AssemblyModel> assemblies = GetAssemblies();
+
+            /*
+             * Ensure each assembly used has been loaded into our documentation database before.            
+             * If not, do it now.
+             */
+
+            // REPO - The project we built
+
+            // Determine if this repo version has been documented already via it's hash                    
+            if (repos.Find(doc => doc.CommitHash == repo.CommitHash) == null)
+            { // Add each repo's documentation file
+                foreach (var build in builds)
+                {
+                    // Find the same assembly in the build as in the assembly model collection to
+                    // get the Models.AssemblyModel
+                    InsertComments(repo.UsedAssemblies
+                        .Single(a => a.Assembly == build.Assembly), 
+                            build.DocumentationFilePath,
+                            GetRepoPrefixString(repo));
+                }
+            }
+
+            // ASSEMBLY - supporting assemblies used by the project
+            foreach (var asm in repo.UsedAssemblies)            
+                if (asm.LocalProject == null // Ensure is not produced by a local project, aka is our user's project
+                    && assemblies // Ensure is not already documented in the system
+                    .Find(a => a.Name == asm.Name && a.Version == asm.Assembly.GetName().Version) == null) // Is not a user project, just supporting assembly
+                {
+                    string docFile = asm.Assembly.Location[..4] + ".xml";
+                    InsertComments(asm, docFile, GetAssemblyPrefixString(asm));
+                }
+        }        
+
+        /// <summary>
+        /// Ensures documentation for the given assembly exists already in the database.
+        /// If not, it will sanitize the documentation and insert comments.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <param name="docPath"></param>
+        public void InsertComments(Models.AssemblyModel assembly, string docPath, string prefix)
         {
             DocXmlReader docReader = GetSanitizedDocumentationFile(docPath);
-            var methods = db.GetCollection<MethodCommentsModel>("methods");
-            var types = db.GetCollection<TypeCommentsModel>("types");
-            var common = db.GetCollection<CommonCommentsModel<CommonComments>>("common");
+
+            var methods = comments.GetCollection<MethodCommentsModel>(GetMethodCollectionName(prefix));
+            var types = comments.GetCollection<TypeCommentsModel>(GetTypeCollectionName(prefix));
+            var common = comments.GetCollection<CommonCommentsModel<CommonComments>>(GetCommonCollectionName(prefix));
 
             var version = assembly.Assembly.GetName().Version;
 
@@ -35,7 +84,7 @@ namespace DotDocs.Core.Loader.Services
                 // Get comments for type
                 type.Comments = new TypeCommentsModel(
                     docReader.GetTypeComments(type.Info),
-                    type.FullName,
+                    type.Info.FullName,
                     version);
                 types.InsertOne(type.Comments);
                 // Get comments for methods
@@ -97,16 +146,24 @@ namespace DotDocs.Core.Loader.Services
 
             }
 
-            // TODO: Remove in prod
-            //using (var writer = new StreamWriter(@"C:\Users\Chase Roth\Desktop\test.xml", false))
-            //{
-            //    writer.Write(memStream);
-            //}
-
             return new DocXmlReader(new XPathDocument(XmlReader.Create(memStream)));
         }
 
-        public IMongoCollection<ProjectDocumentationFile> GetCommentSourceFileRecords()
-            => db.GetCollection<ProjectDocumentationFile>("files");
+        public IMongoCollection<RepositoryModel> GetRepositories()
+            => comments.GetCollection<RepositoryModel>("repositories");
+
+        public IMongoCollection<Models.Mongo.AssemblyModel> GetAssemblies()
+            => comments.GetCollection<Models.Mongo.AssemblyModel>("assemblies");
+
+        static string GetMethodCollectionName(string prefix)
+            => $"{prefix}-methods";
+        static string GetTypeCollectionName(string prefix)
+            => $"{prefix}-types";
+        static string GetCommonCollectionName(string prefix)
+            => $"{prefix}-common";
+        static string GetRepoPrefixString(Repository repo)
+            => $"{repo.Name}-{repo.CommitHash}";
+        static string GetAssemblyPrefixString(Models.AssemblyModel assembly)
+            => $"{assembly.Name}-{assembly.Assembly.GetName().Version}";
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using DotDocs.Core.Models.Comments;
+using DotDocs.Core.Models.Mongo.Comments;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members

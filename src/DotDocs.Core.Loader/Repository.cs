@@ -9,18 +9,27 @@ using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Services.Description;
+using DotDocs.Core.Loader.Build;
 using DotDocs.Core.Loader.Exceptions;
 using DotDocs.Core.Loader.Services;
 using DotDocs.Core.Models;
 using DotDocs.Core.Models.Language;
+using DotDocs.Core.Models.Mongo;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Logging.StructuredLogger;
+using MongoDB.Driver;
 
 namespace DotDocs.Core.Loader
 {
-    public class Repository
+    public class Repository : IDisposable
     {
+        BuildInstance build;
+
+        CommentService comments;
+
+        public string Name { get; set; }
         /// <summary>
         /// The current commit hash of the repository.
         /// </summary>
@@ -45,8 +54,21 @@ namespace DotDocs.Core.Loader
         /// </summary>
         public ProjectDocument ActiveProject { get; private set; }
 
-        public Repository(string url)
-            => Url = url;                
+        /// <summary>
+        /// A collection containing all models required by the project.
+        /// </summary>
+        public ImmutableArray<TypeModel> AllModels { get; private set; }
+        /// <summary>
+        /// A collection containing only user defined models.
+        /// </summary>
+        public ImmutableArray<UserTypeModel> UserModels { get; private set; }
+        public ImmutableArray<Models.AssemblyModel> UsedAssemblies { get; private set; }
+
+        public Repository(string url, CommentService comments)
+        {
+            Url = url;
+            this.comments = comments;
+        }               
 
         /// <summary>
         /// Downloads a repository and returns the path to the repository.
@@ -141,9 +163,9 @@ namespace DotDocs.Core.Loader
         /// <exception cref="BuildException"></exception>
         public Repository Build()
         {
-            var instance = new BuildInstance(ActiveProject)
+            build = new BuildInstance(ActiveProject)
                 .Build()
-                .MakeModels();                
+                .MakeUserModels();                
 
             return this;
         }
@@ -168,7 +190,10 @@ namespace DotDocs.Core.Loader
                         index--;
                         // Valid index range
                         if (index < ProjectGraphs.Length && index > -1)
+                        {
                             ActiveProject = ProjectGraphs[index];
+                            break;
+                        }
                     }
                 }
             }
@@ -176,10 +201,49 @@ namespace DotDocs.Core.Loader
             return this;
         }
 
-        public Repository Document()
+        public Repository Prepare()
         {
+            /*
+             * Load all supporting types for all user created models
+             */
+            AddSupportingTypes();
+
+            /*
+             * Aggregate all assemblies used for documentation later 
+             */
+            UsedAssemblies = AllModels
+                .DistinctBy(m => m.Info.Assembly)
+                .Select(m => new Models.AssemblyModel(m.Info.Assembly))
+                .ToImmutableArray();
+
+            /*
+             * Load all documentation for models from the database
+             */
+            comments.UpdateDocumentation(this, build.AllProjectBuildInstances);
 
             return this;
+        }
+
+        public Repository Document()
+        {
+            // Render documentation
+            return this;
+        }       
+
+        /// <summary>
+        /// Load all supporting types for all user created models.
+        /// </summary>
+        void AddSupportingTypes()
+        {
+            UserModels = build.RootProjectBuildInstance
+                .AggregateModels(new List<UserTypeModel>())
+                .ToImmutableArray();
+            var allModels = new Dictionary<string, TypeModel>(UserModels
+                    .Select(model => new KeyValuePair<string, TypeModel>(model.Info.GetTypeId(), model)));
+            // Add model dependencies to the collection of all types            
+            foreach (var instance in build.AllProjectBuildInstances)
+                foreach (var model in instance.Models)
+                    model.Add(allModels);
         }
 
         /// <summary>
@@ -188,7 +252,7 @@ namespace DotDocs.Core.Loader
         /// <returns></returns>
         static IEnumerable<ProjectDocument> FindRootProjects(List<string> projectFiles)
         {
-            List<ProjectDocument> projects = new List<ProjectDocument>();
+            var projects = new List<ProjectDocument>();
 
             while (projectFiles.Count != 0)
             {
@@ -202,253 +266,8 @@ namespace DotDocs.Core.Loader
             return projects.Where(proj => proj.Parent == null).ToArray();
         }
 
-        /// <summary>
-        /// A class containing a build attempt's information.
-        /// </summary>
-        class BuildInstance : IDisposable
-        {
-            #region Binlog Variables
-            const string PROJECT_NAME = "ProjectName";
-            const string PROJECT_DIR = "ProjectDir";
-            const string PROJECT_FILE_NAME = "ProjectFileName";
-            const string PROJECT_PATH = "ProjectPath";
-            const string TARGET_FILE_NAME = "TargetName";
-            const string ASSEMBLY_NAME = "AssemblyName";
-            const string TARGET_PATH = "TargetPath";
-            const string DOCUMENTATION_FILE = "DocumentationFile";
-            #endregion
-
-            ProjectDocument rootProject;
-
-            ProjectBuildInstance RootProjectBuildInstance { get; set; }
-
-            ImmutableArray<string> allAssemblyPaths;
-
-            List<ProjectBuildInstance> allProjectBuildInstances = new();
-
-            public BuildInstance(ProjectDocument rootProject)
-                => this.rootProject = rootProject;
-
-            /// <summary>
-            /// Builds the root project via the <see cref="rootProject"/> property.
-            /// </summary>
-            /// <returns></returns>
-            /// <exception cref="BuildException"></exception>
-            public BuildInstance Build()
-            {
-                var csProjPath = rootProject.ProjectFilePath;
-
-                var cmd = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        CreateNoWindow = true,
-                        UseShellExecute = false,
-                        Arguments = $"/C dotnet build {csProjPath} /bl"
-                    }
-                };
-                cmd.Start();
-
-                // Wait for files to finish being written & process close
-                cmd.WaitForExit();
-                var build = BinaryLog.ReadBuild("msbuild.binlog");
-                // If the build fails throw exception with build info
-                if (!build.Succeeded)
-                    throw new BuildException(build.FindChildrenRecursive<Error>());
-
-                var projectName = csProjPath[(csProjPath.LastIndexOf('\\') + 1)..];
-
-                var mainBuild = build.FindLastChild<Microsoft.Build.Logging.StructuredLogger.Project>();
-                var target = mainBuild
-                    .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
-                allAssemblyPaths = target.Children
-                    .Select(item => ((Item)((AddItem)item).FirstChild).Text)
-                    .ToImmutableArray();
-
-                // Get the root project
-                var eval = build
-                    .FindChild<TimedNode>("Evaluation");
-                var projectEval = eval
-                    .FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projectName));
-
-                RootProjectBuildInstance = ProjectBuildInstance
-                    .From(projectEval, allProjectBuildInstances);
-
-                // Add the root node as it will never be added otherwise
-                allProjectBuildInstances.Add(RootProjectBuildInstance);
-
-                return this;
-            }
-
-            public BuildInstance MakeModels()
-            {
-                Load(RootProjectBuildInstance, allAssemblyPaths);
-                return this;
-            }
-
-            /// <summary>
-            /// Loads all local projects recursively.
-            /// </summary>
-            /// <param name="build">Project to start loading from.</param>
-            /// <param name="assemblies">Assemblies that may be needed by <see cref="MetadataLoadContext"/>.</param>
-            void Load(ProjectBuildInstance build, ImmutableArray<string> assemblies)
-            {
-                // Visit the lowest level assembly and load it's info before loading higher level assemblies
-                foreach (var proj in build.DependentBuilds)
-                    Load(proj, assemblies);
-                build.Load(assemblies);
-            }
-
-            public void Dispose()
-            {
-                foreach (var build in allProjectBuildInstances)
-                    build.Dispose();
-            }
-
-            /// <summary>
-            /// A class containing a project's build information.
-            /// </summary>
-            class ProjectBuildInstance : IDisposable
-            {
-                /// <summary>
-                /// The context used for loading in an assembly in a reflection-only manner.
-                /// </summary>
-                MetadataLoadContext mlc;
-                /// <summary>
-                /// Name of the project file.
-                /// </summary>
-                public string ProjectFileName { get; private set; } = string.Empty;
-                /// <summary>
-                /// File location of the assembly.
-                /// </summary>
-                public string AssemblyFilePath { get; private set; } = string.Empty;
-                /// <summary>
-                /// File location of the generated documentation.
-                /// </summary>
-                public string DocumentationFilePath { get; private set; } = string.Empty;
-                /// <summary>
-                /// The assembly produced from the build.
-                /// </summary>
-                public Assembly? Assembly { get; private set; }
-                /// <summary>
-                /// Models of interest found within the <see cref="Assembly"/>.
-                /// </summary>
-                public ImmutableArray<TypeModel> Models { get; private set; }
-
-                public ImmutableArray<ProjectBuildInstance> DependentBuilds { get; private set; }
-
-                /// <summary>
-                /// Create a new <see cref="ProjectBuildInstance"/> from the provided build evaluation
-                /// and it's dependent builds.
-                /// </summary>
-                /// <param name="buildEval"></param>
-                /// <param name="projects"></param>
-                /// <returns></returns>
-                public static ProjectBuildInstance From(ProjectEvaluation buildEval, List<ProjectBuildInstance> projects)
-                {
-                    var props = buildEval.FindChild<Folder>("Properties");
-                    var properties = props.Children.Cast<NameValueNode>().Where(p =>
-                    {
-                        return p.Name switch
-                        {
-                            PROJECT_DIR or
-                            PROJECT_FILE_NAME or
-                            PROJECT_PATH or
-                            TARGET_FILE_NAME or
-                            TARGET_PATH or
-                            PROJECT_NAME or
-                            ASSEMBLY_NAME or
-                            DOCUMENTATION_FILE => true,
-                            _ => false,
-                        };
-                    })
-                    .ToDictionary(p => p.Name);
-
-                    string projDir = properties[PROJECT_DIR].Value;
-
-                    return new ProjectBuildInstance
-                    {
-                        ProjectFileName = properties[PROJECT_FILE_NAME].Value,
-                        AssemblyFilePath = properties[TARGET_PATH].Value,
-                        DocumentationFilePath = Path.Combine(projDir, properties[DOCUMENTATION_FILE].Value),
-                        DependentBuilds = GetDependentBuilds(buildEval)
-                    };
-                }
-
-                /// <summary>
-                /// Loads all the desired types from this assembly into the <see cref="Models"/> collection.
-                /// </summary>
-                /// <param name="assemblies">Supporting assemblies.</param>
-                public void Load(ImmutableArray<string> assemblies)
-                {
-                    if (mlc != null)
-                        Dispose();
-                    mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
-                    Assembly = mlc.LoadFromAssemblyPath(AssemblyFilePath);
-
-                    /*
-                     * Do not add all types unless they are relevant to the custom types created by the developer(s)
-                     * or if they are public. All types used in some way by the developer(s')('s) types will be added
-                     * to the type list. That said, if a type is public and available to be used by external libraries,
-                     * ensure that type is accounted for regardless if it's compiler generated.
-                     */
-                    var typesOfInterest = Assembly.DefinedTypes
-                        .Where(type => !type
-                            .CustomAttributes
-                            .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
-                                type.IsPublic && !type.IsNestedFamORAssem);
-
-                    var models = new List<TypeModel>();
-                    foreach (var type in typesOfInterest)
-                        models.Add(new TypeModel(type, true));
-                    Models = models.ToImmutableArray();
-                }
-
-                /// <summary>
-                /// Disposes of unmanaged resources for this build.
-                /// </summary>
-                public void Dispose()
-                    => mlc?.Dispose();
-
-                /// <summary>
-                /// Gets all dependencies of the given project evaluation;
-                /// operates in a depth-first-search mode.
-                /// </summary>
-                /// <param name="projectEval">Current project.</param>
-                /// <returns>All <see cref="LocalProjectModel"/> dependencies of the current.</returns>
-                static ImmutableArray<ProjectBuildInstance> GetDependentBuilds(ProjectEvaluation projectEval)
-                {
-                    var items = projectEval.FindChild<Folder>("Items");
-                    var addItems = items.FindChild<AddItem>("ProjectReference");
-                    if (addItems == null || addItems.Children.Count == 0)
-                        return new ImmutableArray<ProjectBuildInstance>();
-
-                    IEnumerable<string> projectFileNames = addItems.Children
-                        .Cast<Item>()
-                        .Select(p => p.Text[(p.Text.LastIndexOf('\\') + 1)..]);
-
-                    var eval = (TimedNode)projectEval.Parent;
-                    var projects = new List<ProjectBuildInstance>();
-
-                    foreach (var projFileName in projectFileNames)
-                    {
-                        var projEval = eval.FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projFileName));
-                        // Check to see if the project has already been loaded as a dependency elsewhere
-                        var existingProject = projects.SingleOrDefault(p => p.ProjectFileName.Equals(projFileName));
-                        if (existingProject != null) // Exist elsewhere so use existing instance
-                            projects.Add(existingProject);
-                        else // Doesn't exist, create new
-                        {
-                            var project = From(projEval, projects);
-                            // Update both existing project list and add to tree
-                            projects.Add(project);
-                            projects.Add(project);
-                        }
-                    }
-                    return projects.ToImmutableArray();
-                }               
-            }
-        }
+        public void Dispose()
+            => build?.Dispose();
+        
     }
 }

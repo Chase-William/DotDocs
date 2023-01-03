@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Core.Models.Comments
+namespace DotDocs.Core.Models.Mongo.Comments
 {
     /// <summary>
     /// Extension of <see cref="CommonComments"/> for database interaction.
@@ -24,16 +24,17 @@ namespace DotDocs.Core.Models.Comments
         /// <summary>
         /// Versions this comment has been documented for and remains the same throughout.
         /// </summary>
-        public List<Version> Versions { get; set; } 
+        public List<Version> Versions { get; set; }
 
         /// <summary>
         /// Id for MongoDb records.
         /// </summary>
-        public ObjectId Id { get;  init; }
+        public ObjectId Id { get; init; }
 
         string? summary;
-        public string? Summary { 
-            get 
+        public string? Summary
+        {
+            get
             {
                 /*
                  * Return either the summary from the existing comment or from 
@@ -45,14 +46,14 @@ namespace DotDocs.Core.Models.Comments
             {
                 summary = value;
             }
-        }        
+        }
 
-        public CommonCommentsModel() { }        
+        public CommonCommentsModel() { }
         public CommonCommentsModel(TComment comments, string fullName, Version version)
         {
             this.comments = comments;
-            this.FullName = fullName;
-            this.Versions = new List<Version>() { version };
-        }                  
+            FullName = fullName;
+            Versions = new List<Version>() { version };
+        }
     }
 }
