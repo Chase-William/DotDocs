@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using DotDocs.Core;
-using DotDocs.Core.Models.Exceptions;
+﻿using DotDocs.Core.Exceptions;
+using System;
 
 namespace DotDocs.Runner
 {
@@ -60,8 +57,8 @@ namespace DotDocs.Runner
 
                 string config = "{\r\n  \"perspective\": \"internal\",\r\n  \"type\": {\r\n    \"class\": {\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false\r\n    }\r\n  },\r\n  \"member\": {\r\n    \"property\": {\r\n      \"showIfPublic\": false,\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false,\r\n      \"denoteIfSetonly\": false\r\n    }\r\n  }\r\n}";
 
-                Core.DotDocs.Init();
-                var builder = Core.DotDocs.New(url, config);
+                DotDocs.Init();
+                var builder = DotDocs.New(url, config);
                 builder.Document();
                 //builder.Prepare();
                 //builder.Load();
@@ -79,15 +76,11 @@ namespace DotDocs.Runner
             }
             catch (BuildException ex)
             {
-                Console.WriteLine(((int)ErrorCodes.UserError) + " " + ex.Message);
-            }
-            catch (MissingProjectFileException ex)
-            {
-                Console.WriteLine(((int)ErrorCodes.UserError) + " " + ex.Message);
+                Console.WriteLine("There was a problem with building the user's project; they may have requested us to build a faulty project. " + ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine((int)ErrorCodes.InternalError + " " + ex.Message);
+                Console.WriteLine(ex.Message);
             }
         }
     }

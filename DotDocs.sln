@@ -5,11 +5,9 @@ VisualStudioVersion = 17.2.32314.265
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Runner", "src\DotDocs.Runner\DotDocs.Runner.csproj", "{EF56C0EE-5E93-4AB0-93B8-B77BD202A0D6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Core", "src\DotDocs.Core\DotDocs.Core.csproj", "{0F6D424C-B7FE-4C33-B55D-6F28C6419469}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs", "src\DotDocs\DotDocs.csproj", "{0F6D424C-B7FE-4C33-B55D-6F28C6419469}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Core.Models", "src\DotDocs.Core.Models\DotDocs.Core.Models.csproj", "{268FFBE4-67F4-4A7C-A837-F1672B88DB50}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleProject", "src\SimpleProject\SimpleProject.csproj", "{D9634C9E-FCA9-4B1F-AA6B-707996863A3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Core", "src\DotDocs.Core\DotDocs.Core.csproj", "{268FFBE4-67F4-4A7C-A837-F1672B88DB50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
