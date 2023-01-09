@@ -1,4 +1,5 @@
 ﻿using DotDocs.Core.Loader;
+using DotDocs.Core.Models;
 using LoxSmoke.DocXml;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -27,19 +28,13 @@ namespace DotDocs.Core
         //public DotDocs(string csProjFile, string outputPath)
         //    => Builder = new Builder(csProjFile, outputPath);                           
 
-        static IMongoDatabase commentsDatabase;
-
-        public class Test
-        {
-            public ObjectId Id { get; set; }
-            public string Name { get; set; }
-        }
+        static IMongoDatabase commentsDatabase;        
 
         public static void Init()
         {
             // Create connection to database
             var client = new MongoClient("mongodb://localhost:27017");
-            commentsDatabase = client.GetDatabase("test");
+            commentsDatabase = client.GetDatabase("comments");
             //var col = commentsDatabase.GetCollection<Test>("example");
 
             //col.InsertOne(new Test
@@ -52,8 +47,8 @@ namespace DotDocs.Core
             //Console.WriteLine();
         }
 
-        public static Builder New(string url)
-            => new(url, commentsDatabase);
+        public static Builder New(string url, string? config = null)
+            => new(url, commentsDatabase, config);
 
         ///// <summary>
         ///// Cleanup unmanaged resources linked with <see cref="Builder"/>.

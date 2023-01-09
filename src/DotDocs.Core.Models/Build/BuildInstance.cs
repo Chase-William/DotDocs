@@ -1,4 +1,5 @@
-﻿using DotDocs.Core.Loader.Exceptions;
+﻿using DotDocs.Core.Models.Exceptions;
+using DotDocs.Core.Models.Language;
 using Microsoft.Build.Logging.StructuredLogger;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Core.Loader.Build
+namespace DotDocs.Core.Models.Build
 {
     /// <summary>
     /// A class containing a build attempt's information.
@@ -59,7 +60,7 @@ namespace DotDocs.Core.Loader.Build
 
             var projectName = csProjPath[(csProjPath.LastIndexOf('\\') + 1)..];
 
-            var mainBuild = build.FindLastChild<Microsoft.Build.Logging.StructuredLogger.Project>();
+            var mainBuild = build.FindLastChild<Project>();
             var target = mainBuild
                 .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
             allAssemblyPaths = target.Children
@@ -85,8 +86,15 @@ namespace DotDocs.Core.Loader.Build
         {
             Load(RootProjectBuildInstance, allAssemblyPaths);
             return this;
-        }
+        }             
 
+        public void Dispose()
+        {
+            foreach (var build in allProjectBuildInstances)
+                build.Dispose();
+        }        
+
+                    
         /// <summary>
         /// Loads all local projects recursively.
         /// </summary>
@@ -98,12 +106,6 @@ namespace DotDocs.Core.Loader.Build
             foreach (var proj in build.DependentBuilds)
                 Load(proj, assemblies);
             build.Load(assemblies);
-        }
-
-        public void Dispose()
-        {
-            foreach (var build in allProjectBuildInstances)
-                build.Dispose();
         }
     }
 }

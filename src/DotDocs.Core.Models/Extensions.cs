@@ -53,13 +53,7 @@ namespace DotDocs.Core.Models
                 throw new RequiredAssemblyPropertyNullException(assembly, nameof(name.Name));
             return name.Name;
         }
-        /// <summary>
-        /// Gets a unique idenfier for a local project.
-        /// </summary>
-        /// <param name="project">The project to get a id for.</param>
-        /// <returns>A string that is the id.</returns>
-        public static string GetProjectId(this LocalProjectModel project)
-            => project.ProjectName;
+
         /// <summary>
         /// Gets a list of the desired properties that DotDocs will only filter down further as needed.
         /// </summary>
@@ -114,5 +108,33 @@ namespace DotDocs.Core.Models
         }
         public static IEnumerable<Type> GetDesiredInterfaces(this Type type)
             => type.GetInterfaces();
+
+        // TODO: Consider this, do we really want to display public classes that could be inside a private class?
+        // public static bool IsPublic(this TypeInfo info) => info.IsPublic || info.IsNestedPublic;
+        public static bool IsPublic(this Type info) => info.IsPublic || info.IsNestedPublic;
+        public static bool IsPrivate(this Type info) => info.IsNestedPrivate;        
+        public static bool IsInternal(this Type info) => (info.IsNotPublic && !info.IsNested) || info.IsNestedAssembly || info.IsNestedFamORAssem || info.IsNestedFamANDAssem;
+        public static bool IsProtected(this Type info) => info.IsNestedFamily || info.IsNestedFamANDAssem || info.IsNestedFamORAssem;           
+
+        public static Perspective ToPerspective(this string perspective)
+        {
+            if (perspective == ConfigConstants.EXTERNAL_PERSPECTIVE)
+                return Perspective.External;
+            else if (perspective == ConfigConstants.INTERNAL_PERSPECTIVE)
+                return Perspective.Internal;
+            throw new ArgumentException($"The value provided of {perspective} does not align with any of the Perspective enum values.");
+        }
+
+        public static bool From(this Perspective perspective, AccessibilityModifier mod) => mod switch
+            {
+                AccessibilityModifier.Public => true,
+                AccessibilityModifier.Protected | AccessibilityModifier.Internal when perspective == Perspective.Internal => true,
+                AccessibilityModifier.Private | AccessibilityModifier.Protected when perspective == Perspective.Internal => true,
+                AccessibilityModifier.Protected => true,
+                AccessibilityModifier.Internal when perspective == Perspective.Internal => true,
+                AccessibilityModifier.Private when perspective == Perspective.Internal => true,
+                _ => false
+            };
+        
     }
 }

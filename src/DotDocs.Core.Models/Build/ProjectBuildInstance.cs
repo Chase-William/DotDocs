@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Core.Loader.Build
+namespace DotDocs.Core.Models.Build
 {
     /// <summary>
     /// A class containing a project's build information.
@@ -53,11 +53,11 @@ namespace DotDocs.Core.Loader.Build
         /// Note: This these models will only include user created types defined within
         /// this assembly, no types such as `System.Object`.
         /// </summary>
-        public ImmutableArray<UserTypeModel> Models { get; private set; }
+        public ImmutableArray<UserTypeModel> Models { get; private set; } = new List<UserTypeModel>().ToImmutableArray();
         /// <summary>
         /// A collection of project builds that this project's build is dependent on.
         /// </summary>
-        public ImmutableArray<ProjectBuildInstance> DependentBuilds { get; private set; }
+        public ImmutableArray<ProjectBuildInstance> DependentBuilds { get; set; }
 
         /// <summary>
         /// Create a new <see cref="ProjectBuildInstance"/> from the provided build evaluation
@@ -114,14 +114,14 @@ namespace DotDocs.Core.Loader.Build
              * to the type list. That said, if a type is public and available to be used by external libraries,
              * ensure that type is accounted for regardless if it's compiler generated.
              */
-            var typesOfInterest = Assembly.DefinedTypes
-                .Where(type => !type
-                    .CustomAttributes
-                    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
-                        type.IsPublic && !type.IsNestedFamORAssem);
+            var userTypes = Assembly.DefinedTypes.ToList();
+                //.Where(type => !type
+                //    .CustomAttributes
+                //    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
+                //        type.IsPublic && !type.IsNestedFamORAssem);
 
             var models = new List<UserTypeModel>();
-            foreach (var type in typesOfInterest)
+            foreach (var type in userTypes)
                 models.Add(new UserTypeModel(type));
             Models = models.ToImmutableArray();
         }
@@ -143,7 +143,7 @@ namespace DotDocs.Core.Loader.Build
             var items = projectEval.FindChild<Folder>("Items");
             var addItems = items.FindChild<AddItem>("ProjectReference");
             if (addItems == null || addItems.Children.Count == 0)
-                return new ImmutableArray<ProjectBuildInstance>();
+                return new List<ProjectBuildInstance>().ToImmutableArray();
 
             IEnumerable<string> projectFileNames = addItems.Children
                 .Cast<Item>()
@@ -161,7 +161,7 @@ namespace DotDocs.Core.Loader.Build
                     projects.Add(existingProject);
                 else // Doesn't exist, create new
                 {
-                    var project = From(projEval, projects);
+                    var project = From(projEval, allProjects);
                     // Update both existing project list and add to tree
                     allProjects.Add(project);
                     projects.Add(project);

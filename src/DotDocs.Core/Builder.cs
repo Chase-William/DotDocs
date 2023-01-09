@@ -6,7 +6,9 @@ using System.IO.Compression;
 using System.Linq;
 using DotDocs.Core.Loader;
 using DotDocs.Core.Loader.Services;
+using DotDocs.Core.Models;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace DotDocs.Core
 {
@@ -14,60 +16,26 @@ namespace DotDocs.Core
     /// The main class for using DotDoc's services.
     /// </summary>
     public class Builder
-    {
-        /// <summary>
-        /// The root folder of all file output produced by this project.
-        /// </summary>
-        // public const string DOTDOCS_ROOT_FOLDER = "core-info";
-        /// <summary>
-        /// A tree that contains all the local projects the root depends on.
-        /// </summary>
-        // public ProjectBuilder repository;           
-        /// <summary>
-        /// The root path where DotDocs will output all documentation.
-        /// </summary>
-        // string RootPath => Path.Combine(outputPath, DOTDOCS_ROOT_FOLDER);
+    {        
         /// <summary>
         /// The project file used as the root.
         /// </summary>
         string url;
-        /// <summary>
-        /// The output path provided by the user used in determining the root path for the documentation to reside.
-        /// </summary>
-        // string outputPath;
-        IMongoDatabase commentDatabase;
-        private CommentService comments;
 
-        /// <summary>
-        /// Instantiates a new instance of <see cref="Builder"/> which is ready to be used.
-        /// </summary>
-        /// <param name="csProjFile">The project file to be used as the root.</param>
-        /// <param name="outputPath">The output path provided by the user used to determine where DotDocs should put rendered content.</param>
-        public Builder(string url, IMongoDatabase commentDatabase)
+        IMongoDatabase commentDatabase;
+
+        Configuration config;
+
+        public Builder(string url, IMongoDatabase commentDatabase, string? config = null)
         {
             this.url = url;
             this.commentDatabase = commentDatabase;
+
+            if (config == null)
+                this.config = new Configuration(null, null, Perspective.Default);
+            else
+                this.config = JsonConvert.DeserializeObject<Configuration>(config).From();
         }
-
-        /// <summary>
-        /// Prepares the <see cref="Builder"/> for loading information by modifing .csproj files where needed and building all projects to collect information.
-        /// </summary>
-        //public void Prepare()
-        //{
-        //    // Prepare all .csproj files recursively
-        //    projectContext.Prepare(projectFile);
-        //    // Build the project
-        //    projectContext.BuildProject(projectFile);      
-        //}
-
-        /// <summary>
-        /// Loads types from assemblies and documentation for all entities where available.
-        /// </summary>
-        //public void Load()
-        //{
-        //    projectContext.LoadTypes();
-        //    projectContext.PrepareDocumentation();
-        //}
 
         /// <summary>
         /// Cleans the output dir and renderers all documentation.
@@ -79,15 +47,19 @@ namespace DotDocs.Core
             // repository = new ProjectBuilder(commentManager);
             // repository = new ProjectLoadContext(commentManager);
 
+            //var baseOutStream = new MemoryStream();
+            //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);
+
             // Create a repository from the url
             // This 
-            using Repository repo = new Repository(url, new CommentService(commentDatabase))
+            using Repository repo = new Repository(url, new CommentService(commentDatabase), config)
                 .Download()
                 .RetrieveHashInfo()
                 .MakeProjectGraph()
                 .SetActiveProject()
                 .EnableDocumentationGeneration()
                 .Build()
+                .Prepare()
                 .Document();
 
             
@@ -116,17 +88,11 @@ namespace DotDocs.Core
             //repository.LoadDocumentation();
 
             // Utility.CleanDirectory(output);
-            var baseOutStream = new MemoryStream();
-            var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
+            //var baseOutStream = new MemoryStream();
+            //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
             // repository.Document(zip);
             // repository.Dispose();
-            return baseOutStream;
-        }                           
-
-        /// <summary>
-        /// Use to cleanup unmanaged resources used by the <see cref="repository"/>.
-        /// </summary>
-        //public void Dispose()
-        //    => ProjectContext?.Dispose();        
+            return null;
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace DotDocs.Core.Loader
+namespace DotDocs.Core.Models
 {
     public class ProjectDocument
     {
@@ -36,6 +36,12 @@ namespace DotDocs.Core.Loader
             // Update to true if set to false
             else if (bool.Parse(docGenProp.Value.ToLower()) == false)
                 docGenProp.Value = "True";
+
+            using (var writer = new StreamWriter(ProjectFilePath))
+            {
+                xDoc.Save(writer);
+            }
+                        
 
             if (recursive)
                 foreach (var dependency in Dependencies)

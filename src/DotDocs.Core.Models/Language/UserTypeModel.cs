@@ -80,32 +80,32 @@ namespace DotDocs.Core.Models.Language
         public UserTypeModel(Type type) : base(type.GetTypeInfo()) { }
         public UserTypeModel(TypeInfo typeInfo) : base(typeInfo) { }
 
-        public override void Add(Dictionary<string, TypeModel> allModels)
+        public override void Add(Dictionary<Type, TypeModel> allModels, Dictionary<Assembly, AssemblyModel<TypeModel>> assemblies)
         {
-            base.Add(allModels);
+            base.Add(allModels, assemblies);
 
             // Add properties
-            foreach (var property in properties)
-                AddType(property.Info.PropertyType, allModels);
+            foreach (var property in Properties)
+                AddType(property.Info.PropertyType, allModels, assemblies);
             // Add fields
-            foreach (var field in fields)
-                AddType(field.Info.FieldType, allModels);
+            foreach (var field in Fields)
+                AddType(field.Info.FieldType, allModels, assemblies);
             // Add methods
-            foreach (var method in methods)
+            foreach (var method in Methods)
             {
-                AddType(method.Info.ReturnType, allModels);
+                AddType(method.Info.ReturnType, allModels, assemblies);
                 var parameters = method.Info.GetParameters();
                 foreach (var parameter in parameters)
-                    AddType(parameter.ParameterType, allModels);
+                    AddType(parameter.ParameterType, allModels, assemblies);
             }
             // Add events
-            foreach (var _event in events)
+            foreach (var _event in Events)
                 if (_event.Info.EventHandlerType != null)
-                    AddType(_event.Info.EventHandlerType, allModels);
+                    AddType(_event.Info.EventHandlerType, allModels, assemblies);
 
             // Ensure implemented interfaces are accounted for
-            foreach (var _interface in Info.GetDesiredInterfaces())
-                AddType(_interface, allModels);
+            //foreach (var _interface in Info.GetDesiredInterfaces())
+            //    AddType(_interface, allModels, assemblies);
         }
 
         /// <summary>
@@ -114,8 +114,23 @@ namespace DotDocs.Core.Models.Language
         /// <param name="fileStream"></param>
         public void Document(Stream fileStream)
         {
-            fileStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello World!"));
+            fileStream.Write(Encoding.UTF8.GetBytes("Hello World!"));
             // From here render all contents for type
         }
+
+        public void Document(string basePath)
+        {
+            var folderPath = Path.Join(basePath, GetNamespaceAsPath());
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            using var writer = File.CreateText(Path.Join(folderPath, Info.Name) + ".md");
+            
+            writer.Write(Info.FullName);
+        }
+
+        string GetNamespaceAsPath()
+            => string.Join("/", Info.Namespace.Split('.'));
     }    
 }

@@ -10,24 +10,34 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Services.Description;
-using DotDocs.Core.Loader.Build;
-using DotDocs.Core.Loader.Exceptions;
 using DotDocs.Core.Loader.Services;
 using DotDocs.Core.Models;
+using DotDocs.Core.Models.Build;
 using DotDocs.Core.Models.Language;
-using DotDocs.Core.Models.Mongo;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Logging.StructuredLogger;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
 namespace DotDocs.Core.Loader
 {
     public class Repository : IDisposable
     {
+        /// <summary>
+        /// Id for MongoDb records.
+        /// </summary>
+        public ObjectId Id { get; init; }
+
+        [BsonIgnore]
         BuildInstance build;
 
+        [BsonIgnore]
         CommentService comments;
+
+        [BsonIgnore]
+        Configuration config;
 
         public string Name { get; set; }
         /// <summary>
@@ -38,36 +48,53 @@ namespace DotDocs.Core.Loader
         /// The url of the repository.
         /// </summary>
         public string Url { get; init; }
+
+        [BsonIgnore]
         /// <summary>
         /// The directory of the repository.
         /// </summary>
         public string Dir { get; private set; }
 
         // public ImmutableList<SolutionFile> Solutions { get; private set; }
-        
+
+        [BsonIgnore]
         /// <summary>
         /// All project groups in the repository.
         /// </summary>
         public ImmutableArray<ProjectDocument> ProjectGraphs { get; private set; }
+
+        [BsonIgnore]
         /// <summary>
         /// The select root project of a group to be documented.
         /// </summary>
         public ProjectDocument ActiveProject { get; private set; }
 
-        /// <summary>
-        /// A collection containing all models required by the project.
-        /// </summary>
-        public ImmutableArray<TypeModel> AllModels { get; private set; }
+        [BsonIgnore]
         /// <summary>
         /// A collection containing only user defined models.
         /// </summary>
-        public ImmutableArray<UserTypeModel> UserModels { get; private set; }
-        public ImmutableArray<Models.AssemblyModel> UsedAssemblies { get; private set; }
+        public ImmutableArray<UserTypeModel> UserTypes { get; private set; }
 
-        public Repository(string url, CommentService comments)
+        [BsonIgnore]
+        public ImmutableDictionary<Type, TypeModel> AllTypes { get; private set; }
+
+        [BsonIgnore]
+        ImmutableArray<AssemblyModel<UserTypeModel>> userAssemblies;
+        [BsonIgnore]
+        ImmutableArray<AssemblyModel<TypeModel>> otherAssemblies;
+
+        // public ImmutableArray<Models.AssemblyModel> UsedAssemblies { get; private set; }
+
+        public Repository(string url, CommentService comments, Configuration config)
         {
             Url = url;
             this.comments = comments;
+            this.config = config;
+
+            Name = url.Split('/')[^1];
+
+            if (Name.EndsWith(".git"))
+                Name = Name[0..^4]; // Take until the last 4, remove .git
         }               
 
         /// <summary>
@@ -86,7 +113,7 @@ namespace DotDocs.Core.Loader
             using PowerShell powershell = PowerShell.Create();
             // this changes from the user folder that PowerShell starts up with to your git repository
             powershell.AddScript($"cd {downloadRepoLocation}");
-            powershell.AddScript(@"git clone https://github.com/Chase-William/.Docs.Core.git");
+            powershell.AddScript($"git clone {Url}");
             //powershell.AddScript("cd.. / .. /.Docs.Core");
             //powershell.AddScript("dotnet build");
             powershell.Invoke(); // Run powershell            
@@ -192,7 +219,7 @@ namespace DotDocs.Core.Loader
                         if (index < ProjectGraphs.Length && index > -1)
                         {
                             ActiveProject = ProjectGraphs[index];
-                            break;
+                            return this;
                         }
                     }
                 }
@@ -202,30 +229,51 @@ namespace DotDocs.Core.Loader
         }
 
         public Repository Prepare()
-        {
+        {            
+            userAssemblies = build.AllProjectBuildInstances
+                .Select(proj => new AssemblyModel<UserTypeModel>(proj, config))
+                .ToImmutableArray();
+
+            UserTypes = userAssemblies
+                .SelectMany(m => m.TypeModels)
+                .Cast<UserTypeModel>()
+                .ToImmutableArray();
+
             /*
-             * Load all supporting types for all user created models
+             * Load all supporting types for all user created models & group their assemblies.
              */
-            AddSupportingTypes();
+            ProcessRequireTypes(UserTypes);
 
             /*
              * Aggregate all assemblies used for documentation later 
              */
-            UsedAssemblies = AllModels
-                .DistinctBy(m => m.Info.Assembly)
-                .Select(m => new Models.AssemblyModel(m.Info.Assembly))
-                .ToImmutableArray();
+            //UsedAssemblies = AllModels
+            //    .DistinctBy(m => m.Value.Info.Assembly)
+            //    .Select(m => new Models.AssemblyModel(m.Value.Info.Assembly))
+            //    .ToImmutableArray();
+
+            /*
+             * Provide AssemblyModels with a reference to the list of their models from the build             
+             */
+
+
 
             /*
              * Load all documentation for models from the database
              */
-            comments.UpdateDocumentation(this, build.AllProjectBuildInstances);
+            comments.UpdateDocumentation(this, userAssemblies, otherAssemblies);
 
             return this;
         }
 
         public Repository Document()
         {
+            var basePath = @"C:\Users\Chase Roth\Desktop";
+
+            foreach (var userType in UserTypes)
+            {
+                userType.Document(basePath);
+            }
             // Render documentation
             return this;
         }       
@@ -233,17 +281,20 @@ namespace DotDocs.Core.Loader
         /// <summary>
         /// Load all supporting types for all user created models.
         /// </summary>
-        void AddSupportingTypes()
+        void ProcessRequireTypes(ImmutableArray<UserTypeModel> userTypes)
         {
-            UserModels = build.RootProjectBuildInstance
-                .AggregateModels(new List<UserTypeModel>())
-                .ToImmutableArray();
-            var allModels = new Dictionary<string, TypeModel>(UserModels
-                    .Select(model => new KeyValuePair<string, TypeModel>(model.Info.GetTypeId(), model)));
+            var allTypes = new Dictionary<Type, TypeModel>(userTypes
+                    .Select(model => new KeyValuePair<Type, TypeModel>(model.Info, model)));
+
+            var otherAssemblies = new Dictionary<Assembly, AssemblyModel<TypeModel>>();
+
             // Add model dependencies to the collection of all types            
-            foreach (var instance in build.AllProjectBuildInstances)
-                foreach (var model in instance.Models)
-                    model.Add(allModels);
+            foreach (var model in userTypes)
+                    model.Add(allTypes, otherAssemblies);
+
+            AllTypes = allTypes.ToImmutableDictionary();
+
+            this.otherAssemblies = otherAssemblies.Values.ToImmutableArray();
         }
 
         /// <summary>

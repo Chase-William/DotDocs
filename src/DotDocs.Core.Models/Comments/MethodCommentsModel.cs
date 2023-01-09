@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace DotDocs.Core.Models.Mongo.Comments
+namespace DotDocs.Core.Models.Comments
 {
     /// <summary>
     /// Extension of <see cref="CommonCommentsModel{TComment}"/> for interacting with the database.
@@ -26,7 +27,6 @@ namespace DotDocs.Core.Models.Mongo.Comments
             }
         }
 
-        public MethodCommentsModel() { }
-        public MethodCommentsModel(MethodComments comments, string fullName, Version version) : base(comments, fullName, version) { }
+        public MethodCommentsModel(MethodComments comments, MethodInfo method, Version version) : base(comments, method, version) { }
     }
 }

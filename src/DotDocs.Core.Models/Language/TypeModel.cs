@@ -1,4 +1,4 @@
-﻿using DotDocs.Core.Models.Mongo.Comments;
+﻿using DotDocs.Core.Models.Comments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace DotDocs.Core.Models.Language
         #endregion
 
         /// <summary>
-        /// A reference to the actual <see cref="Type"/> instance for this <see cref="UserTypeModel"/>.
+        /// A reference to the actual <see cref="TypeConfig"/> instance for this <see cref="UserTypeModel"/>.
         /// </summary>           
         public TypeInfo Info { get; init; }
 
@@ -31,7 +31,7 @@ namespace DotDocs.Core.Models.Language
         /// </summary>
         public TypeCommentsModel? Comments { get; set; }
 
-        public override string Name => throw new NotImplementedException();
+        public override string Name => Info.Name;
 
         public TypeModel(Type type)
         {
@@ -43,39 +43,57 @@ namespace DotDocs.Core.Models.Language
             Info = typeInfo;            
         }
 
-        public virtual void Add(Dictionary<string, TypeModel> allModels)
+        public virtual void Add(Dictionary<Type, TypeModel> allModels, Dictionary<Assembly, AssemblyModel<TypeModel>> assemblies)
         {
             // Do not add if already accounted for
-            if (allModels.ContainsKey(Info.GetTypeId()))
-                return;
+            //if (allModels.ContainsKey(Info.GetTypeId()))
+            //    return;
+
+            // Ensure the base type is added too
+            if (Info.BaseType != null)
+                AddType(Info.BaseType, allModels, assemblies);
 
             // Ensure all generic parameters are accounted for
             if (Info.ContainsGenericParameters) // Process generic parameters            
                 foreach (Type param in Info.GenericTypeParameters)
-                    AddType(param, allModels);
+                    AddType(param, allModels, assemblies);
 
             // Ensure all type argument types are accounted for
             if (Info.GenericTypeArguments.Length > 0)
                 foreach (Type arg in Info.GenericTypeArguments)
-                    if (!allModels.ContainsKey(arg.GetTypeId()))
-                        AddType(arg, allModels);
+                    if (!allModels.ContainsKey(arg))
+                        AddType(arg, allModels, assemblies);
 
             // Ensure the element type for a arrays are accounted for
             if (Info.IsArray && Info.HasElementType)            
                 AddType(
                     Info.GetElementType() ?? throw new Exception($"The element type of {Info.FullName} was null."), 
-                    allModels);
+                    allModels, 
+                    assemblies);
         }
 
-        protected void AddType(Type type, Dictionary<string, TypeModel> allModels)
+        protected static void AddType(Type type, Dictionary<Type, TypeModel> allModels, Dictionary<Assembly, AssemblyModel<TypeModel>> assemblies)
         {
             // Do not add if already accounted for
-            if (allModels.ContainsKey(Info.GetTypeId()))
+            if (allModels.ContainsKey(type))
                 return;
 
             var model = new TypeModel(type);
-            allModels.Add(model.Info.GetTypeId(), model);
-            model.Add(allModels);
+            allModels.Add(model.Info, model);
+
+            AssemblyModel<TypeModel> asmModel;
+            if (!assemblies.ContainsKey(type.Assembly))
+            {
+                asmModel = new AssemblyModel<TypeModel>(type.Assembly);
+                assemblies.Add(asmModel.Assembly, asmModel);
+            }
+            else
+                asmModel = assemblies[type.Assembly];
+            // Add this used supporting type to the assembly model
+            asmModel.TypeModels.Add(model);
+
+            // Check the model recursively
+            model.Add(allModels, assemblies);
         }
     }
 }

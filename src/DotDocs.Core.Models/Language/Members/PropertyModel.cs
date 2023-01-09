@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
-using DotDocs.Core.Models.Mongo.Comments;
+using DotDocs.Core.Models.Comments;
 using LoxSmoke.DocXml;
 
 namespace DotDocs.Core.Models.Language.Members

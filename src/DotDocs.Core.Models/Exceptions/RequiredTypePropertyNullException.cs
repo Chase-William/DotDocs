@@ -8,10 +8,10 @@ namespace DotDocs.Core.Models.Exceptions
 {
     public class RequiredTypePropertyNullException : Exception
     {
-        public Type Type { get; set; }
+        public TypeConfig Type { get; set; }
         public string PropertyName { get; set; }
 
-        public RequiredTypePropertyNullException(Type type, string propName, string message = null) : base(message)
+        public RequiredTypePropertyNullException(TypeConfig type, string propName, string message = null) : base(message)
         {
             Type = type;
             PropertyName = propName;

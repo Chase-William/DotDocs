@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using DotDocs.Core;
-using DotDocs.Core.Loader.Exceptions;
+using DotDocs.Core.Models.Exceptions;
 
 namespace DotDocs.Runner
 {
@@ -58,8 +58,10 @@ namespace DotDocs.Runner
                 //fileInArchiveStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello, World"));
                 //return File(outStream.GetBuffer(), "application/zip");
 
+                string config = "{\r\n  \"perspective\": \"internal\",\r\n  \"type\": {\r\n    \"class\": {\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false\r\n    }\r\n  },\r\n  \"member\": {\r\n    \"property\": {\r\n      \"showIfPublic\": false,\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false,\r\n      \"denoteIfSetonly\": false\r\n    }\r\n  }\r\n}";
+
                 Core.DotDocs.Init();
-                var builder = Core.DotDocs.New(url);
+                var builder = Core.DotDocs.New(url, config);
                 builder.Document();
                 //builder.Prepare();
                 //builder.Load();

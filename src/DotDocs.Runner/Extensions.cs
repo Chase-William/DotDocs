@@ -1,4 +1,4 @@
-﻿using DotDocs.Core.Loader.Exceptions;
+﻿using DotDocs.Core.Models.Exceptions;
 using DotDocs.Runner.Models.Errors;
 using System.Linq;
 using System.Text.Json;

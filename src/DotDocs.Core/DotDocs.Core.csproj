@@ -9,6 +9,6 @@
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DotDocs.Core.Loader\DotDocs.Core.Loader.csproj" />
+    <ProjectReference Include="..\DotDocs.Core.Models\DotDocs.Core.Models.csproj" />
   </ItemGroup>
 </Project>

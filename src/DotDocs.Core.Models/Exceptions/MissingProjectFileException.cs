@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Core.Loader.Exceptions
+namespace DotDocs.Core.Models.Exceptions
 {
     /// <summary>
     /// An exception that is used when the root or a .csproj file referenced by another project cannot be found.

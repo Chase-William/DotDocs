@@ -2,7 +2,7 @@
 using LoxSmoke.DocXml;
 using DotDocs.Core.Models.Language.Parameters;
 using DotDocs.Core.Models.Language.Interfaces;
-using DotDocs.Core.Models.Mongo.Comments;
+using DotDocs.Core.Models.Comments;
 
 namespace DotDocs.Core.Models.Language.Members
 {

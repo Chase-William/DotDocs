@@ -5,26 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
-namespace DotDocs.Core.Models.Mongo.Comments
+namespace DotDocs.Core.Models.Comments
 {
-    /// <summary>
-    /// Extension of <see cref="CommonComments"/> for database interaction.
-    /// </summary>
-    /// <typeparam name="TComment"></typeparam>
-    public record class CommonCommentsModel<TComment> where TComment : CommonComments
+    public abstract record class CommentsModel<TComment> where TComment : CommonComments
     {
         protected TComment? comments;
 
         /// <summary>
-        /// Full name of assembly member used to identify member across versions.        
-        /// </summary>
-        public string FullName { get; set; }
-
-        /// <summary>
         /// Versions this comment has been documented for and remains the same throughout.
         /// </summary>
-        public List<Version> Versions { get; set; }
+        public Version Version { get; init; }
 
         /// <summary>
         /// Id for MongoDb records.
@@ -48,12 +40,10 @@ namespace DotDocs.Core.Models.Mongo.Comments
             }
         }
 
-        public CommonCommentsModel() { }
-        public CommonCommentsModel(TComment comments, string fullName, Version version)
+        public CommentsModel(TComment comments, Version version)
         {
             this.comments = comments;
-            FullName = fullName;
-            Versions = new List<Version>() { version };
+            Version = version;
         }
     }
 }
