@@ -104,7 +104,7 @@ namespace DotDocs.Core
             //powershell.AddScript("cd.. / .. /.Docs.Core");
             //powershell.AddScript("dotnet build");
             powershell.Invoke(); // Run powershell            
-
+            
             var folder = Url.Split("/").Last();
             if (folder.Contains(".git"))
                 folder = folder[..4];
@@ -261,6 +261,7 @@ namespace DotDocs.Core
             {
                 userType.Document(basePath);
             }
+
             // Render documentation
             return this;
         }       
@@ -305,7 +306,22 @@ namespace DotDocs.Core
         }
 
         public void Dispose()
-            => build?.Dispose();
+        {
+            // Deleted cloned repo            
+            // Release metadataloadcontext'd assemblies
+            build?.Dispose();
+
+            // Delete repo from disk if it exists
+            if (Directory.Exists(Dir))
+            {
+                // Using powershell because Directory.Delete recursive cannot delete some files for some reason.
+                // .git's objects/pack/*.dix and *.pack files.. their not locked, just dont have access to the path
+                // This is my work around below:
+                using PowerShell powershell = PowerShell.Create();
+                powershell.AddScript($"rm -r -fo {Dir}");
+                powershell.Invoke(); // Run powershell            
+            }
+        }
         
     }
 }

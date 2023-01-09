@@ -54,9 +54,7 @@ namespace DotDocs
                 .EnableDocumentationGeneration()
                 .Build()
                 .Prepare()
-                .Document();
-
-            
+                .Document();            
 
             // Take repo and return documentation
 
