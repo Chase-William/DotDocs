@@ -10,6 +10,6 @@ namespace DotDocs.Models
     public class AssemblyModel : Model
     {
         public string Name { get; set; }
-        public IEnumerable<TypeModel> Types { get; set; }
+        public List<TypeModel> Types { get; set; } = new();
     }
 }

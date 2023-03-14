@@ -1,6 +1,7 @@
 ﻿using DotDocs.Core;
 using DotDocs.Core.Util;
 using DotDocs.Models;
+using Neo4j.Driver;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -24,7 +25,7 @@ namespace DotDocs
         /// <summary>
         /// Cleans the output dir and renderers all documentation.
         /// </summary>
-        public MemoryStream Document()
+        public async void Document()
         {
             // https://github.com/Chase-William/.Docs.Core.git
             // comments = new CommentService(commentDatabase);
@@ -48,7 +49,14 @@ namespace DotDocs
 
             RepositoryModel model = new RepositoryModel().Apply(repo);
 
-            System.Console.WriteLine();
+            GraphDatabaseConnection.Init(
+                "bolt://44.213.248.121:7687",
+                "neo4j",
+                "records-canyon-ditch");
+
+            model.Run();
+
+            GraphDatabaseConnection.Close();
 
             // Take repo and return documentation
 
@@ -77,8 +85,7 @@ namespace DotDocs
             //var baseOutStream = new MemoryStream();
             //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
             // repository.Document(zip);
-            // repository.Dispose();
-            return null;
+            // repository.Dispose();            
         }
     }
 }

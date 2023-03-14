@@ -110,7 +110,7 @@ namespace DotDocs.Core.Build
                 lowerModel = Load(proj, assemblies); // Capture dependency projectModel
             var currentModel = build.Load(assemblies); // Capture this projectModel
             if (lowerModel != null) // If dependency exists, add it to the dependency list
-                currentModel.Dependencies.Add(lowerModel);
+                currentModel.Projects.Add(lowerModel);
             return currentModel;
         }
     }
