@@ -1,5 +1,5 @@
-﻿using DotDocs.Core.Language;
-using DotDocs.Core.Models.Language;
+﻿using DotDocs.Core.Util;
+using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -42,12 +42,6 @@ namespace DotDocs.Core.Build
         /// The assembly produced from the build.
         /// </summary>
         public Assembly? Assembly { get; private set; }
-        /// <summary>
-        /// Models of interest found within the <see cref="Assembly"/>.
-        /// Note: This these models will only include user created types defined within
-        /// this assembly, no types such as `System.Object`.
-        /// </summary>
-        public ImmutableArray<UserTypeModel> Models { get; private set; } = new List<UserTypeModel>().ToImmutableArray();
         /// <summary>
         /// A collection of project builds that this project's build is dependent on.
         /// </summary>
@@ -95,7 +89,7 @@ namespace DotDocs.Core.Build
         /// Loads all the desired types from this assembly into the <see cref="Models"/> collection.
         /// </summary>
         /// <param name="assemblies">Supporting assemblies.</param>
-        public void Load(ImmutableArray<string> assemblies)
+        public ProjectModel Load(ImmutableArray<string> assemblies)
         {
             if (mlc != null)
                 Dispose();
@@ -108,16 +102,18 @@ namespace DotDocs.Core.Build
              * to the type list. That said, if a type is public and available to be used by external libraries,
              * ensure that type is accounted for regardless if it's compiler generated.
              */
-            var userTypes = Assembly.DefinedTypes.ToList();
-                //.Where(type => !type
-                //    .CustomAttributes
-                //    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
-                //        type.IsPublic && !type.IsNestedFamORAssem);
+            // var userTypes = Assembly.DefinedTypes.ToList();
+            //.Where(type => !type
+            //    .CustomAttributes
+            //    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
+            //        type.IsPublic && !type.IsNestedFamORAssem);
 
-            var models = new List<UserTypeModel>();
-            foreach (var type in userTypes)
-                models.Add(new UserTypeModel(type));
-            Models = models.ToImmutableArray();
+            return new ProjectModel().Apply(this);
+
+            //var models = new List<UserTypeModel>();
+            //foreach (var type in userTypes)
+            //    models.Add(new UserTypeModel(type));
+            //Models = models.ToImmutableArray();
         }
 
         /// <summary>
@@ -162,20 +158,6 @@ namespace DotDocs.Core.Build
                 }
             }
             return projects.ToImmutableArray();
-        }
-
-        /// <summary>
-        /// Flattens all project models into one collection.
-        /// </summary>
-        /// <param name="models">Aggregated collection.</param>
-        /// <param name="recursive">Run recursively or not.</param>
-        public List<UserTypeModel> AggregateModels(List<UserTypeModel> models, bool recursive = true)
-        {
-            models.AddRange(Models);
-            if (recursive)
-                foreach (var build in DependentBuilds)               
-                    build.AggregateModels(models);
-            return models;
         }
     }
 }

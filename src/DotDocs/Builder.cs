@@ -1,6 +1,6 @@
 ﻿using DotDocs.Core;
-using DotDocs.Core.Services;
-using MongoDB.Driver;
+using DotDocs.Core.Util;
+using DotDocs.Models;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -16,19 +16,9 @@ namespace DotDocs
         /// </summary>
         string url;
 
-        IMongoDatabase commentDatabase;
-
-        Configuration config;
-
-        public Builder(string url, IMongoDatabase commentDatabase, string? config = null)
+        public Builder(string url)
         {
             this.url = url;
-            this.commentDatabase = commentDatabase;
-
-            if (config == null)
-                this.config = new Configuration(null, null, Perspective.Default);
-            else
-                this.config = JsonConvert.DeserializeObject<Configuration>(config).From();
         }
 
         /// <summary>
@@ -46,15 +36,19 @@ namespace DotDocs
 
             // Create a repository from the url
             // This 
-            using Repository repo = new Repository(url, new CommentService(commentDatabase), config)
+            using Repository repo = new Repository(url)
                 .Download()
-                .RetrieveHashInfo()
+                .GetCommitInfo()
                 .MakeProjectGraph()
                 .SetActiveProject()
                 .EnableDocumentationGeneration()
-                .Build()
-                .Prepare()
-                .Document();            
+                .Build();
+            //.Prepare()
+            //.Document();            
+
+            RepositoryModel model = new RepositoryModel().Apply(repo);
+
+            System.Console.WriteLine();
 
             // Take repo and return documentation
 

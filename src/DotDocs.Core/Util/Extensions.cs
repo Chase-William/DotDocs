@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using DotDocs.Core.Build;
+using DotDocs.Models;
+using DotDocs.Models.Language;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DotDocs.Core.Util
@@ -7,12 +10,51 @@ namespace DotDocs.Core.Util
     /// A static class that exists purely to contain extension methods.
     /// </summary>
     public static class Extensions
-    {
+    {        
         /// <summary>
         /// Collection of members always present in an object.
         /// Works for structs too because they are <see cref="ValueType"/> which is a class behind the scenes.
         /// </summary>
         static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
+
+        public static RepositoryModel Apply(this RepositoryModel model, Repository repo)
+        {
+            model.Name = repo.Name;
+            model.Url = repo.Url;
+            model.Commit = repo.Commit;
+            // Handles creation of the project and all down stream entities
+            model.Projects.Add(repo.build.MakeModels());
+            return model;
+        }
+
+        public static ProjectModel Apply(this ProjectModel model, ProjectBuildInstance build)
+        {
+            model.Name = build.ProjectFileName;
+            model.Assembly = new AssemblyModel().Apply(build.Assembly);
+            return model;
+        }
+
+        public static AssemblyModel Apply(this AssemblyModel model, Assembly assembly)
+        {
+            model.Name = assembly.GetName().Name;
+
+            List<TypeModel> models = new List<TypeModel>();
+            foreach (var type in assembly.DefinedTypes)
+            {
+                models.Add(new TypeModel().Apply(type));
+            }
+            model.Types = models;
+            return model;
+        }
+
+        public static TypeModel Apply(this TypeModel model, Type type)
+        {
+            model.Name = type.Name;
+            
+            // TODO: From here we would perform addition logic for handling member models
+
+            return model;
+        }
 
         /// <summary>
         /// Gets a list of the desired properties that DotDocs will only filter down further as needed.
@@ -74,27 +116,6 @@ namespace DotDocs.Core.Util
         public static bool IsPublic(this Type info) => info.IsPublic || info.IsNestedPublic;
         public static bool IsPrivate(this Type info) => info.IsNestedPrivate;
         public static bool IsInternal(this Type info) => info.IsNotPublic && !info.IsNested || info.IsNestedAssembly || info.IsNestedFamORAssem || info.IsNestedFamANDAssem;
-        public static bool IsProtected(this Type info) => info.IsNestedFamily || info.IsNestedFamANDAssem || info.IsNestedFamORAssem;
-
-        public static Perspective ToPerspective(this string perspective)
-        {
-            if (perspective == ConfigConstants.EXTERNAL_PERSPECTIVE)
-                return Perspective.External;
-            else if (perspective == ConfigConstants.INTERNAL_PERSPECTIVE)
-                return Perspective.Internal;
-            throw new ArgumentException($"The value provided of {perspective} does not align with any of the Perspective enum values.");
-        }
-
-        public static bool From(this Perspective perspective, AccessibilityModifier mod) => mod switch
-        {
-            AccessibilityModifier.Public => true,
-            AccessibilityModifier.Protected | AccessibilityModifier.Internal when perspective == Perspective.Internal => true,
-            AccessibilityModifier.Private | AccessibilityModifier.Protected when perspective == Perspective.Internal => true,
-            AccessibilityModifier.Protected => true,
-            AccessibilityModifier.Internal when perspective == Perspective.Internal => true,
-            AccessibilityModifier.Private when perspective == Perspective.Internal => true,
-            _ => false
-        };
-
+        public static bool IsProtected(this Type info) => info.IsNestedFamily || info.IsNestedFamANDAssem || info.IsNestedFamORAssem;       
     }
 }

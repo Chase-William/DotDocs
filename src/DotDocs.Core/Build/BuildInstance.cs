@@ -1,4 +1,5 @@
 ﻿using DotDocs.Core.Exceptions;
+using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -76,11 +77,18 @@ namespace DotDocs.Core.Build
             return this;
         }
 
-        public BuildInstance MakeUserModels()
-        {
-            Load(RootProjectBuildInstance, allAssemblyPaths);
-            return this;
-        }             
+        /// <summary>
+        /// Generates models for all of the projects, assemblies, and types.
+        /// </summary>
+        /// <returns>The root project.</returns>
+        public ProjectModel MakeModels()
+            => Load(RootProjectBuildInstance, allAssemblyPaths);
+
+        //public BuildInstance MakeUserModels()
+        //{
+        //    Load(RootProjectBuildInstance, allAssemblyPaths);
+        //    return this;
+        //}             
 
         public void Dispose()
         {
@@ -94,12 +102,16 @@ namespace DotDocs.Core.Build
         /// </summary>
         /// <param name="build">Project to start loading from.</param>
         /// <param name="assemblies">Assemblies that may be needed by <see cref="MetadataLoadContext"/>.</param>
-        void Load(ProjectBuildInstance build, ImmutableArray<string> assemblies)
+        ProjectModel Load(ProjectBuildInstance build, ImmutableArray<string> assemblies)
         {
+            ProjectModel? lowerModel = null;
             // Visit the lowest level assembly and load it's info before loading higher level assemblies
             foreach (var proj in build.DependentBuilds)
-                Load(proj, assemblies);
-            build.Load(assemblies);
+                lowerModel = Load(proj, assemblies); // Capture dependency projectModel
+            var currentModel = build.Load(assemblies); // Capture this projectModel
+            if (lowerModel != null) // If dependency exists, add it to the dependency list
+                currentModel.Dependencies.Add(lowerModel);
+            return currentModel;
         }
     }
 }

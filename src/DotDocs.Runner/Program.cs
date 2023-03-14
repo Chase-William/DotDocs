@@ -31,7 +31,7 @@ namespace DotDocs.Runner
 
             // Test test library
             Run(url: "https://github.com/Chase-William/.Docs.Core",
-                outputPath: @"C:\Users\Chase Roth\Desktop");
+                outputPath: @"C:\Users\cxr69\Desktop");
 
             //Run(csProjFile: @"C:\Dev\.Docs.Core - Copy\src\DotDocs.Core\DotDocs.Core.csproj",
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
@@ -55,10 +55,10 @@ namespace DotDocs.Runner
                 //fileInArchiveStream.Write(System.Text.Encoding.UTF8.GetBytes("Hello, World"));
                 //return File(outStream.GetBuffer(), "application/zip");
 
-                string config = "{\r\n  \"perspective\": \"internal\",\r\n  \"type\": {\r\n    \"class\": {\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false\r\n    }\r\n  },\r\n  \"member\": {\r\n    \"property\": {\r\n      \"showIfPublic\": false,\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false,\r\n      \"denoteIfSetonly\": false\r\n    }\r\n  }\r\n}";
+                // string config = "{\r\n  \"perspective\": \"internal\",\r\n  \"type\": {\r\n    \"class\": {\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false\r\n    }\r\n  },\r\n  \"member\": {\r\n    \"property\": {\r\n      \"showIfPublic\": false,\r\n      \"showIfInternalProtected\": true,\r\n      \"denoteIfStatic\": false,\r\n      \"denoteIfSetonly\": false\r\n    }\r\n  }\r\n}";
 
                 DotDocs.Init();
-                var builder = DotDocs.New(url, config);
+                var builder = DotDocs.New(url);
                 builder.Document();
                 //builder.Prepare();
                 //builder.Load();

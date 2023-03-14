@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-
-namespace DotDocs
+﻿namespace DotDocs
 {
     /// <summary>
     /// The entry-point for .Docs.Core.
@@ -20,13 +18,13 @@ namespace DotDocs
         //public DotDocs(string csProjFile, string outputPath)
         //    => Builder = new Builder(csProjFile, outputPath);                           
 
-        static IMongoDatabase commentsDatabase;        
+        // static IMongoDatabase commentsDatabase;        
 
         public static void Init()
         {
-            // Create connection to database
-            var client = new MongoClient("mongodb://localhost:27017");
-            commentsDatabase = client.GetDatabase("comments");
+            //// Create connection to database
+            //var client = new MongoClient("mongodb://localhost:27017");
+            //commentsDatabase = client.GetDatabase("comments");
             //var col = commentsDatabase.GetCollection<Test>("example");
 
             //col.InsertOne(new Test
@@ -39,8 +37,8 @@ namespace DotDocs
             //Console.WriteLine();
         }
 
-        public static Builder New(string url, string? config = null)
-            => new(url, commentsDatabase, config);
+        public static Builder New(string url)
+            => new(url);
 
         ///// <summary>
         ///// Cleanup unmanaged resources linked with <see cref="Builder"/>.

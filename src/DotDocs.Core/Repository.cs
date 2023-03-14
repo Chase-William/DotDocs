@@ -1,9 +1,4 @@
 ﻿using DotDocs.Core.Build;
-using DotDocs.Core.Language;
-using DotDocs.Core.Services;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver;
 using System.Collections.Immutable;
 using System.Management.Automation;
 using System.Reflection;
@@ -12,31 +7,18 @@ namespace DotDocs.Core
 {
     public class Repository : IDisposable
     {
-        /// <summary>
-        /// Id for MongoDb records.
-        /// </summary>
-        public ObjectId Id { get; init; }
-
-        [BsonIgnore]
-        BuildInstance build;
-
-        [BsonIgnore]
-        CommentService comments;
-
-        [BsonIgnore]
-        Configuration config;
+        internal BuildInstance build;
 
         public string Name { get; set; }
         /// <summary>
         /// The current commit hash of the repository.
         /// </summary>
-        public string CommitHash { get; private set; }
+        public string Commit { get; private set; }
         /// <summary>
         /// The url of the repository.
         /// </summary>
         public string Url { get; init; }
 
-        [BsonIgnore]
         /// <summary>
         /// The directory of the repository.
         /// </summary>
@@ -44,39 +26,22 @@ namespace DotDocs.Core
 
         // public ImmutableList<SolutionFile> Solutions { get; private set; }
 
-        [BsonIgnore]
         /// <summary>
         /// All project groups in the repository.
         /// </summary>
         public ImmutableArray<ProjectDocument> ProjectGraphs { get; private set; }
 
-        [BsonIgnore]
         /// <summary>
         /// The select root project of a group to be documented.
         /// </summary>
         public ProjectDocument ActiveProject { get; private set; }
 
-        [BsonIgnore]
-        /// <summary>
-        /// A collection containing only user defined models.
-        /// </summary>
-        public ImmutableArray<UserTypeModel> UserTypes { get; private set; }
-
-        [BsonIgnore]
-        public ImmutableDictionary<Type, TypeModel> AllTypes { get; private set; }
-
-        [BsonIgnore]
-        ImmutableArray<AssemblyModel<UserTypeModel>> userAssemblies;
-        [BsonIgnore]
-        ImmutableArray<AssemblyModel<TypeModel>> otherAssemblies;
 
         // public ImmutableArray<Models.AssemblyModel> UsedAssemblies { get; private set; }
 
-        public Repository(string url, CommentService comments, Configuration config)
+        public Repository(string url)
         {
             Url = url;
-            this.comments = comments;
-            this.config = config;
 
             Name = url.Split('/')[^1];
 
@@ -119,7 +84,7 @@ namespace DotDocs.Core
         /// <param name="repoDir">Base directory of the repo.</param>
         /// <returns>Commit HEAD Hash</returns>
         /// <exception cref="FileNotFoundException"></exception>
-        public Repository RetrieveHashInfo()
+        public Repository GetCommitInfo()
         {
             string gitHeadFile = Path.Combine(Dir, @".git\HEAD");
             if (!File.Exists(gitHeadFile))
@@ -135,7 +100,7 @@ namespace DotDocs.Core
             if (!File.Exists(commitHashFilePath))
                 throw new FileNotFoundException($"The file containing the current HEAD file hash was not found at: {commitHashFilePath}");
 
-            CommitHash = File.ReadAllText(commitHashFilePath)
+            Commit = File.ReadAllText(commitHashFilePath)
                 .Replace("\n", "")
                 .Trim();
             return this;
@@ -178,8 +143,7 @@ namespace DotDocs.Core
         public Repository Build()
         {
             build = new BuildInstance(ActiveProject)
-                .Build()
-                .MakeUserModels();                
+                .Build();              
 
             return this;
         }
@@ -216,20 +180,22 @@ namespace DotDocs.Core
         }
 
         public Repository Prepare()
-        {            
-            userAssemblies = build.AllProjectBuildInstances
-                .Select(proj => new AssemblyModel<UserTypeModel>(proj, config))
-                .ToImmutableArray();
+        {
+            //var repoModel = new RepositoryModel();
+            //var rootProjectModel = build.MakeModels();
+            //userAssemblies = build.AllProjectBuildInstances
+            //    .Select(proj => new AssemblyModel<UserTypeModel>(proj, config))
+            //    .ToImmutableArray();
 
-            UserTypes = userAssemblies
-                .SelectMany(m => m.TypeModels)
-                .Cast<UserTypeModel>()
-                .ToImmutableArray();
+            //UserTypes = userAssemblies
+            //    .SelectMany(m => m.TypeModels)
+            //    .Cast<UserTypeModel>()
+            //    .ToImmutableArray();
 
             /*
              * Load all supporting types for all user created models & group their assemblies.
              */
-            ProcessRequireTypes(UserTypes);
+            // ProcessRequireTypes(UserTypes);
 
             /*
              * Aggregate all assemblies used for documentation later 
@@ -248,42 +214,42 @@ namespace DotDocs.Core
             /*
              * Load all documentation for models from the database
              */
-            comments.UpdateDocumentation(this, userAssemblies, otherAssemblies);
+            // comments.UpdateDocumentation(this, userAssemblies, otherAssemblies);
 
             return this;
         }
 
-        public Repository Document()
-        {
-            var basePath = @"C:\Users\Chase Roth\Desktop";
+        //public Repository Document()
+        //{
+        //    var basePath = @"C:\Users\Chase Roth\Desktop";
 
-            foreach (var userType in UserTypes)
-            {
-                userType.Document(basePath);
-            }
+        //    foreach (var userType in UserTypes)
+        //    {
+        //        userType.Document(basePath);
+        //    }
 
-            // Render documentation
-            return this;
-        }       
+        //    // Render documentation
+        //    return this;
+        //}       
 
         /// <summary>
         /// Load all supporting types for all user created models.
         /// </summary>
-        void ProcessRequireTypes(ImmutableArray<UserTypeModel> userTypes)
-        {
-            var allTypes = new Dictionary<Type, TypeModel>(userTypes
-                    .Select(model => new KeyValuePair<Type, TypeModel>(model.Info, model)));
+        //void ProcessRequireTypes(ImmutableArray<UserTypeModel> userTypes)
+        //{
+        //    var allTypes = new Dictionary<Type, TypeModel>(userTypes
+        //            .Select(model => new KeyValuePair<Type, TypeModel>(model.Info, model)));
 
-            var otherAssemblies = new Dictionary<Assembly, AssemblyModel<TypeModel>>();
+        //    var otherAssemblies = new Dictionary<Assembly, AssemblyModel<TypeModel>>();
 
-            // Add model dependencies to the collection of all types            
-            foreach (var model in userTypes)
-                    model.Add(allTypes, otherAssemblies);
+        //    // Add model dependencies to the collection of all types            
+        //    foreach (var model in userTypes)
+        //            model.Add(allTypes, otherAssemblies);
 
-            AllTypes = allTypes.ToImmutableDictionary();
+        //    AllTypes = allTypes.ToImmutableDictionary();
 
-            this.otherAssemblies = otherAssemblies.Values.ToImmutableArray();
-        }
+        //    this.otherAssemblies = otherAssemblies.Values.ToImmutableArray();
+        //}
 
         /// <summary>
         /// Returns all .csproj files that are the root project of a possibly larger project structure.
