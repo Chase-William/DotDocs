@@ -1,8 +1,8 @@
 ﻿using DotDocs.Core;
 using DotDocs.Core.Util;
 using DotDocs.Models;
-using Neo4j.Driver;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 
 namespace DotDocs
@@ -27,65 +27,77 @@ namespace DotDocs
         /// </summary>
         public async void Document()
         {
-            // https://github.com/Chase-William/.Docs.Core.git
-            // comments = new CommentService(commentDatabase);
-            // repository = new ProjectBuilder(commentManager);
-            // repository = new ProjectLoadContext(commentManager);
+            try
+            {
+                // https://github.com/Chase-William/.Docs.Core.git
+                // comments = new CommentService(commentDatabase);
+                // repository = new ProjectBuilder(commentManager);
+                // repository = new ProjectLoadContext(commentManager);
 
-            //var baseOutStream = new MemoryStream();
-            //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);
+                //var baseOutStream = new MemoryStream();
+                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);
 
-            // Create a repository from the url
-            // This 
-            using Repository repo = new Repository(url)
-                .Download()
-                .GetCommitInfo()
-                .MakeProjectGraph()
-                .SetActiveProject()
-                .EnableDocumentationGeneration()
-                .Build();
-            //.Prepare()
-            //.Document();            
+                // Create a repository from the url
+                // This 
+                using Repository repo = new Repository(url)
+                    .Download()
+                    .GetCommitInfo()
+                    .MakeProjectGraph()
+                    .SetActiveProject()
+                    .EnableDocumentationGeneration()
+                    .Build();
+                //.Prepare()
+                //.Document();            
 
-            RepositoryModel model = new RepositoryModel().Apply(repo);
+                RepositoryModel model = new RepositoryModel().Apply(repo);
 
-            GraphDatabaseConnection.Init(
-                "bolt://44.213.248.121:7687",
-                "neo4j",
-                "records-canyon-ditch");
+                GraphDatabaseConnection.Init(
+                    "bolt://44.213.248.121:7687",
+                    "neo4j",
+                    "records-canyon-ditch");
 
-            model.Run();
+                model.Run();
 
-            GraphDatabaseConnection.Close();
+                //GraphDatabaseConnection.Close();
 
-            // Take repo and return documentation
-
-
-            // Returns the root node to all project structures
-            // If there are multiple nodes here, we need to ask the user which tree to build for
-            // Different trees are not related, therefore we do not build them into the documented output
-            // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
-            // Select project if multiple exists, otherwise the single existing project is selected.
-            // ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
-
-            //repository
-            //    .EnableDocumentationGeneration();
+                // Take repo and return documentation
 
 
-            // Prepare all .csproj files recursively
-            //repository.Prepare("");
-            //// Build the project
-            //repository.BuildProject("");
-            //// Load type info
-            //repository.LoadTypes();
-            //// Load documentation
-            //repository.LoadDocumentation();
+                // Returns the root node to all project structures
+                // If there are multiple nodes here, we need to ask the user which tree to build for
+                // Different trees are not related, therefore we do not build them into the documented output
+                // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
+                // Select project if multiple exists, otherwise the single existing project is selected.
+                // ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
 
-            // Utility.CleanDirectory(output);
-            //var baseOutStream = new MemoryStream();
-            //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
-            // repository.Document(zip);
-            // repository.Dispose();            
+                //repository
+                //    .EnableDocumentationGeneration();
+
+
+                // Prepare all .csproj files recursively
+                //repository.Prepare("");
+                //// Build the project
+                //repository.BuildProject("");
+                //// Load type info
+                //repository.LoadTypes();
+                //// Load documentation
+                //repository.LoadDocumentation();
+
+                // Utility.CleanDirectory(output);
+                //var baseOutStream = new MemoryStream();
+                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
+                // repository.Document(zip);
+                // repository.Dispose(); 
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                if (Directory.Exists("downloads"))
+                    Utility.CleanDirectory("downloads");
+            }                       
         }
     }
 }
