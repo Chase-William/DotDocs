@@ -7,6 +7,6 @@ namespace DotDocs.Models
     public abstract class Model
     {
         [JsonIgnore]
-        public string Id { get; set; }
+        public string UID { get; set; }
     }
 }

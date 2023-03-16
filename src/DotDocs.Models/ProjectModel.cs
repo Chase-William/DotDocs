@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using GDC = DotDocs.Models.GraphDatabaseConnection;
 using Newtonsoft.Json;
+using DotDocs.Models.Util;
 
 namespace DotDocs.Models
 {
@@ -23,6 +24,30 @@ namespace DotDocs.Models
             foreach (var proj in Projects)
                 proj.Flat(projects);
             projects.Add(this);
+        }
+
+        internal async Task ConnectProjects()
+        {
+            foreach (var item in Projects)            
+                await ConnectProjects();
+
+            using var session = GDC.GetSession();
+            // sid == sender id
+            await session.RunAsync(@"
+                MATCH (p1:Project { uid: $sid }), 
+                UNWIND $projects AS proj
+                MATCH (p:Project { uid: proj.uid })
+                CREATE (p1)-[r:USES]->(p)
+                ",
+                new Dictionary<string, object>() 
+                { 
+                    { 
+                        "props", ParameterSerializer.ToDictionary(Projects)                        
+                    },
+                    {
+                        "uid", UID
+                    }
+                });
         }
     }
 }
