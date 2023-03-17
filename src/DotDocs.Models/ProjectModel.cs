@@ -19,6 +19,46 @@ namespace DotDocs.Models
         [Newtonsoft.Json.JsonIgnore]
         public List<ProjectModel> Projects { get; set; } = new();       
 
+        internal async Task ConnectToAssembly(IAsyncSession session)
+        {
+            foreach (var proj in Projects)
+                await proj.ConnectToAssembly(session);
+
+            // using var session = GDC.GetSession();
+
+            try
+            {
+                var r = await session.RunAsync(@"
+                    MATCH (p:Project { uid: $sid }),
+                          (a:Assembly { uid: $rid })
+                    CREATE (p)-[rel:PRODUCES]->(a)
+                    ",
+                    new
+                    {
+                        sid = UID,
+                        rid = Assembly.UID
+                    });
+                _ = await r.ConsumeAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }
+            //finally
+            //{
+            //    await session.CloseAsync();
+            //}
+        }
+
+        internal void GetProducedAssemblies(List<AssemblyModel> assemblies)
+        {
+            foreach (var proj in Projects)
+                proj.GetProducedAssemblies(assemblies);
+
+            if (!assemblies.Contains(Assembly))
+                assemblies.Add(Assembly);
+        }
+
         internal void Flat(List<ProjectModel> projects)
         {
             foreach (var proj in Projects)
@@ -26,10 +66,10 @@ namespace DotDocs.Models
             projects.Add(this);
         }
 
-        internal async Task ConnectProjects()
+        internal async Task ConnectProjects(IAsyncSession session)
         {
             foreach (var item in Projects)            
-                await item.ConnectProjects();
+                await item.ConnectProjects(session);
 
             // Prevent query from operating on an empty list
             if (Projects.Count == 0)
@@ -37,7 +77,7 @@ namespace DotDocs.Models
 
             foreach (var proj in Projects)
             {
-                using var session = GDC.GetSession();
+                // using var session = GDC.GetSession();
 
                 try
                 {

@@ -21,12 +21,55 @@ namespace DotDocs.Models
             await InsertRepo();            
             await ConnectRepoToRootProject();
             await ConnectProjects();
+            await InsertAssemblies();
+            await ConnectProjectToAssembly();
+        }
+
+        async Task ConnectProjectToAssembly()
+        {
+            using var session = GDC.GetSession();
+            await Projects.First().ConnectToAssembly(session);
+            await session.CloseAsync();
+        }
+
+        async Task InsertAssemblies()
+        {
+            var assemblies = new List<AssemblyModel>();
+            Projects.First().GetProducedAssemblies(assemblies);
+
+            using var session = GDC.GetSession();
+
+            string cypher = new StringBuilder()
+                .AppendLine("UNWIND $props AS map")
+                .AppendLine("CREATE (p:Assembly { uid: apoc.create.uuid() })")
+                .AppendLine("SET p += map")
+                .AppendLine("RETURN p.uid, p.name")
+                .ToString();
+
+            try
+            {
+                var results = await session.RunAsync(cypher, new Dictionary<string, object>() { { "props", ParameterSerializer.ToDictionary(assemblies) } });
+                var asmItems = await results.ToListAsync();
+
+                // Get the ids from each project and feed it back into this application's projects
+                foreach (var asm in assemblies)
+                {
+                    var aItem = asmItems.Single(p => ((string)p["p.name"]) == asm.Name);
+                    asm.UID = (string)aItem["p.uid"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }
         }
 
         async Task ConnectProjects()
         {
             var root = Projects.First();
-            await root.ConnectProjects();
+            using var session = GDC.GetSession();
+            await root.ConnectProjects(session);
+            await session.CloseAsync();
         }
 
         async Task ConnectRepoToRootProject()
@@ -40,7 +83,7 @@ namespace DotDocs.Models
 
             try
             {
-                var test = Projects.First().UID;
+                // var test = Projects.First().UID;
                 var result = await session.RunAsync(query, new
                 {
                     rid = UID,
@@ -117,7 +160,11 @@ namespace DotDocs.Models
             catch(Exception ex)
             {
                 Console.WriteLine();
-            }                      
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
         }
     }
 }
