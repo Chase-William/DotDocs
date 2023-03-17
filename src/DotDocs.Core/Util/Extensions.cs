@@ -50,7 +50,7 @@ namespace DotDocs.Core.Util
         public static TypeModel Apply(this TypeModel model, Type type)
         {
             model.Name = type.Name;
-            
+            model.FullName = type.FullName;
             // TODO: From here we would perform addition logic for handling member models
 
             return model;

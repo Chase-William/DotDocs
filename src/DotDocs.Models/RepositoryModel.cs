@@ -1,11 +1,5 @@
-﻿using DotDocs.Models.Util;
-using Neo4j.Driver;
+﻿using Neo4j.Driver;
 using Neo4jClient.Cypher;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Xml.Linq;
 using GDC = DotDocs.Models.GraphDatabaseConnection;
 
 namespace DotDocs.Models
@@ -22,130 +16,111 @@ namespace DotDocs.Models
         {
             await InsertProjects();
             await InsertRepo();            
-            //await ConnectRepoToRootProject();
-            //await ConnectProjects();
-            //await InsertAssemblies();
-            //// await ConnectAssemblies();
-            //using var session = GDC.GetSession();
-            //await ConnectProjectToAssembly(session);
-            //// await InsertTypes(session);
-            //await session.CloseAsync();
+            await ConnectRepoToRootProject();
+            await ConnectProjects();
+            await InsertAssemblies();
+            await ConnectAssemblies();
+            await InsertTypes();
+            // await ConnectTypes();
         }
 
-        async Task InsertTypes(IAsyncSession session)
+        //async Task ConnectTypes()
+        //{
+
+        //}
+
+        async Task InsertTypes()
         {
-            // using var session = GDC.GetSession();
             // Used to track which assemblies have had their types already inserted
             var assemblyTracker = new List<AssemblyModel>();
-            await Projects.First().InsertTypes(session, assemblyTracker);
-            // await session.CloseAsync();
+            await Projects.First().InsertTypes(assemblyTracker);
         }
 
-        //async Task ConnectAssemblies()
-        //{
-        //    using var session = GDC.GetSession();
-        //    await Projects.First().ConnectToAssembly(session);
-        //    await session.CloseAsync();
-        //}
-
-        async Task ConnectProjectToAssembly(IAsyncSession session)
+        async Task ConnectAssemblies()
         {
-            
-            await Projects.First().ConnectToAssembly(session);
-            
+            await Projects.First().ConnectToAssembly();
         }
 
-        //async Task InsertAssemblies()
-        //{
-        //    var assemblies = new List<AssemblyModel>();
-        //    Projects.First().GetProducedAssemblies(assemblies);
+        async Task InsertAssemblies()
+        {
+            var assemblies = new List<AssemblyModel>();
+            Projects.First().GetProducedAssemblies(assemblies);
 
-        //    using var session = GDC.GetSession();
+            var query = GDC.Client.Cypher
+                .Unwind("$assemblies", "props")
+                .WithParam("assemblies", assemblies)
+                .Create("(a:Assembly { uid: apoc.create.uuid() })")
+                .Set("a += props")
+                .Return(a =>
+                new {
+                    UID = Return.As<string>("a.uid"),
+                    Name = Return.As<string>("a.name")
+                });
 
-        //    string cypher = new StringBuilder()
-        //        .AppendLine("UNWIND $props AS map")
-        //        .AppendLine("CREATE (p:Assembly { uid: apoc.create.uuid() })")
-        //        .AppendLine("SET p += map")
-        //        .AppendLine("RETURN p.uid, p.name")
-        //        .ToString();
+            try
+            {
+                var col = query.ResultsAsync.Result;
 
-        //    try
-        //    {
-        //        var results = await session.RunAsync(cypher, new Dictionary<string, object>() { { "props", ParameterSerializer.ToDictionary(assemblies) } });
-        //        var asmItems = await results.ToListAsync();
+                // Get the ids from each project and feed it back into this application's projects
+                foreach (var asm in assemblies)
+                {
+                    var aItem = col.Single(p => p.Name == asm.Name);
+                    asm.UID = aItem.UID;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }
+        }
 
-        //        // Get the ids from each project and feed it back into this application's projects
-        //        foreach (var asm in assemblies)
-        //        {
-        //            var aItem = asmItems.Single(p => ((string)p["p.name"]) == asm.Name);
-        //            asm.UID = (string)aItem["p.uid"];
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine();
-        //    }
-        //}
+        async Task ConnectProjects()
+        {
+            var root = Projects.First();
+            await root.ConnectProjects();
+        }
 
-        //async Task ConnectProjects()
-        //{
-        //    var root = Projects.First();
-        //    using var session = GDC.GetSession();
-        //    await root.ConnectProjects(session);
-        //    await session.CloseAsync();
-        //}
+        async Task ConnectRepoToRootProject()
+        {
+            var test = new
+            {
+                puid = Projects.First().UID,
+                ruid = UID
+            };
+            var query = GDC.Client.Cypher
+                .Match("(p:Project { uid: $puid }), (r:Repository { uid: $ruid })")
+                .WithParams(test)
+                .Create("(r)-[rel:HAS]->(p)");
 
-        //async Task ConnectRepoToRootProject()
-        //{
-        //    using var session = GDC.GetSession();
-
-        //    string query = @"
-        //        MATCH (p:Project { uid: $pid }), 
-        //              (r:Repository { uid: $rid })
-        //        CREATE (r)-[rel:HAS]->(p)";              
-
-        //    try
-        //    {
-        //        // var test = Projects.First().UID;
-        //        var result = await session.RunAsync(query, new
-        //        {
-        //            rid = UID,
-        //            pid = Projects.First().UID
-        //        });
-        //        _ = result.ConsumeAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine();
-        //    }
-        //}
+            try
+            {
+                query.ExecuteWithoutResultsAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }
+        }
 
         async Task InsertRepo()
         {
+            var query = GDC.Client.Cypher
+                .Create("(r:Repository { uid: apoc.create.uuid(), name: $name, url: $url, commit: $commit })")
+                .WithParams(new
+                {
+                    name = Name,
+                    url = Url,
+                    commit = Commit
+                })
+                .Return((r) => new
+                {
+                    UID = Return.As<string>("r.uid")
+                });
+
             try
             {
-                var query = GDC.Client.Cypher
-                    .Create("(r:Repository { uid: apoc.create.uuid(), name: $name, url: $url, commit: $commit })")
-                    .WithParams(new
-                    {
-                        name = Name,
-                        url = Url,
-                        commit = Commit
-                    })
-                    .Return((r) => new
-                    {
-                        UID = Return.As<string>("r.uid")
-                    });
-
-                try
-                {
-                    var col = query.ResultsAsync.Result;
-                    UID = col.First().UID;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine();
-                }
+                var col = query.ResultsAsync.Result;
+                UID = col.First().UID;
             }
             catch (Exception ex)
             {

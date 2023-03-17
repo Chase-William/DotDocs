@@ -1,12 +1,14 @@
 ﻿using DotDocs.Models.Language;
 using DotDocs.Models.Util;
 using Neo4j.Driver;
+using Neo4jClient.Cypher;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GDC = DotDocs.Models.GraphDatabaseConnection;
 
 namespace DotDocs.Models
 {
@@ -19,29 +21,47 @@ namespace DotDocs.Models
         [JsonIgnore]
         public List<AssemblyModel> Assemblies { get; set; } = new();
 
-        internal async Task InsertTypes(IAsyncSession session, List<AssemblyModel> assemblies)
+        internal async Task InsertTypes(List<AssemblyModel> assemblies)
         {
+            // Avoid adding an assembly's types again...
             if (assemblies.Contains(this))
                 return;
 
-            string cypher = new StringBuilder()
-                .AppendLine("UNWIND $props AS map")
-                .AppendLine("CREATE (p:Type { uid: apoc.create.uuid() })")
-                .AppendLine("SET p += map")
-                .AppendLine("RETURN p.uid, p.name")
-                .ToString();
+            var query = GDC.Client.Cypher
+                .Match("(a:Assembly { uid: $auid })")
+                .WithParam("auid", UID)
+                .Unwind("$types", "props")
+                .WithParam("types", Types)
+                .Create("(t:Type { uid: apoc.create.uuid() })<-[rel:HAS]-(a)")
+                .Set("t += props")
+                .Return(t => new
+                {
+                    UID = Return.As<string>("t.uid"),
+                    FullName = Return.As<string>("t.fullName")
+                });
 
             try
             {
-                var results = await session.RunAsync(cypher, new Dictionary<string, object>() { { "props", ParameterSerializer.ToDictionary(Types) } });
-                var typeItems = await results.ToListAsync();
+                var col = query.ResultsAsync.Result;
 
                 // Get the ids from each project and feed it back into this application's projects
                 foreach (var type in Types)
                 {
-                    var tItem = typeItems.Single(p => ((string)p["p.name"]) == type.Name);
-                    type.UID = (string)tItem["p.uid"];
+                    var tItem = col.SingleOrDefault(t => t.FullName == type.FullName);
+                    if (tItem == null)
+                    {
+                        return;
+                    }
+                    type.UID = tItem.UID;
                 }
+            }
+            catch (ArgumentNullException ex)
+            {
+                Console.WriteLine();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
