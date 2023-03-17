@@ -20,12 +20,13 @@ namespace DotDocs.Models
             await InsertProjects();
             await InsertRepo();            
             await ConnectRepoToRootProject();
-            // await ConnectProjects();
+            await ConnectProjects();
         }
 
         async Task ConnectProjects()
         {
-            var root = Projects.First();            
+            var root = Projects.First();
+            await root.ConnectProjects();
         }
 
         async Task ConnectRepoToRootProject()
