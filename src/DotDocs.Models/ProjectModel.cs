@@ -19,6 +19,14 @@ namespace DotDocs.Models
         [Newtonsoft.Json.JsonIgnore]
         public List<ProjectModel> Projects { get; set; } = new();       
 
+        internal async Task InsertTypes(IAsyncSession session, List<AssemblyModel> assemblies)
+        {
+            foreach (var proj in Projects)
+                await proj.InsertTypes(session, assemblies);
+
+            await Assembly.InsertTypes(session, assemblies);
+        }
+
         internal async Task ConnectToAssembly(IAsyncSession session)
         {
             foreach (var proj in Projects)

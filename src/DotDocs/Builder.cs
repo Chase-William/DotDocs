@@ -4,6 +4,7 @@ using DotDocs.Models;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DotDocs
 {
@@ -51,12 +52,12 @@ namespace DotDocs
 
                 RepositoryModel model = new RepositoryModel().Apply(repo);
 
-                GraphDatabaseConnection.Init(
+                await GraphDatabaseConnection.Init(
                     "bolt://44.213.248.121:7687",
                     "neo4j",
                     "records-canyon-ditch");
 
-                model.Run();
+                await model.Run();
 
                 //GraphDatabaseConnection.Close();
 
