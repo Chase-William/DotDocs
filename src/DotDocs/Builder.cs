@@ -1,10 +1,8 @@
 ﻿using DotDocs.Core;
 using DotDocs.Core.Util;
 using DotDocs.Models;
-using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace DotDocs
 {
@@ -58,8 +56,6 @@ namespace DotDocs
                     "sling-calls-hips");
 
                 model.Run();
-
-                //GraphDatabaseConnection.Close();
 
                 // Take repo and return documentation
 
