@@ -19,18 +19,18 @@ namespace DotDocs.Models
         [Newtonsoft.Json.JsonIgnore]
         public List<ProjectModel> Projects { get; set; } = new();       
 
-        internal async Task InsertTypes(List<AssemblyModel> assemblies)
+        internal void InsertTypes(List<AssemblyModel> assemblies)
         {
             foreach (var proj in Projects)
-                await proj.InsertTypes(assemblies);
+                proj.InsertTypes(assemblies);
 
-            await Assembly.InsertTypes(assemblies);
+            Assembly.InsertTypes(assemblies);
         }
 
-        internal async Task ConnectToAssembly()
+        internal void ConnectToAssembly()
         {
             foreach (var proj in Projects)
-                await proj.ConnectToAssembly();
+                proj.ConnectToAssembly();
 
             var query = GDC.Client.Cypher
                 .Match("(p:Project { uid: $suid }), (a:Assembly { uid: $ruid })")
@@ -71,10 +71,10 @@ namespace DotDocs.Models
             projects.Add(this);
         }
 
-        internal async Task ConnectProjects()
+        internal void ConnectProjects()
         {
             foreach (var item in Projects)            
-                await item.ConnectProjects();
+                item.ConnectProjects();
 
             // Prevent query from operating on an empty list
             if (Projects.Count == 0)

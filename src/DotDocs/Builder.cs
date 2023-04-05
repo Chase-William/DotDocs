@@ -26,7 +26,7 @@ namespace DotDocs
         /// <summary>
         /// Cleans the output dir and renderers all documentation.
         /// </summary>
-        public async void Document()
+        public void Document()
         {
             try
             {
@@ -52,12 +52,12 @@ namespace DotDocs
 
                 RepositoryModel model = new RepositoryModel().Apply(repo);
 
-                await GraphDatabaseConnection.Init(
-                    "bolt://44.213.248.121:7687",
+                GraphDatabaseConnection.Init(
+                    "bolt://34.227.14.65:7687",
                     "neo4j",
-                    "records-canyon-ditch");
+                    "sling-calls-hips");
 
-                await model.Run();
+                model.Run();
 
                 //GraphDatabaseConnection.Close();
 

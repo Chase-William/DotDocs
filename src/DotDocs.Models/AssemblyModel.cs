@@ -21,7 +21,7 @@ namespace DotDocs.Models
         [JsonIgnore]
         public List<AssemblyModel> Assemblies { get; set; } = new();
 
-        internal async Task InsertTypes(List<AssemblyModel> assemblies)
+        internal void InsertTypes(List<AssemblyModel> assemblies)
         {
             // Avoid adding an assembly's types again...
             if (assemblies.Contains(this))

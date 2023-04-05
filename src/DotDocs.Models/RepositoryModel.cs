@@ -12,15 +12,15 @@ namespace DotDocs.Models
         public DateTime Added { get; set; }
         public List<ProjectModel> Projects { get; set; } = new();
 
-        public async Task Run()
+        public void Run()
         {
-            await InsertProjects();
-            await InsertRepo();            
-            await ConnectRepoToRootProject();
-            await ConnectProjects();
-            await InsertAssemblies();
-            await ConnectAssemblies();
-            await InsertTypes();
+            InsertProjects();
+            InsertRepo();            
+            ConnectRepoToRootProject();
+            ConnectProjects();
+            InsertAssemblies();
+            ConnectAssemblies();
+            InsertTypes();
             // await ConnectTypes();
         }
 
@@ -29,19 +29,19 @@ namespace DotDocs.Models
 
         //}
 
-        async Task InsertTypes()
+        void InsertTypes()
         {
             // Used to track which assemblies have had their types already inserted
             var assemblyTracker = new List<AssemblyModel>();
-            await Projects.First().InsertTypes(assemblyTracker);
+            Projects.First().InsertTypes(assemblyTracker);
         }
 
-        async Task ConnectAssemblies()
+        void ConnectAssemblies()
         {
-            await Projects.First().ConnectToAssembly();
+            Projects.First().ConnectToAssembly();
         }
 
-        async Task InsertAssemblies()
+        void InsertAssemblies()
         {
             var assemblies = new List<AssemblyModel>();
             Projects.First().GetProducedAssemblies(assemblies);
@@ -74,13 +74,13 @@ namespace DotDocs.Models
             }
         }
 
-        async Task ConnectProjects()
+        void ConnectProjects()
         {
             var root = Projects.First();
-            await root.ConnectProjects();
+            root.ConnectProjects();
         }
 
-        async Task ConnectRepoToRootProject()
+        void ConnectRepoToRootProject()
         {
             var test = new
             {
@@ -102,7 +102,7 @@ namespace DotDocs.Models
             }
         }
 
-        async Task InsertRepo()
+        void InsertRepo()
         {
             var query = GDC.Client.Cypher
                 .Create("(r:Repository { uid: apoc.create.uuid(), name: $name, url: $url, commit: $commit })")
@@ -128,7 +128,7 @@ namespace DotDocs.Models
             }
         }
 
-        async Task InsertProjects()
+        void InsertProjects()
         {
             var projects = new List<ProjectModel>();
             Projects.First().Flat(projects);

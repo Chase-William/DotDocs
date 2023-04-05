@@ -12,7 +12,7 @@ namespace DotDocs.Models
     {
         internal static BoltGraphClient Client { get; private set; }
 
-        public static async Task Init(string uri, string user, string password)
+        public static void Init(string uri, string user, string password)
         {
             //var driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password), (b) =>
             //{
