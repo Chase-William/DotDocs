@@ -1,5 +1,6 @@
 ﻿using DotDocs.Core.Exceptions;
 using System;
+using System.Threading.Tasks;
 
 namespace DotDocs.Runner
 {
@@ -37,7 +38,7 @@ namespace DotDocs.Runner
             //    outputPath: @"C:\Users\Chase Roth\Desktop");
         }
 
-        static void Run(string url, string outputPath)
+        static async Task Run(string url, string outputPath)
         {
             try
             {

@@ -1,7 +1,6 @@
 ﻿using DotDocs.Core;
 using DotDocs.Core.Util;
 using DotDocs.Models;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -25,7 +24,7 @@ namespace DotDocs
         /// <summary>
         /// Cleans the output dir and renderers all documentation.
         /// </summary>
-        public async void Document()
+        public void Document()
         {
             try
             {
@@ -52,13 +51,11 @@ namespace DotDocs
                 RepositoryModel model = new RepositoryModel().Apply(repo);
 
                 GraphDatabaseConnection.Init(
-                    "bolt://44.213.248.121:7687",
+                    "bolt://34.227.14.65:7687",
                     "neo4j",
-                    "records-canyon-ditch");
+                    "sling-calls-hips");
 
                 model.Run();
-
-                //GraphDatabaseConnection.Close();
 
                 // Take repo and return documentation
 

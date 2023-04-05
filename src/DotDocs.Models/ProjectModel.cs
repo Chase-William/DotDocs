@@ -19,26 +19,31 @@ namespace DotDocs.Models
         [Newtonsoft.Json.JsonIgnore]
         public List<ProjectModel> Projects { get; set; } = new();       
 
-        internal async Task ConnectToAssembly(IAsyncSession session)
+        internal void InsertTypes(List<AssemblyModel> assemblies)
         {
             foreach (var proj in Projects)
-                await proj.ConnectToAssembly(session);
+                proj.InsertTypes(assemblies);
 
-            // using var session = GDC.GetSession();
+            Assembly.InsertTypes(assemblies);
+        }
+
+        internal void ConnectToAssembly()
+        {
+            foreach (var proj in Projects)
+                proj.ConnectToAssembly();
+
+            var query = GDC.Client.Cypher
+                .Match("(p:Project { uid: $suid }), (a:Assembly { uid: $ruid })")
+                .WithParams(new
+                {
+                    suid = UID,
+                    ruid = Assembly.UID
+                })
+                .Create("(p)-[rel:PRODUCES]->(a)");
 
             try
             {
-                var r = await session.RunAsync(@"
-                    MATCH (p:Project { uid: $sid }),
-                          (a:Assembly { uid: $rid })
-                    CREATE (p)-[rel:PRODUCES]->(a)
-                    ",
-                    new
-                    {
-                        sid = UID,
-                        rid = Assembly.UID
-                    });
-                _ = await r.ConsumeAsync();
+                query.ExecuteWithoutResultsAsync().Wait();
             }
             catch (Exception ex)
             {
@@ -66,10 +71,10 @@ namespace DotDocs.Models
             projects.Add(this);
         }
 
-        internal async Task ConnectProjects(IAsyncSession session)
+        internal void ConnectProjects()
         {
             foreach (var item in Projects)            
-                await item.ConnectProjects(session);
+                item.ConnectProjects();
 
             // Prevent query from operating on an empty list
             if (Projects.Count == 0)
@@ -81,17 +86,17 @@ namespace DotDocs.Models
 
                 try
                 {
-                    // sid == sender id, rid == receiving id
-                    await session.RunAsync(@"
-                        MATCH (p1:Project { uid: $sid }),
-                              (p2:Project { uid: $rid })
-                        CREATE (p1)-[r:USES]->(p2)
-                    ",
-                    new
-                    {
-                        sid = UID,
-                        rid = proj.UID
-                    });
+                    // suid == sender id, ruid == receiving id
+                    var r = GDC.Client.Cypher
+                        .Match("(p1:Project { uid: $suid }), (p2:Project { uid: $ruid })")
+                        .WithParams(new
+                        {
+                            suid = UID,
+                            ruid = proj.UID
+                        })
+                        .Create("(p1)-[r:USES]->(p2)");
+
+                    r.ExecuteWithoutResultsAsync().Wait();                    
                 }
                 catch (Exception ex)
                 {

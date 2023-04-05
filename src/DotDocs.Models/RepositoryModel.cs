@@ -1,8 +1,5 @@
-﻿using DotDocs.Models.Util;
-using Neo4j.Driver;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using Neo4j.Driver;
+using Neo4jClient.Cypher;
 using GDC = DotDocs.Models.GraphDatabaseConnection;
 
 namespace DotDocs.Models
@@ -15,47 +12,60 @@ namespace DotDocs.Models
         public DateTime Added { get; set; }
         public List<ProjectModel> Projects { get; set; } = new();
 
-        public async void Run()
+        public void Run()
         {
-            await InsertProjects();
-            await InsertRepo();            
-            await ConnectRepoToRootProject();
-            await ConnectProjects();
-            await InsertAssemblies();
-            await ConnectProjectToAssembly();
+            InsertProjects();
+            InsertRepo();            
+            ConnectRepoToRootProject();
+            ConnectProjects();
+            InsertAssemblies();
+            ConnectAssemblies();
+            InsertTypes();
+            // await ConnectTypes();
         }
 
-        async Task ConnectProjectToAssembly()
+        //async Task ConnectTypes()
+        //{
+
+        //}
+
+        void InsertTypes()
         {
-            using var session = GDC.GetSession();
-            await Projects.First().ConnectToAssembly(session);
-            await session.CloseAsync();
+            // Used to track which assemblies have had their types already inserted
+            var assemblyTracker = new List<AssemblyModel>();
+            Projects.First().InsertTypes(assemblyTracker);
         }
 
-        async Task InsertAssemblies()
+        void ConnectAssemblies()
+        {
+            Projects.First().ConnectToAssembly();
+        }
+
+        void InsertAssemblies()
         {
             var assemblies = new List<AssemblyModel>();
             Projects.First().GetProducedAssemblies(assemblies);
 
-            using var session = GDC.GetSession();
-
-            string cypher = new StringBuilder()
-                .AppendLine("UNWIND $props AS map")
-                .AppendLine("CREATE (p:Assembly { uid: apoc.create.uuid() })")
-                .AppendLine("SET p += map")
-                .AppendLine("RETURN p.uid, p.name")
-                .ToString();
+            var query = GDC.Client.Cypher
+                .Unwind("$assemblies", "props")
+                .WithParam("assemblies", assemblies)
+                .Create("(a:Assembly { uid: apoc.create.uuid() })")
+                .Set("a += props")
+                .Return(a =>
+                new {
+                    UID = Return.As<string>("a.uid"),
+                    Name = Return.As<string>("a.name")
+                });
 
             try
             {
-                var results = await session.RunAsync(cypher, new Dictionary<string, object>() { { "props", ParameterSerializer.ToDictionary(assemblies) } });
-                var asmItems = await results.ToListAsync();
+                var col = query.ResultsAsync.Result;
 
                 // Get the ids from each project and feed it back into this application's projects
                 foreach (var asm in assemblies)
                 {
-                    var aItem = asmItems.Single(p => ((string)p["p.name"]) == asm.Name);
-                    asm.UID = (string)aItem["p.uid"];
+                    var aItem = col.Single(p => p.Name == asm.Name);
+                    asm.UID = aItem.UID;
                 }
             }
             catch (Exception ex)
@@ -64,32 +74,27 @@ namespace DotDocs.Models
             }
         }
 
-        async Task ConnectProjects()
+        void ConnectProjects()
         {
             var root = Projects.First();
-            using var session = GDC.GetSession();
-            await root.ConnectProjects(session);
-            await session.CloseAsync();
+            root.ConnectProjects();
         }
 
-        async Task ConnectRepoToRootProject()
+        void ConnectRepoToRootProject()
         {
-            using var session = GDC.GetSession();
-
-            string query = @"
-                MATCH (p:Project { uid: $pid }), 
-                      (r:Repository { uid: $rid })
-                CREATE (r)-[rel:HAS]->(p)";              
+            var test = new
+            {
+                puid = Projects.First().UID,
+                ruid = UID
+            };
+            var query = GDC.Client.Cypher
+                .Match("(p:Project { uid: $puid }), (r:Repository { uid: $ruid })")
+                .WithParams(test)
+                .Create("(r)-[rel:HAS]->(p)");
 
             try
             {
-                // var test = Projects.First().UID;
-                var result = await session.RunAsync(query, new
-                {
-                    rid = UID,
-                    pid = Projects.First().UID
-                });
-                _ = result.ConsumeAsync();
+                query.ExecuteWithoutResultsAsync().Wait();
             }
             catch (Exception ex)
             {
@@ -97,73 +102,60 @@ namespace DotDocs.Models
             }
         }
 
-        async Task InsertRepo()
+        void InsertRepo()
         {
-            using var session = GDC.GetSession();
-
-            string query = @"
-                CREATE (r:Repository {
-                    uid: apoc.create.uuid(),
-                    name: $name,
-                    url: $url,
-                    commit: $commit
-                })
-                RETURN r.uid";
-
-            try
-            {
-                var result = await session.RunAsync(query, new
+            var query = GDC.Client.Cypher
+                .Create("(r:Repository { uid: apoc.create.uuid(), name: $name, url: $url, commit: $commit })")
+                .WithParams(new
                 {
                     name = Name,
                     url = Url,
                     commit = Commit
+                })
+                .Return((r) => new
+                {
+                    UID = Return.As<string>("r.uid")
                 });
-                var record = await result.SingleAsync();
-                UID = (string)record["r.uid"];               
+
+            try
+            {
+                var col = query.ResultsAsync.Result;
+                UID = col.First().UID;
             }
             catch (Exception ex)
             {
                 Console.WriteLine();
-            }        
+            }
         }
 
-        async Task InsertProjects()
+        void InsertProjects()
         {
             var projects = new List<ProjectModel>();
             Projects.First().Flat(projects);
 
-            using var session = GDC.GetSession();
-
-            // https://github.com/bytefish/Neo4JSample
-
-            string cypher = new StringBuilder()
-                .AppendLine("UNWIND $props AS map")
-                .AppendLine("CREATE (p:Project { uid: apoc.create.uuid() })")
-                .AppendLine("SET p += map")
-                .AppendLine("RETURN p.uid, p.name")
-                .ToString();
-
-            // https://gist.github.com/nandosola/ebe2ced123e05a79e238edd6ec81fee5
+            var query = GDC.Client.Cypher
+                .Unwind("$projects", "props")
+                .WithParam("projects", projects)
+                .Create("(p:Project { uid: apoc.create.uuid() })")
+                .Set("p += props")
+                .Return((p) => new
+                {
+                    UID = Return.As<string>("p.uid"),
+                    Name = Return.As<string>("p.name")
+                });
 
             try
-            {                                             
-                var results = await session.RunAsync(cypher, new Dictionary<string, object>() { { "props", ParameterSerializer.ToDictionary(projects) } });
-                var projItems = await results.ToListAsync();
-
-                // Get the ids from each project and feed it back into this application's projects
+            {
+                var col = query.ResultsAsync.Result;
                 foreach (var proj in projects)
                 {
-                    var pItem = projItems.Single(p => ((string)p["p.name"]) == proj.Name);
-                    proj.UID = (string)pItem["p.uid"];
+                    var item = col.Single(p => p.Name == proj.Name);
+                    proj.UID = item.UID;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine();
-            }
-            finally
-            {
-                await session.CloseAsync();
             }
         }
     }
