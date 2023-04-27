@@ -6,6 +6,11 @@ using System.IO;
 
 namespace DotDocs
 {
+    public class BT
+    {
+        public int MyProperty { get; set; }
+    }
+
     /// <summary>
     /// The main class for using DotDoc's services.
     /// </summary>
