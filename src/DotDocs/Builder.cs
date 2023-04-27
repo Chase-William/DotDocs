@@ -51,9 +51,9 @@ namespace DotDocs
                 RepositoryModel model = new RepositoryModel().Apply(repo);
 
                 GraphDatabaseConnection.Init(
-                    "bolt://34.227.14.65:7687",
+                    "bolt://3.235.45.45:7687",
                     "neo4j",
-                    "sling-calls-hips");
+                    "forests-center-auxiliaries");
 
                 model.Run();
 
