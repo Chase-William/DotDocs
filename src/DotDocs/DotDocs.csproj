@@ -9,5 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotDocs.Core\DotDocs.Core.csproj" />
+    <ProjectReference Include="..\DotDocs.PDF\DotDocs.PDF.csproj" />
   </ItemGroup>
 </Project>
