@@ -10,7 +10,7 @@ namespace DotDocs.Models
 {
     public static class GraphDatabaseConnection
     {
-        internal static BoltGraphClient Client { get; private set; }
+        public static BoltGraphClient Client { get; private set; }
 
         public static void Init(string uri, string user, string password)
         {

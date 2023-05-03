@@ -18,7 +18,7 @@ namespace DotDocs.Runner
             try
             {
                 var builder = DotDocs.New(url);
-                builder.Document();
+                builder.AddRepository();
             }
             catch (BuildException ex)
             {

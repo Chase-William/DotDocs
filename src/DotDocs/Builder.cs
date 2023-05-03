@@ -6,11 +6,6 @@ using System.IO;
 
 namespace DotDocs
 {
-    public class BT
-    {
-        public int MyProperty { get; set; }
-    }
-
     /// <summary>
     /// The main class for using DotDoc's services.
     /// </summary>
@@ -21,26 +16,18 @@ namespace DotDocs
         /// </summary>
         string url;
 
-        public Builder(string url)
+        internal Builder(string url)
         {
             this.url = url;
         }
 
         /// <summary>
-        /// Cleans the output dir and renderers all documentation.
+        /// Performs the long runnning task of inserting the repository.
         /// </summary>
-        public void Document()
+        public void AddRepository()
         {
             try
             {
-                // https://github.com/Chase-William/.Docs.Core.git
-                // comments = new CommentService(commentDatabase);
-                // repository = new ProjectBuilder(commentManager);
-                // repository = new ProjectLoadContext(commentManager);
-
-                //var baseOutStream = new MemoryStream();
-                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);
-
                 // Create a repository from the url
                 // This 
                 using Repository repo = new Repository(url)
@@ -49,51 +36,15 @@ namespace DotDocs
                     .MakeProjectGraph()
                     .SetActiveProject()
                     .EnableDocumentationGeneration()
-                    .Build();
-                //.Prepare()
-                //.Document();            
+                    .Build();          
 
-                RepositoryModel model = new RepositoryModel().Apply(repo);
-
-                GraphDatabaseConnection.Init(
-                    "bolt://3.235.45.45:7687",
-                    "neo4j",
-                    "forests-center-auxiliaries");
-
+                RepositoryModel model = new RepositoryModel().Apply(repo);               
+            
                 model.Run();
-
-                // Take repo and return documentation
-
-
-                // Returns the root node to all project structures
-                // If there are multiple nodes here, we need to ask the user which tree to build for
-                // Different trees are not related, therefore we do not build them into the documented output
-                // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
-                // Select project if multiple exists, otherwise the single existing project is selected.
-                // ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
-
-                //repository
-                //    .EnableDocumentationGeneration();
-
-
-                // Prepare all .csproj files recursively
-                //repository.Prepare("");
-                //// Build the project
-                //repository.BuildProject("");
-                //// Load type info
-                //repository.LoadTypes();
-                //// Load documentation
-                //repository.LoadDocumentation();
-
-                // Utility.CleanDirectory(output);
-                //var baseOutStream = new MemoryStream();
-                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
-                // repository.Document(zip);
-                // repository.Dispose(); 
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
             }
             finally
             {

@@ -1,4 +1,6 @@
-﻿namespace DotDocs
+﻿using DotDocs.Models;
+
+namespace DotDocs
 {
     /// <summary>
     /// The entry-point for .Docs.Core.
@@ -22,19 +24,10 @@
 
         public static void Init()
         {
-            //// Create connection to database
-            //var client = new MongoClient("mongodb://localhost:27017");
-            //commentsDatabase = client.GetDatabase("comments");
-            //var col = commentsDatabase.GetCollection<Test>("example");
-
-            //col.InsertOne(new Test
-            //{
-            //    Name = "Mark Reynolds"
-            //});
-
-            //var test = client.ListDatabaseNames();
-            //var test2 = test.ToList();
-            //Console.WriteLine();
+            GraphDatabaseConnection.Init(
+                    "bolt://3.239.18.228:7687",
+                    "neo4j",
+                    "splices-drops-protest");
         }
 
         public static Builder New(string url)
