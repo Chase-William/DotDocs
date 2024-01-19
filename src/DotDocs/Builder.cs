@@ -1,104 +1,101 @@
-﻿using DotDocs.Core;
-using DotDocs.Core.Util;
+﻿using System;
+using DotDocs.Build;
+using DotDocs.Build.Util;
+using DotDocs.Document;
 using DotDocs.Models;
-using System;
-using System.IO;
+using DotDocs.Source;
 
 namespace DotDocs
-{
-    public class BT
-    {
-        public int MyProperty { get; set; }
-    }
-
+{           
     /// <summary>
     /// The main class for using DotDoc's services.
     /// </summary>
     public class Builder
-    {        
-        /// <summary>
-        /// The project file used as the root.
-        /// </summary>
-        string url;
+    {
+        internal ISourceable Source { get; private set; }
 
-        public Builder(string url)
-        {
-            this.url = url;
-        }
+        internal RepositoryModel RepoModel { get; private set; }
+
+        private Builder(ISourceable _src)
+            => Source = _src;
 
         /// <summary>
-        /// Cleans the output dir and renderers all documentation.
+        /// Service from a url.
         /// </summary>
-        public void Document()
+        /// <param name="url">Url to the github repository.</param>
+        /// <returns></returns>
+        public static Builder FromUrl(string url)
+            => new(new GitCloneSource(url));
+
+        /// <summary>
+        /// Service from a path.
+        /// </summary>
+        /// <param name="path">Location of the repsitory root dir.</param>
+        /// <returns></returns>
+        public static Builder FromPath(string path)
+            => new(new LocalSource(path));
+
+
+        public void Prepare()
         {
             try
             {
-                // https://github.com/Chase-William/.Docs.Core.git
-                // comments = new CommentService(commentDatabase);
-                // repository = new ProjectBuilder(commentManager);
-                // repository = new ProjectLoadContext(commentManager);
+                // Prepare git source
+                if (Source is GitCloneSource)
+                    Source = Source.Prepare(); // Returns a new local source
+                                               // Prepare local source
+                _ = Source.Prepare();
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                //if (Directory.Exists("downloads"))
+                //    Utility.CleanDirectory("downloads");
+            }            
+        }
 
-                //var baseOutStream = new MemoryStream();
-                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);
-
-                // Create a repository from the url
-                // This 
-                using Repository repo = new Repository(url)
-                    .Download()
+        public void Build()
+        {
+            try
+            {
+                // Process repository files and build
+                // Must close unmanaged MetadataLoadContext
+                using Repository repo = new Repository(Source.Src)                    
                     .GetCommitInfo()
                     .MakeProjectGraph()
                     .SetActiveProject()
                     .EnableDocumentationGeneration()
                     .Build();
-                //.Prepare()
-                //.Document();            
 
-                RepositoryModel model = new RepositoryModel().Apply(repo);
-
-                GraphDatabaseConnection.Init(
-                    "bolt://3.235.45.45:7687",
-                    "neo4j",
-                    "forests-center-auxiliaries");
-
-                model.Run();
-
-                // Take repo and return documentation
-
-
-                // Returns the root node to all project structures
-                // If there are multiple nodes here, we need to ask the user which tree to build for
-                // Different trees are not related, therefore we do not build them into the documented output
-                // var rootProjects = Utility.GetRootProjects(projectFiles.ToList());
-                // Select project if multiple exists, otherwise the single existing project is selected.
-                // ProjectDocument selectedProj = SelectProject(repo.ProjectGraphs);
-
-                //repository
-                //    .EnableDocumentationGeneration();
-
-
-                // Prepare all .csproj files recursively
-                //repository.Prepare("");
-                //// Build the project
-                //repository.BuildProject("");
-                //// Load type info
-                //repository.LoadTypes();
-                //// Load documentation
-                //repository.LoadDocumentation();
-
-                // Utility.CleanDirectory(output);
-                //var baseOutStream = new MemoryStream();
-                //var zip = new ZipArchive(baseOutStream, ZipArchiveMode.Create, true);                        
-                // repository.Document(zip);
-                // repository.Dispose(); 
+                // Apply built repository results to a model structure going top -> down
+                RepoModel = new RepositoryModel()
+                    .Apply(repo);
             }
-            catch (Exception ex)
+            catch
             {
+                throw;
+            }            
+        }
 
+        public void Document()
+        {
+            try
+            {
+                // Use RepositoryModel as data source for rendering
+                var renderer = new Renderer(RepoModel);
+                renderer.Render();                
+            }
+            catch
+            {
+                
             }
             finally
             {
-                if (Directory.Exists("downloads"))
-                    Utility.CleanDirectory("downloads");
+                //if (Directory.Exists("downloads"))
+                //    Utility.CleanDirectory("downloads");
             }                       
         }
     }

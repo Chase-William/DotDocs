@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace DotDocs.Core
+namespace DotDocs.Build
 {
     public class ProjectDocument
     {

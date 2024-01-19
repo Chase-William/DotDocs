@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +8,8 @@ namespace DotDocs.Models.Language
 {
     public class TypeModel : Model
     {
-        [JsonProperty("assemblyQualifiedName")]
         public string AssemblyQualifiedName { get; set; }
         //public bool ContainsGenericParameters { get; set; }
-        [JsonProperty("fullName")]
         public string FullName { get; set; }
         //public int GenericParameterPosition { get; set; }
         //public bool HasElementType { get; set; }
@@ -55,9 +52,7 @@ namespace DotDocs.Models.Language
         //public bool IsVariableBoundArray { get; set; }
         //public bool IsVisible { get; set; }
         //public bool IsSpecialName { get; set; }
-        [JsonProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("namespace")]
         public string Namespace { get; set; }
     }
 }

@@ -1,9 +1,9 @@
-﻿using DotDocs.Core.Build;
+﻿using DotDocs.Build.Build;
 using System.Collections.Immutable;
 using System.Management.Automation;
 using System.Reflection;
 
-namespace DotDocs.Core
+namespace DotDocs.Build
 {
     public class Repository : IDisposable
     {
@@ -35,48 +35,12 @@ namespace DotDocs.Core
         /// The select root project of a group to be documented.
         /// </summary>
         public ProjectDocument ActiveProject { get; private set; }
+                    
 
-
-        // public ImmutableArray<Models.AssemblyModel> UsedAssemblies { get; private set; }
-
-        public Repository(string url)
+        public Repository(string path)
         {
-            Url = url;
-
-            Name = url.Split('/')[^1];
-
-            if (Name.EndsWith(".git"))
-                Name = Name[0..^4]; // Take until the last 4, remove .git
-        }               
-
-        /// <summary>
-        /// Downloads a repository and returns the path to the repository.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public Repository Download()
-        {
-            // CODE FOR DOWNLOADING AND BUILDNG
-            string directory = AppContext.BaseDirectory; // directory of process execution
-            string downloadRepoLocation = Path.Combine(directory, "downloads");
-            if (!Directory.Exists(downloadRepoLocation))
-                Directory.CreateDirectory(downloadRepoLocation);
-
-            using PowerShell powershell = PowerShell.Create();
-            // this changes from the user folder that PowerShell starts up with to your git repository
-            powershell.AddScript($"cd {downloadRepoLocation}");
-            powershell.AddScript($"git clone {Url}");
-            //powershell.AddScript("cd.. / .. /.Docs.Core");
-            //powershell.AddScript("dotnet build");
-            powershell.Invoke(); // Run powershell            
-            
-            var folder = Url.Split("/").Last();
-            if (folder.Contains(".git"))
-                folder = folder[..4];
-
-            Dir = Path.Combine(downloadRepoLocation, folder);
-            return this;
-        }
+            Dir = path;                    
+        }        
 
         /// <summary>
         /// Retrieves the current hash for the HEAD commit of the downloaded repository.
@@ -105,12 +69,6 @@ namespace DotDocs.Core
                 .Trim();
             return this;
         }
-
-        //public Repository FindSolutions()
-        //{
-        //    var solutionFiles = Directory.GetFiles(repoDir, "*.sln", SearchOption.AllDirectories);
-            
-        //}
 
         /// <summary>
         /// Creates a dependency graph for each project group.
@@ -177,79 +135,7 @@ namespace DotDocs.Core
             }
             ActiveProject = ProjectGraphs.First();
             return this;
-        }
-
-        public Repository Prepare()
-        {
-            //var repoModel = new RepositoryModel();
-            //var rootProjectModel = build.MakeModels();
-            //userAssemblies = build.AllProjectBuildInstances
-            //    .Select(proj => new AssemblyModel<UserTypeModel>(proj, config))
-            //    .ToImmutableArray();
-
-            //UserTypes = userAssemblies
-            //    .SelectMany(m => m.TypeModels)
-            //    .Cast<UserTypeModel>()
-            //    .ToImmutableArray();
-
-            /*
-             * Load all supporting types for all user created models & group their assemblies.
-             */
-            // ProcessRequireTypes(UserTypes);
-
-            /*
-             * Aggregate all assemblies used for documentation later 
-             */
-            //UsedAssemblies = AllModels
-            //    .DistinctBy(m => m.Value.Info.Assembly)
-            //    .Select(m => new Models.AssemblyModel(m.Value.Info.Assembly))
-            //    .ToImmutableArray();
-
-            /*
-             * Provide AssemblyModels with a reference to the list of their models from the build             
-             */
-
-
-
-            /*
-             * Load all documentation for models from the database
-             */
-            // comments.UpdateDocumentation(this, userAssemblies, otherAssemblies);
-
-            return this;
-        }
-
-        //public Repository Document()
-        //{
-        //    var basePath = @"C:\Users\Chase Roth\Desktop";
-
-        //    foreach (var userType in UserTypes)
-        //    {
-        //        userType.Document(basePath);
-        //    }
-
-        //    // Render documentation
-        //    return this;
-        //}       
-
-        /// <summary>
-        /// Load all supporting types for all user created models.
-        /// </summary>
-        //void ProcessRequireTypes(ImmutableArray<UserTypeModel> userTypes)
-        //{
-        //    var allTypes = new Dictionary<Type, TypeModel>(userTypes
-        //            .Select(model => new KeyValuePair<Type, TypeModel>(model.Info, model)));
-
-        //    var otherAssemblies = new Dictionary<Assembly, AssemblyModel<TypeModel>>();
-
-        //    // Add model dependencies to the collection of all types            
-        //    foreach (var model in userTypes)
-        //            model.Add(allTypes, otherAssemblies);
-
-        //    AllTypes = allTypes.ToImmutableDictionary();
-
-        //    this.otherAssemblies = otherAssemblies.Values.ToImmutableArray();
-        //}
+        }      
 
         /// <summary>
         /// Returns all .csproj files that are the root project of a possibly larger project structure.
@@ -278,16 +164,15 @@ namespace DotDocs.Core
             build?.Dispose();
 
             // Delete repo from disk if it exists
-            if (Directory.Exists(Dir))
-            {
-                // Using powershell because Directory.Delete recursive cannot delete some files for some reason.
-                // .git's objects/pack/*.dix and *.pack files.. their not locked, just dont have access to the path
-                // This is my work around below:
-                using PowerShell powershell = PowerShell.Create();
-                powershell.AddScript($"rm -r -fo {Dir}");
-                powershell.Invoke(); // Run powershell            
-            }
-        }
-        
+            //if (Directory.Exists(Dir))
+            //{
+            //    // Using powershell because Directory.Delete recursive cannot delete some files for some reason.
+            //    // .git's objects/pack/*.dix and *.pack files.. their not locked, just dont have access to the path
+            //    // This is my work around below:
+            //    using PowerShell powershell = PowerShell.Create();
+            //    powershell.AddScript($"rm -r -fo {Dir}");
+            //    powershell.Invoke(); // Run powershell            
+            //}
+        }        
     }
 }

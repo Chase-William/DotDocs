@@ -1,10 +1,10 @@
-﻿using DotDocs.Core.Build;
+﻿using DotDocs.Build.Build;
 using DotDocs.Models;
 using DotDocs.Models.Language;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace DotDocs.Core.Util
+namespace DotDocs.Build.Util
 {
     /// <summary>
     /// A static class that exists purely to contain extension methods.

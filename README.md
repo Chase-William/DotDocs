@@ -1,20 +1,24 @@
-<p align="center">
-  <img src="./resources/media/.docs.core-purple-1024x.png" style="width: 450px;margin-left: auto;margin-right: auto;">
-</p>
+## How to Use
 
-# DotDocs.Core *(.Docs.Core)* 
-This is a supporting library for the [.Docs](https://github.com/Chase-William/.Docs) project. `DocDocs.Core` builds a *.csproj* and it's dependencies and extracts, organizes and exports types, assemblies, and project metadata to `JSON` files.
+Its simple, either provide a path to the location of the repository on your local machine or provide a url to the repository's github.
 
-## Project Structure
-
-```mermaid
-graph TD;
-Docshark.Runner-->Docshark.Core;
-Docshark.Core-->Docshark.Core.Loader;
-Docshark.Core.Loader-->Docshark.Core.Models;
+```cs
+// var builder = Builder.FromPath("...");
+// OR
+var builder = Builder.FromUrl("...");
+builder.Prepare();
+builder.Build();
+builder.Document();
 ```
 
-- `DotDocs.Core.Runner`, Executeable entry point called by `.Docs` a *Node.js* project
-- `DotDocs.Core`, Main library that contains high level commands for using dependencies
-- `DotDocs.Core.Loader`, Contains logic for preparing, building, analyizing projects *(.csproj files)* 
-- `DotDocs.Core.Models`, Contains models for projects, assemblies, types, and members etc.
+#### Prepare();
+
+Downloads the repository via the given url if nessessary and ensures the validity of the path to the new or existing repository.
+
+#### Build();
+
+Collects metadata, issues the MSBuild system to compile the root project and its dependencies, and instanciates models. 
+
+#### Document();
+
+Uses models to generate markdown files for each corresponding type and its members.

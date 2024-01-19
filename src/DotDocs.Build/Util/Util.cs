@@ -1,9 +1,9 @@
-﻿namespace DotDocs.Core.Util
+﻿namespace DotDocs.Build.Util
 {
     /// <summary>
     /// Contains utility functionalities needed by this project.
     /// </summary>
-    public static class Utility
+    public static class Util
     {
         /// <summary>
         /// Deletes all elements within a directory if it exists and ensures the directory given exist afterwards.

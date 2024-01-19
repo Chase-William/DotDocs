@@ -1,7 +1,7 @@
 ﻿using Microsoft.Build.Logging.StructuredLogger;
 using System.Text;
 
-namespace DotDocs.Core.Exceptions
+namespace DotDocs.Build.Exceptions
 {
     /// <summary>
     /// An exception used when a project's build fails.

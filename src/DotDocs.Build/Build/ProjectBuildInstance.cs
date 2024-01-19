@@ -1,10 +1,10 @@
-﻿using DotDocs.Core.Util;
+﻿using DotDocs.Build.Util;
 using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Reflection;
 
-namespace DotDocs.Core.Build
+namespace DotDocs.Build.Build
 {
     /// <summary>
     /// A class containing a project's build information.

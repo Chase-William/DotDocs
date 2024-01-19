@@ -1,11 +1,11 @@
-﻿using DotDocs.Core.Exceptions;
+﻿using DotDocs.Build.Exceptions;
 using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace DotDocs.Core.Build
+namespace DotDocs.Build.Build
 {
     /// <summary>
     /// A class containing a build attempt's information.
@@ -44,35 +44,43 @@ namespace DotDocs.Core.Build
                     Arguments = $"/C dotnet build {csProjPath} /bl"
                 }
             };
-            cmd.Start();
 
-            // Wait for files to finish being written & process close
-            cmd.WaitForExit();
-            var build = BinaryLog.ReadBuild("msbuild.binlog");
-            // If the build fails throw exception with build info
-            if (!build.Succeeded)
-                throw new BuildException(build.FindChildrenRecursive<Error>());
+            try
+            {
+                cmd.Start();
 
-            var projectName = csProjPath[(csProjPath.LastIndexOf('\\') + 1)..];
+                // Wait for files to finish being written & process close
+                cmd.WaitForExit();
+                var build = BinaryLog.ReadBuild("msbuild.binlog");
+                // If the build fails throw exception with build info
+                if (!build.Succeeded)
+                    throw new BuildException(build.FindChildrenRecursive<Error>());
 
-            var mainBuild = build.FindLastChild<Project>();
-            var target = mainBuild
-                .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
-            allAssemblyPaths = target.Children
-                .Select(item => ((Item)((AddItem)item).FirstChild).Text)
-                .ToImmutableArray();
+                var projectName = csProjPath[(csProjPath.LastIndexOf('\\') + 1)..];
 
-            // Get the root project
-            var eval = build
-                .FindChild<TimedNode>("Evaluation");
-            var projectEval = eval
-                .FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projectName));
+                var mainBuild = build.FindLastChild<Project>();
+                var target = mainBuild
+                    .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
+                allAssemblyPaths = target.Children
+                    .Select(item => ((Item)((AddItem)item).FirstChild).Text)
+                    .ToImmutableArray();
 
-            RootProjectBuildInstance = ProjectBuildInstance
-                .From(projectEval, allProjectBuildInstances);
+                // Get the root project
+                var eval = build
+                    .FindChild<TimedNode>("Evaluation");
+                var projectEval = eval
+                    .FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projectName));
 
-            // Add the root node as it will never be added otherwise
-            allProjectBuildInstances.Add(RootProjectBuildInstance);
+                RootProjectBuildInstance = ProjectBuildInstance
+                    .From(projectEval, allProjectBuildInstances);
+
+                // Add the root node as it will never be added otherwise
+                allProjectBuildInstances.Add(RootProjectBuildInstance);
+            }            
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+            }
 
             return this;
         }
@@ -82,13 +90,7 @@ namespace DotDocs.Core.Build
         /// </summary>
         /// <returns>The root project.</returns>
         public ProjectModel MakeModels()
-            => Load(RootProjectBuildInstance, allAssemblyPaths);
-
-        //public BuildInstance MakeUserModels()
-        //{
-        //    Load(RootProjectBuildInstance, allAssemblyPaths);
-        //    return this;
-        //}             
+            => Load(RootProjectBuildInstance, allAssemblyPaths);             
 
         public void Dispose()
         {

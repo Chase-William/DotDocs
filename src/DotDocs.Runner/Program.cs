@@ -1,4 +1,4 @@
-﻿using DotDocs.Core.Exceptions;
+﻿using DotDocs.Build.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -9,16 +9,17 @@ namespace DotDocs.Runner
         static void Main(string[] args)
         {
             // Test test library
-            Run(url: "https://github.com/Chase-William/DotDocs",
-                outputPath: @"C:\Users\cxr69\Desktop");
+            // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));
+            Run(Builder.FromPath(@"C:\Dev\Custom2DArray"));
         }
 
-        static async Task Run(string url, string outputPath)
+        static void Run(Builder builder)
         {
             try
             {
-                var builder = DotDocs.New(url);
-                builder.Document();
+                builder.Prepare(); // Performs downloads if nessessary/checks directory validity
+                builder.Build(); // Compiles project(s) and creates models using results
+                builder.Document(); // Creates documentation from models
             }
             catch (BuildException ex)
             {
