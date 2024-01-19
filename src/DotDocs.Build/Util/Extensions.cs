@@ -17,14 +17,15 @@ namespace DotDocs.Build.Util
         /// </summary>
         static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
-        public static RepositoryModel Apply(this RepositoryModel model, Repository repo)
+        public static (RepositoryModel, Dictionary<string, ProjectModel>) Apply(this RepositoryModel model, Repository repo)
         {
             model.Name = repo.Name;
             model.Url = repo.Url;
             model.Commit = repo.Commit;
             // Handles creation of the project and all down stream entities
-            model.Projects.Add(repo.build.MakeModels());
-            return model;
+            var (rootProj, projMap) = repo.build.MakeModels();
+            model.Projects.Add(rootProj);
+            return (model, projMap);
         }
 
         public static ProjectModel Apply(this ProjectModel model, ProjectBuildInstance build)

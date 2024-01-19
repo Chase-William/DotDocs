@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Source
+namespace DotDocs.IO
 {
-    internal class LocalSource : ISourceable
+    public class LocalSource : ISourceable
     {
         public string Src { get; init; }
 

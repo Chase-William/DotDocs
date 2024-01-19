@@ -1,6 +1,5 @@
 ﻿using DotDocs.Build.Build;
 using System.Collections.Immutable;
-using System.Management.Automation;
 using System.Reflection;
 
 namespace DotDocs.Build

@@ -1,9 +1,15 @@
-﻿namespace DotDocs.Build.Util
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DotDocs.IO
 {
     /// <summary>
     /// Contains utility functionalities needed by this project.
     /// </summary>
-    public static class Util
+    internal static class Util
     {
         /// <summary>
         /// Deletes all elements within a directory if it exists and ensures the directory given exist afterwards.

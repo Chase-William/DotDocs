@@ -6,9 +6,9 @@ using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Source
+namespace DotDocs.IO
 {
-    internal class GitCloneSource : ISourceable
+    public class GitCloneSource : ISourceable
     {
         public string Src { get; init; }
 

@@ -90,8 +90,11 @@ namespace DotDocs.Build.Build
         /// Generates models for all of the projects, assemblies, and types.
         /// </summary>
         /// <returns>The root project.</returns>
-        public ProjectModel MakeModels()
-            => Load(RootProjectBuildInstance, allAssemblyPaths, new());             
+        public (ProjectModel, Dictionary<string, ProjectModel>) MakeModels()
+        {
+            var dic = new Dictionary<string, ProjectModel>();
+            return (Load(RootProjectBuildInstance, allAssemblyPaths, dic), dic);
+        }           
 
         public void Dispose()
         {
