@@ -45,7 +45,7 @@ namespace DotDocs.Build.Build
         /// <summary>
         /// A collection of project builds that this project's build is dependent on.
         /// </summary>
-        public ImmutableArray<ProjectBuildInstance> DependentBuilds { get; set; }
+        public ImmutableArray<ProjectBuildInstance> DependencyBuilds { get; set; }
 
         /// <summary>
         /// Create a new <see cref="ProjectBuildInstance"/> from the provided build evaluation
@@ -81,20 +81,19 @@ namespace DotDocs.Build.Build
                 ProjectFileName = properties[PROJECT_FILE_NAME].Value,
                 AssemblyFilePath = properties[TARGET_PATH].Value,
                 DocumentationFilePath = Path.Combine(projDir, properties[DOCUMENTATION_FILE].Value),
-                DependentBuilds = GetDependentBuilds(buildEval, projects)
+                DependencyBuilds = GetDependentBuilds(buildEval, projects)
             };
         }
 
-        /// <summary>
-        /// Loads all the desired types from this assembly into the <see cref="Models"/> collection.
-        /// </summary>
-        /// <param name="assemblies">Supporting assemblies.</param>
-        public ProjectModel Load(ImmutableArray<string> assemblies)
+        
+        public ProjectBuildInstance InitMetadataLoadCtx(ImmutableArray<string> assemblies)
         {
             if (mlc != null)
                 Dispose();
             mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
             Assembly = mlc.LoadFromAssemblyPath(AssemblyFilePath);
+
+            return this;
 
             /*
              * Do not add all types unless they are relevant to the custom types created by the developer(s)
@@ -108,7 +107,8 @@ namespace DotDocs.Build.Build
             //    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
             //        type.IsPublic && !type.IsNestedFamORAssem);
 
-            return new ProjectModel().Apply(this);
+            // return new ProjectModel();//, this);
+            // return new ProjectModel().Apply(this);
 
             //var models = new List<UserTypeModel>();
             //foreach (var type in userTypes)

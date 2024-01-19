@@ -10,7 +10,7 @@ namespace DotDocs.Runner
         {
             // Test test library
             // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));
-            Run(Builder.FromPath(@"C:\Dev\Custom2DArray"));
+            Run(Builder.FromPath(@"C:\Dev\ex\DotDocs"));
         }
 
         static void Run(Builder builder)

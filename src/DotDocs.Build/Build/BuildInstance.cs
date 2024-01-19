@@ -1,4 +1,5 @@
 ﻿using DotDocs.Build.Exceptions;
+using DotDocs.Build.Util;
 using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
@@ -90,30 +91,56 @@ namespace DotDocs.Build.Build
         /// </summary>
         /// <returns>The root project.</returns>
         public ProjectModel MakeModels()
-            => Load(RootProjectBuildInstance, allAssemblyPaths);             
+            => Load(RootProjectBuildInstance, allAssemblyPaths, new());             
 
         public void Dispose()
         {
             foreach (var build in allProjectBuildInstances)
                 build.Dispose();
-        }        
+        }
 
-                    
         /// <summary>
-        /// Loads all local projects recursively.
+        /// Recursive function that creates the project tree recursively in a BDF fashion.
         /// </summary>
-        /// <param name="build">Project to start loading from.</param>
-        /// <param name="assemblies">Assemblies that may be needed by <see cref="MetadataLoadContext"/>.</param>
-        ProjectModel Load(ProjectBuildInstance build, ImmutableArray<string> assemblies)
-        {
-            ProjectModel? lowerModel = null;
-            // Visit the lowest level assembly and load it's info before loading higher level assemblies
-            foreach (var proj in build.DependentBuilds)
-                lowerModel = Load(proj, assemblies); // Capture dependency projectModel
-            var currentModel = build.Load(assemblies); // Capture this projectModel
-            if (lowerModel != null) // If dependency exists, add it to the dependency list
-                currentModel.Projects.Add(lowerModel);
-            return currentModel;
+        /// <param name="build">The build results for a project.</param>
+        /// <param name="assemblies">All the assemblies needed by the application used by <see cref="MetadataLoadContext"/>.</param>
+        /// <param name="models">A flat map of all project models created used to lookup and reference existing <see cref="ProjectModel"/>.</param>
+        /// <returns></returns>
+        ProjectModel Load(
+            ProjectBuildInstance build,
+            ImmutableArray<string> assemblies,
+            Dictionary<string, ProjectModel> models
+            ) {
+
+            // Create a blank instance providing a target for dependencies to add themselves to
+            var projModel = new ProjectModel();
+
+            // Process nodes starting at the highest level leaf (furtherest into the tree)
+            foreach (var proj in build.DependencyBuilds)
+            {
+                // This dependency ProjectModel has not been created yet
+                if (!models.ContainsKey(proj.ProjectFileName))
+                {
+                    // Call this function recursively to reach highest level lead node
+                    var dep = Load(proj, assemblies, models);
+                    // Add dependency project to parent project list
+                    projModel.Projects.Add(dep);
+                    // Add to function's global map of project models
+                    // used to prevent duplicate instances
+                    models.Add(dep.Name, dep);                    
+                    continue;
+                }
+                // ProjectModel already exists so get a reference
+                // Note: This this proj must be a dependency to another proj then
+                projModel.Projects.Add(models[proj.ProjectFileName]);
+            }
+
+            // Now that all dependency information for this project is setup
+            // Initialize the MetadataLoadContext for reflection only introspection
+            // Call the Apply method to apply assembmly info/build results to the model
+            // Return to caller
+            return projModel                
+                .Apply(build.InitMetadataLoadCtx(assemblies));
         }
     }
 }
