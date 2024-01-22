@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Models.Language.Members
 {
-    internal class FieldModel : MemberModel
+    public class FieldModel : MemberModel
     {        
         public bool IsInitOnly { get; set; }
         public bool IsLiteral { get; set; }

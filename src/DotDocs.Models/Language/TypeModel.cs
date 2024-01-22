@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotDocs.Models.Language.Members;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,9 @@ namespace DotDocs.Models.Language
         //public bool IsVariableBoundArray { get; set; }
         //public bool IsVisible { get; set; }
         //public bool IsSpecialName { get; set; }
+
+        public List<FieldModel> Fields { get; set; } = new();
+
         public string Name { get; set; }
         public string Namespace { get; set; }
     }

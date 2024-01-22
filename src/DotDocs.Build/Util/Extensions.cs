@@ -1,6 +1,7 @@
 ﻿using DotDocs.Build.Build;
 using DotDocs.Models;
 using DotDocs.Models.Language;
+using DotDocs.Models.Language.Members;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -39,8 +40,8 @@ namespace DotDocs.Build.Util
         {
             model.Name = assembly.GetName().Name;
 
-            List<TypeModel> models = new List<TypeModel>();
-            foreach (var type in assembly.DefinedTypes)
+            List<TypeModel> models = new();
+            foreach (var type in assembly.GetExportedTypes())
             {
                 models.Add(new TypeModel().Apply(type));
             }
@@ -54,6 +55,15 @@ namespace DotDocs.Build.Util
             model.FullName = type.FullName;
             // TODO: From here we would perform addition logic for handling member models
 
+            foreach (var field in type.GetFields())            
+                model.Fields.Add(new FieldModel().Apply(field));            
+
+            return model;
+        }
+
+        public static FieldModel Apply(this FieldModel model, FieldInfo info)
+        {
+            model.Name = info.Name;
             return model;
         }
 
@@ -86,7 +96,7 @@ namespace DotDocs.Build.Util
         /// </summary>
         /// <param name="type">The type to get the fields from.</param>
         /// <returns>Desired fields from the type.</returns>
-        public static IEnumerable<FieldInfo> GetDesiredFields(this Type type)
+        public static IEnumerable<FieldInfo> GetExportedFields(this Type type)
             => type.GetRuntimeFields()
                    .Where(_field => !_field
                        .GetCustomAttributesData()
