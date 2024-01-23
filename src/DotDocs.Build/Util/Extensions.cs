@@ -18,54 +18,98 @@ namespace DotDocs.Build.Util
         /// </summary>
         static readonly string[] DEFAULT_OBJECT_METHODS = typeof(object).GetRuntimeMethods().Select(m => m.Name).ToArray();
 
-        public static (RepositoryModel, Dictionary<string, ProjectModel>) Apply(this RepositoryModel model, Repository repo)
-        {
+        public static RepositoryModel Apply(
+            this RepositoryModel model, 
+            Repository repo,
+            Dictionary<string, ProjectModel> projects,
+            Dictionary<string, AssemblyModel> assemblies,
+            Dictionary<string, ITypeable> types
+            ) {
             model.Name = repo.Name;
             model.Url = repo.Url;
             model.Commit = repo.Commit;
             // Handles creation of the project and all down stream entities
-            var (rootProj, projMap) = repo.build.MakeModels();
-            model.Projects.Add(rootProj);
-            return (model, projMap);
+            var rootProject = repo.build.MakeModels(projects, assemblies, types);
+            model.Projects.Add(rootProject);
+            return model;
         }
 
-        public static ProjectModel Apply(this ProjectModel model, ProjectBuildInstance build)
-        {
+        public static ProjectModel Apply(
+            this ProjectModel model, 
+            ProjectBuildInstance build,
+            Dictionary<string, AssemblyModel> assemblies,
+            Dictionary<string, ITypeable> types
+            ) {
             model.Name = build.ProjectFileName;
-            model.Assembly = new AssemblyModel().Apply(build.Assembly);
+            model.Assembly = new AssemblyModel(build.Assembly, assemblies, types); //.Apply(build.Assembly);
             return model;
         }
 
-        public static AssemblyModel Apply(this AssemblyModel model, Assembly assembly)
-        {
-            model.Name = assembly.GetName().Name;
+        //public static AssemblyModel Apply(this AssemblyModel model, Assembly assembly)
+        //{
+        //    model.Name = assembly.GetName().Name;
 
-            List<TypeModel> models = new();
-            foreach (var type in assembly.GetExportedTypes())
-            {
-                models.Add(new TypeModel().Apply(type));
-            }
-            model.Types = models;
-            return model;
-        }
+        //    List<TypeModel> models = new();
+        //    foreach (var type in assembly.GetExportedTypes())
+        //    {
+        //        models.Add(new TypeModel().Apply(type));
+        //    }
+        //    model.Types = models;
+        //    return model;
+        //}
 
-        public static TypeModel Apply(this TypeModel model, Type type)
-        {
-            model.Name = type.Name;
-            model.FullName = type.FullName;
-            // TODO: From here we would perform addition logic for handling member models
+        //public static TypeModel Apply(this TypeModel model, Type type)
+        //{
+        //    model.Name = type.Name;
+        //    model.FullName = type.FullName;
+        //    // TODO: From here we would perform addition logic for handling member models
 
-            foreach (var field in type.GetFields())            
-                model.Fields.Add(new FieldModel().Apply(field));            
+        //    // Fields
+        //    // TODO: Needs Testing
+        //    var fields = type.GetFields();
+        //    model.Fields = new FieldModel[fields.Length];
+        //    int i = 0;
+        //    for (; i < fields.Length; i++)            
+        //        model.Fields[i] = new FieldModel().Apply(fields[i]);
 
-            return model;
-        }
+        //    // Methods
+        //    // TODO: Needs Testing
+        //    var methods = type.GetMethods();
+        //    model.Methods = new MethodModel[methods.Length];
+        //    for (i = 0; i < methods.Length; i++)
+        //        model.Methods[i] = new MethodModel().Apply(methods[i]);
 
-        public static FieldModel Apply(this FieldModel model, FieldInfo info)
-        {
-            model.Name = info.Name;
-            return model;
-        }
+        //    // Properties
+        //    // TODO: Needs Testing
+        //    var properties = type.GetProperties();
+        //    model.Properties = new PropertyModel[properties.Length];
+        //    for (i = 0; i < properties.Length; i++)
+        //        model.Properties[i] = new PropertyModel();
+
+        //    // Events
+        //    // TODO: Needs Testing
+        //    var events = type.GetEvents();
+        //    model.Events = new EventModel[events.Length];
+        //    for (i = 0; i < events.Length; i++)
+        //        model.Events[i] = new EventModel();
+
+        //    return model;
+        //}
+
+        //public static FieldModel Apply(this FieldModel model, FieldInfo info)
+        //{
+        //    model.Name = info.Name;
+        //    return model;
+        //}
+
+        //public static MethodModel Apply(this MethodModel model, MethodInfo info)
+        //{
+        //    model.Name = info.Name;
+        //    return model;
+        //}
+
+       
+        
 
         /// <summary>
         /// Gets a list of the desired properties that DotDocs will only filter down further as needed.

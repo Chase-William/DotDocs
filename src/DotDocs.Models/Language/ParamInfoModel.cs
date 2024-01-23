@@ -6,21 +6,21 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Models.Language.Members
+namespace DotDocs.Models.Language
 {
-    public class PropertyModel : MemberModel
+    public class ParamInfoModel
     {
+        public ITypeable ParamType { get; set; }
         public string Name { get; set; }
 
-        public ITypeable PropertyType { get; set; }
-
-        public PropertyModel(
-            PropertyInfo info,
+        public ParamInfoModel(
+            ParameterInfo info,
             ImmutableDictionary<string, AssemblyModel> assemblies,
             Dictionary<string, ITypeable> types
             ) {
             Name = info.Name;
-            PropertyType = ITypeable.GetOrCreateTypeFrom(info.PropertyType, assemblies, types);
+
+            ParamType = ITypeable.GetOrCreateTypeFrom(info.ParameterType, assemblies, types);
         }
     }
 }

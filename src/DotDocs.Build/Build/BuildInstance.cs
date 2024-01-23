@@ -1,6 +1,7 @@
 ﻿using DotDocs.Build.Exceptions;
 using DotDocs.Build.Util;
 using DotDocs.Models;
+using DotDocs.Models.Language;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -90,10 +91,29 @@ namespace DotDocs.Build.Build
         /// Generates models for all of the projects, assemblies, and types.
         /// </summary>
         /// <returns>The root project.</returns>
-        public (ProjectModel, Dictionary<string, ProjectModel>) MakeModels()
-        {
-            var dic = new Dictionary<string, ProjectModel>();
-            return (Load(RootProjectBuildInstance, allAssemblyPaths, dic), dic);
+        public ProjectModel MakeModels(
+            Dictionary<string, ProjectModel> projects,
+            Dictionary<string, AssemblyModel> assemblies,
+            Dictionary<string, ITypeable> types
+            ) {
+            // 
+            //
+            //  You remember ref assemblies? We need that for types so we can
+            //  reference `int` later on as the return type of some method. This
+            //  map should also probably hold user defined types as well. Therefore,
+            //  it holds all types used *to an extent*.
+            //
+            //
+            //
+            var rootProject = Load(
+                RootProjectBuildInstance, 
+                allAssemblyPaths, 
+                projects, 
+                assemblies, 
+                types);
+            // The root is not added until here
+            projects.Add(rootProject.Name, rootProject);
+            return rootProject;
         }           
 
         public void Dispose()
@@ -106,13 +126,15 @@ namespace DotDocs.Build.Build
         /// Recursive function that creates the project tree recursively in a BDF fashion.
         /// </summary>
         /// <param name="build">The build results for a project.</param>
-        /// <param name="assemblies">All the assemblies needed by the application used by <see cref="MetadataLoadContext"/>.</param>
-        /// <param name="models">A flat map of all project models created used to lookup and reference existing <see cref="ProjectModel"/>.</param>
+        /// <param name="asmPaths">All the assemblies needed by the application used by <see cref="MetadataLoadContext"/>.</param>
+        /// <param name="projects">A flat map of all project models created used to lookup and reference existing <see cref="ProjectModel"/>.</param>
         /// <returns></returns>
         ProjectModel Load(
             ProjectBuildInstance build,
-            ImmutableArray<string> assemblies,
-            Dictionary<string, ProjectModel> models
+            ImmutableArray<string> asmPaths,
+            Dictionary<string, ProjectModel> projects,
+            Dictionary<string, AssemblyModel> assemblies,
+            Dictionary<string, ITypeable> types
             ) {
 
             // Create a blank instance providing a target for dependencies to add themselves to
@@ -122,20 +144,20 @@ namespace DotDocs.Build.Build
             foreach (var proj in build.DependencyBuilds)
             {
                 // This dependency ProjectModel has not been created yet
-                if (!models.ContainsKey(proj.ProjectFileName))
+                if (!projects.ContainsKey(proj.ProjectFileName))
                 {
                     // Call this function recursively to reach highest level lead node
-                    var dep = Load(proj, assemblies, models);
+                    var dep = Load(proj, asmPaths, projects, assemblies, types);
                     // Add dependency project to parent project list
                     projModel.Projects.Add(dep);
                     // Add to function's global map of project models
                     // used to prevent duplicate instances
-                    models.Add(dep.Name, dep);                    
+                    projects.Add(dep.Name, dep);                    
                     continue;
                 }
                 // ProjectModel already exists so get a reference
                 // Note: This this proj must be a dependency to another proj then
-                projModel.Projects.Add(models[proj.ProjectFileName]);
+                projModel.Projects.Add(projects[proj.ProjectFileName]);
             }
 
             // Now that all dependency information for this project is setup
@@ -143,7 +165,7 @@ namespace DotDocs.Build.Build
             // Call the Apply method to apply assembmly info/build results to the model
             // Return to caller
             return projModel                
-                .Apply(build.InitMetadataLoadCtx(assemblies));
+                .Apply(build.InitMetadataLoadCtx(asmPaths), assemblies, types);
         }
     }
 }

@@ -3,13 +3,12 @@ using DotDocs.Models;
 using DotDocs.Models.Language;
 using DotDocs.Models.Language.Members;
 using DotDocs.Render;
-using DotDocs.Render.Args;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Text;
 
 namespace DotDocs.Markdown
-{    
+{
     public class MarkdownRenderer : IRenderable
     {
         const int DEFAULT_STR_BUILDER_CAPACITY = 256;
@@ -28,9 +27,45 @@ namespace DotDocs.Markdown
                 var builder = new StringBuilder(DEFAULT_STR_BUILDER_CAPACITY);
                 using var fstream = File.CreateText(Path.Combine(Output.GetValue(), model.Name + ".md"));
 
-                model.Name.ToHeader(builder, HeaderVariant.H1);
-                "Exported Fields".ToHeader(builder, HeaderVariant.H2);
-                model.Fields.ToFields(builder);
+                // Class Name
+                builder.AppendMarkdownHeader(model.Name, HeaderVariant.H1, false);
+                if (model.BaseType is not null)
+                    builder.Append($" : {model.BaseType.AsMaybeLink()}");
+                builder.LinePadding();
+
+                builder.AppendMarkdownHeader("Exported Fields", HeaderVariant.H2);
+                model.Fields.ToMarkdown(builder, (m) =>
+                {
+                    builder.AppendMarkdownHeader($"{m.FieldType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);                                          
+
+                    return Padding.NoPadding;
+                });
+
+                builder.AppendMarkdownHeader("Exported Methods", HeaderVariant.H2);
+                model.Methods.ToMarkdown(builder, (m) =>
+                {
+                    builder.AppendMarkdownHeader($"{m.ReturnType.AsMaybeLink()} {m.Name}", HeaderVariant.H3, false);
+                   
+                    // Create parameter listing
+                    builder.Append(m.Parameters.AsMarkdownParams());
+                    
+
+                    return Padding.Default;
+                });
+
+                builder.AppendMarkdownHeader("Exported Propertes", HeaderVariant.H2);
+                model.Properties.ToMarkdown(builder, (m) =>
+                {
+                    builder.AppendMarkdownHeader($"{m.PropertyType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
+                    return Padding.NoPadding;
+                });
+
+                builder.AppendMarkdownHeader("Exported Events", HeaderVariant.H2);
+                model.Events.ToMarkdown(builder, (m) =>
+                {
+                    builder.AppendMarkdownHeader($"{m.EventHandlerType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
+                    return Padding.NoPadding;
+                });
 
                 fstream.Write(builder);
             }
@@ -60,31 +95,74 @@ namespace DotDocs.Markdown
     /// 
     /// </summary>
 
+    public enum Padding
+    {
+        Default,
+        NoPadding
+    }
+
     public static class Extensions
     {
-        public static void ToFields(this List<FieldModel> fields, StringBuilder builder)
+        const string DEFAULT_SPACING = "\n\n";
+
+        /// <summary>
+        /// Iterates over a collection of models calling the given render function on each one.
+        /// After each callback, default line padding is added to the provided <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="models"></param>
+        /// <param name="builder"></param>
+        /// <param name="render"></param>
+        public static void ToMarkdown<T>(
+            this IEnumerable<T> models,
+            StringBuilder builder,
+            Func<T, Padding> render)
+            where T : MemberModel
         {
-            foreach (var field in fields)
+            foreach (var model in models)
             {
-                builder.Append(field.Name);
-                builder.AppendLine();
+                if (render(model) == Padding.Default)
+                    builder.LinePadding();
             }
         }
 
-        public static string ToItalic(this string str)
+        public static string AsMarkdownParams(this ParamInfoModel[] _params)        
+            => $"({string.Join(", ", _params.Select(p => $"{p.ParamType.Name.AsCode()} {p.Name.AsItalic()}"))})";                                
+
+        public static string AsItalic(this string str)
             => $"*{str}*";
 
-        public static string ToBold(this string str)
+        public static string AsBold(this string str)
             => $"**{str}**";
 
-        public static string ToBoldItanlic(this string str)
+        public static string AsBoldItalic(this string str)
             => $"***{str}***";
 
-        public static void ToHeader(
-            this string str,
-            StringBuilder builder,
+        public static string AsCode(this string str)
+            => $"`{str}`";        
+
+        public static string AsMaybeLink(this ITypeable model)
+        {
+            if (model is TypeModel)
+                return model.Name
+                .AsCode()
+                .AsLink("./" + model.Name);
+            return model.Name.AsCode();
+        }
+
+        //public static string AsLink(this TypeModel model)
+        //    => model.Name
+        //        .AsCode()
+        //        .AsLink("./" + model.Name);
+
+        public static string AsLink(this string str, string href)
+            => $"[{str}]({href})";
+
+        public static void AppendMarkdownHeader(
+            this StringBuilder builder,
+            string str,
             HeaderVariant variant,
-            bool newLine = true
+            bool padded = true
             ) {            
             // + 1 for space character
             var temp = new char[(int)variant + 1];
@@ -95,9 +173,16 @@ namespace DotDocs.Markdown
 
             builder.Append(temp);
             builder.Append(str);
-            if (newLine)
-                builder.AppendLine();
+            if (padded)
+                builder.LinePadding();
         }
+
+        /// <summary>
+        /// Adds a line height padding using <see cref="DEFAULT_SPACING"/>.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void LinePadding(this StringBuilder builder)
+            => builder.Append(DEFAULT_SPACING);
     }
 
     //public static class Extensions

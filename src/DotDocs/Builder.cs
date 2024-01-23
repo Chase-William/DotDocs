@@ -7,6 +7,7 @@ using DotDocs.Models;
 using DotDocs.IO;
 using DotDocs.Render;
 using System.Collections.Immutable;
+using DotDocs.Models.Language;
 
 namespace DotDocs
 {           
@@ -32,13 +33,16 @@ namespace DotDocs
         /// Repository model structure that mimics the real programmical structure.
         /// </summary>
         internal RepositoryModel RepoModel { get; private set; }
-
         /// <summary>
         /// A flat map containing all locally defined projects used.
         /// </summary>
         internal Dictionary<string, ProjectModel> Projects { get; private set; }
+        /// <summary>
+        /// A flap map containing all visible types by the root project.
+        /// </summary>
+        internal Dictionary<string, ITypeable> Types { get; private set; }
         #endregion
-       
+
         public IRenderable Renderer { get; init; }
 
         private Builder(ISourceable _src, string _output, IRenderable renderable)
@@ -111,16 +115,19 @@ namespace DotDocs
                     .SetActiveProject()
                     .EnableDocumentationGeneration()
                     .Build();
-                
+
                 // Apply built repository results to a model structure going top -> down
                 // Assign results to respective properties via destructure
-                var (repoModel, projs) = new RepositoryModel().Apply(repo);
+                var projects = new Dictionary<string, ProjectModel>();
+                var assemblies = new Dictionary<string, AssemblyModel>();
+                var types = new Dictionary<string, ITypeable>();
+                var repoModel = new RepositoryModel().Apply(repo, projects, assemblies, types);
                 // Use RepositoryModel & Projects as data source for rendering
                 // RepoModel & Projects dict share the same data,
                 // they both providea  different perspective
                 Renderer.Prepare(
                     repoModel, 
-                    projs.ToImmutableDictionary(), 
+                    projects.ToImmutableDictionary(), 
                     Output);
             }
             catch

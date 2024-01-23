@@ -1,17 +1,24 @@
 ﻿using DotDocs.Models.Language.Members;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DotDocs.Models.Language
 {
-    public class TypeModel : Model
+    public class TypeModel : ITypeable
     {
         public string AssemblyQualifiedName { get; set; }
-        //public bool ContainsGenericParameters { get; set; }
-        public string FullName { get; set; }
+        //public bool ContainsGenericParameters { get; set; }        
+        
+        public string Namespace { get; set; }
+        public string Name { get; set; }
+        // public string FullName { get; set; }
+
         //public int GenericParameterPosition { get; set; }
         //public bool HasElementType { get; set; }
         //public bool IsAbstract { get; set; }
@@ -54,9 +61,84 @@ namespace DotDocs.Models.Language
         //public bool IsVisible { get; set; }
         //public bool IsSpecialName { get; set; }
 
-        public List<FieldModel> Fields { get; set; } = new();
+        public FieldModel[] Fields { get; set; }
 
-        public string Name { get; set; }
-        public string Namespace { get; set; }
+        public MethodModel[] Methods { get; set; }
+
+        public PropertyModel[] Properties { get; set; }
+
+        public EventModel[] Events { get; set; }
+
+        public ITypeable? BaseType { get; set; }
+
+        const BindingFlags DEFAULT_SEARCH = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public;
+
+        public TypeModel(
+            Type type,
+            ImmutableDictionary<string, AssemblyModel> assemblies,
+            Dictionary<string, ITypeable> types
+            ) {
+
+            // Add before processing to prevent members who use this type from calling the constructor again    
+            var key = type.GetUniqueName();                    
+            if (!types.ContainsKey(key))
+                types.Add(key, this);
+            // ^ Duplicate inside TypeModel, where can we move this to that it makes sense?
+
+            Namespace = type.Namespace;
+            Name = type.Name;
+            // FullName = type.FullName;
+
+            // Generic Type Parameters
+            // ITypeable.TestingTypeParams(type, assemblies, types);
+            if (type.IsGenericType)
+            {
+                Console.WriteLine();
+            }
+            if (type.BaseType.IsConstructedGenericType)
+            {
+                
+                var a = type.GenericTypeArguments;
+                var p = type.GetTypeInfo().GenericTypeParameters;
+                var t = type.BaseType.GetTypeInfo().GenericTypeArguments[1].GetTypeInfo();
+                Console.WriteLine();
+            }               
+
+            // Gather BaseType info for TypeModels only
+            if (type.BaseType is not null)
+                BaseType = ITypeable.GetOrCreateTypeFrom(type.BaseType, assemblies, types);
+
+            // Fields
+            // TODO: Needs Testing
+            var fields = type.GetFields(DEFAULT_SEARCH);
+            Fields = new FieldModel[fields.Length];
+            int i = 0;
+            for (; i < fields.Length; i++)
+                Fields[i] = new FieldModel(fields[i], assemblies, types); //.Apply(fields[i]);
+
+            // Methods
+            // TODO: Needs Testing
+            // Returns exported methods that are also not compiler generated i.e. property getter/setter
+            var methods = type.GetMethods(DEFAULT_SEARCH)
+                .Where(m => !m.Attributes.HasFlag(MethodAttributes.SpecialName))
+                .ToArray();
+            Methods = new MethodModel[methods.Length];
+            for (i = 0; i < methods.Length; i++)
+                Methods[i] = new MethodModel(methods[i], assemblies, types); // .Apply(methods[i]);
+
+            // Properties
+            // TODO: Needs Testing
+            var properties = type.GetProperties(DEFAULT_SEARCH);
+            Properties = new PropertyModel[properties.Length];
+            for (i = 0; i < properties.Length; i++)
+                Properties[i] = new PropertyModel(properties[i], assemblies, types);
+
+            // Events
+            // TODO: Needs Testing
+            var events = type.GetEvents(DEFAULT_SEARCH);
+            Events = new EventModel[events.Length];
+            for (i = 0; i < events.Length; i++)
+                Events[i] = new EventModel(events[i], assemblies, types);
+        }
     }
 }

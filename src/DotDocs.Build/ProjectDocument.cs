@@ -61,9 +61,7 @@ namespace DotDocs.Build
                 foreach (var item in itemGroup)
                     if (item.Name.LocalName == "ProjectReference")
                     {
-                        string? includePath = item.Attribute(XName.Get("Include"))?.Value;
-                        if (includePath == null)
-                            throw new Exception($"No 'Include' attribute was found for the 'ProjectReference' in the .csproj file at: {projectFile}");
+                        string includePath = (item.Attribute(XName.Get("Include"))?.Value) ?? throw new Exception($"No 'Include' attribute was found for the 'ProjectReference' in the .csproj file at: {projectFile}");
                         // Calculate relative path from this .csproj to the included one
                         string absolutePath = Path.GetFullPath(Path.Combine(projectFile[..projectFile.LastIndexOf('\\')], includePath));
                         var dependencyProj = projects.SingleOrDefault(p => p.ProjectFilePath == absolutePath);
