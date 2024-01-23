@@ -1,6 +1,6 @@
 ﻿namespace DotDocs.Models
 {
-    public class RepositoryModel : Model
+    public class RepositoryModel
     {
         public string Name { get; set; }
         public string Url { get; set; }

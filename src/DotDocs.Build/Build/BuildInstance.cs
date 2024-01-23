@@ -1,7 +1,6 @@
 ﻿using DotDocs.Build.Exceptions;
 using DotDocs.Build.Util;
 using DotDocs.Models;
-using DotDocs.Models.Language;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -12,7 +11,7 @@ namespace DotDocs.Build.Build
     /// <summary>
     /// A class containing a build attempt's information.
     /// </summary>
-    public class BuildInstance : IDisposable
+    public class BuildInstance //: IDisposable
     {        
         ProjectDocument rootProject;
 
@@ -91,10 +90,8 @@ namespace DotDocs.Build.Build
         /// Generates models for all of the projects, assemblies, and types.
         /// </summary>
         /// <returns>The root project.</returns>
-        public ProjectModel MakeModels(
-            Dictionary<string, ProjectModel> projects,
-            Dictionary<string, AssemblyModel> assemblies,
-            Dictionary<string, ITypeable> types
+        public ProjectModel GetRootProject(
+            Dictionary<string, ProjectModel> projects
             ) {
             // 
             //
@@ -105,22 +102,17 @@ namespace DotDocs.Build.Build
             //
             //
             //
-            var rootProject = Load(
-                RootProjectBuildInstance, 
-                allAssemblyPaths, 
-                projects, 
-                assemblies, 
-                types);
+            var rootProject = Load(RootProjectBuildInstance, allAssemblyPaths, projects);
             // The root is not added until here
             projects.Add(rootProject.Name, rootProject);
             return rootProject;
         }           
 
-        public void Dispose()
-        {
-            foreach (var build in allProjectBuildInstances)
-                build.Dispose();
-        }
+        //public void Dispose()
+        //{
+        //    foreach (var build in allProjectBuildInstances)
+        //        build.Dispose();
+        //}
 
         /// <summary>
         /// Recursive function that creates the project tree recursively in a BDF fashion.
@@ -132,13 +124,12 @@ namespace DotDocs.Build.Build
         ProjectModel Load(
             ProjectBuildInstance build,
             ImmutableArray<string> asmPaths,
-            Dictionary<string, ProjectModel> projects,
-            Dictionary<string, AssemblyModel> assemblies,
-            Dictionary<string, ITypeable> types
+            Dictionary<string, ProjectModel> projects
             ) {
 
+            build.InitMetadataLoadCtx(asmPaths);
             // Create a blank instance providing a target for dependencies to add themselves to
-            var projModel = new ProjectModel();
+            var projModel = new ProjectModel(build.ProjectFileName, build.Assembly, build.MetadataLoadCtx);
 
             // Process nodes starting at the highest level leaf (furtherest into the tree)
             foreach (var proj in build.DependencyBuilds)
@@ -147,7 +138,7 @@ namespace DotDocs.Build.Build
                 if (!projects.ContainsKey(proj.ProjectFileName))
                 {
                     // Call this function recursively to reach highest level lead node
-                    var dep = Load(proj, asmPaths, projects, assemblies, types);
+                    var dep = Load(proj, asmPaths, projects);
                     // Add dependency project to parent project list
                     projModel.Projects.Add(dep);
                     // Add to function's global map of project models
@@ -164,8 +155,8 @@ namespace DotDocs.Build.Build
             // Initialize the MetadataLoadContext for reflection only introspection
             // Call the Apply method to apply assembmly info/build results to the model
             // Return to caller
-            return projModel                
-                .Apply(build.InitMetadataLoadCtx(asmPaths), assemblies, types);
+            return projModel;                
+                //.Apply(build.InitMetadataLoadCtx(asmPaths));
         }
     }
 }

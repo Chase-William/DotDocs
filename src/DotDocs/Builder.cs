@@ -5,16 +5,15 @@ using DotDocs.Build.Util;
 using DotDocs.Render;
 using DotDocs.Models;
 using DotDocs.IO;
-using DotDocs.Render;
 using System.Collections.Immutable;
-using DotDocs.Models.Language;
+using System.Linq;
 
 namespace DotDocs
 {           
     /// <summary>
     /// The main class for using DotDoc's services.
     /// </summary>
-    public class Builder
+    public class Builder : IDisposable
     {
         #region IO
         /// <summary>
@@ -37,13 +36,10 @@ namespace DotDocs
         /// A flat map containing all locally defined projects used.
         /// </summary>
         internal Dictionary<string, ProjectModel> Projects { get; private set; }
-        /// <summary>
-        /// A flap map containing all visible types by the root project.
-        /// </summary>
-        internal Dictionary<string, ITypeable> Types { get; private set; }
         #endregion
 
         public IRenderable Renderer { get; init; }
+                
 
         private Builder(ISourceable _src, string _output, IRenderable renderable)
         {
@@ -109,7 +105,7 @@ namespace DotDocs
             {
                 // Process repository files and build
                 // Must close unmanaged MetadataLoadContext
-                using Repository repo = new Repository(Source.Src)                    
+                var repo = new Repository(Source.Src)                    
                     .GetCommitInfo()
                     .MakeProjectGraph()
                     .SetActiveProject()
@@ -119,9 +115,7 @@ namespace DotDocs
                 // Apply built repository results to a model structure going top -> down
                 // Assign results to respective properties via destructure
                 var projects = new Dictionary<string, ProjectModel>();
-                var assemblies = new Dictionary<string, AssemblyModel>();
-                var types = new Dictionary<string, ITypeable>();
-                var repoModel = new RepositoryModel().Apply(repo, projects, assemblies, types);
+                var repoModel = new RepositoryModel().Apply(repo, projects);
                 // Use RepositoryModel & Projects as data source for rendering
                 // RepoModel & Projects dict share the same data,
                 // they both providea  different perspective
@@ -151,6 +145,13 @@ namespace DotDocs
                 //if (Directory.Exists("downloads"))
                 //    Utility.CleanDirectory("downloads");
             }                       
+        }
+
+        public void Dispose()
+        {
+            if (Projects is not null)            
+                foreach (var proj in Projects.Values)
+                    proj.Dispose();            
         }
     }
 }

@@ -9,7 +9,7 @@ namespace DotDocs.Build.Build
     /// <summary>
     /// A class containing a project's build information.
     /// </summary>
-    public class ProjectBuildInstance : IDisposable
+    public class ProjectBuildInstance
     {
         #region Binlog Variables
         const string PROJECT_NAME = "ProjectName";
@@ -25,7 +25,7 @@ namespace DotDocs.Build.Build
         /// <summary>
         /// The context used for loading in an assembly in a reflection-only manner.
         /// </summary>
-        MetadataLoadContext mlc;
+        public MetadataLoadContext MetadataLoadCtx { get; private set; }
         /// <summary>
         /// Name of the project file.
         /// </summary>
@@ -86,14 +86,13 @@ namespace DotDocs.Build.Build
         }
 
         
-        public ProjectBuildInstance InitMetadataLoadCtx(ImmutableArray<string> assemblies)
+        public void InitMetadataLoadCtx(ImmutableArray<string> assemblies)
         {
-            if (mlc != null)
-                Dispose();
-            mlc = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
-            Assembly = mlc.LoadFromAssemblyPath(AssemblyFilePath);
-
-            return this;
+            // if (MetadataLoadCtx != null)
+                // Dispose();
+            MetadataLoadCtx = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
+            Assembly = MetadataLoadCtx.LoadFromAssemblyPath(AssemblyFilePath);
+            
 
             /*
              * Do not add all types unless they are relevant to the custom types created by the developer(s)
@@ -119,8 +118,8 @@ namespace DotDocs.Build.Build
         /// <summary>
         /// Disposes of unmanaged resources for this build.
         /// </summary>
-        public void Dispose()
-            => mlc?.Dispose();
+        //public void Dispose()
+        //    => mlc?.Dispose();
 
         /// <summary>
         /// Gets all dependencies of the given project evaluation;

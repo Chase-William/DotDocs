@@ -1,10 +1,8 @@
 ﻿using DotDocs.IO;
 using DotDocs.Models;
-using DotDocs.Models.Language;
-using DotDocs.Models.Language.Members;
 using DotDocs.Render;
 using System.Collections.Immutable;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace DotDocs.Markdown
@@ -12,7 +10,8 @@ namespace DotDocs.Markdown
     public class MarkdownRenderer : IRenderable
     {
         const int DEFAULT_STR_BUILDER_CAPACITY = 256;
-        
+        const BindingFlags DEFAULT_SEARCH = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public;
+
         public RepositoryModel Model { get; set; }
 
         public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
@@ -20,21 +19,21 @@ namespace DotDocs.Markdown
         public IOutputable Output { get; set; }
          
 
-        public void RenderType(TypeModel model)
+        public void RenderType(Type type)
         {
             try
             {
                 var builder = new StringBuilder(DEFAULT_STR_BUILDER_CAPACITY);
-                using var fstream = File.CreateText(Path.Combine(Output.GetValue(), model.Name + ".md"));
+                using var fstream = File.CreateText(Path.Combine(Output.GetValue(), type.Name + ".md"));
 
                 // Class Name
-                builder.AppendMarkdownHeader(model.Name, HeaderVariant.H1, false);
-                if (model.BaseType is not null)
-                    builder.Append($" : {model.BaseType.AsMaybeLink()}");
+                builder.AppendMarkdownHeader(type.Name, HeaderVariant.H1, false);
+                if (type.BaseType is not null)
+                    builder.Append($" : {type.BaseType.AsMaybeLink()}");
                 builder.LinePadding();
 
                 builder.AppendMarkdownHeader("Exported Fields", HeaderVariant.H2);
-                model.Fields.ToMarkdown(builder, (m) =>
+                type.GetFields(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
                 {
                     builder.AppendMarkdownHeader($"{m.FieldType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);                                          
 
@@ -42,26 +41,27 @@ namespace DotDocs.Markdown
                 });
 
                 builder.AppendMarkdownHeader("Exported Methods", HeaderVariant.H2);
-                model.Methods.ToMarkdown(builder, (m) =>
+                type.GetMethods(DEFAULT_SEARCH)
+                    .Where(m => !m.Attributes.HasFlag(MethodAttributes.SpecialName)).ToMarkdown(builder, (m) =>
                 {
                     builder.AppendMarkdownHeader($"{m.ReturnType.AsMaybeLink()} {m.Name}", HeaderVariant.H3, false);
                    
                     // Create parameter listing
-                    builder.Append(m.Parameters.AsMarkdownParams());
+                    builder.Append(m.GetParameters().AsMarkdownParams());
                     
 
                     return Padding.Default;
                 });
 
                 builder.AppendMarkdownHeader("Exported Propertes", HeaderVariant.H2);
-                model.Properties.ToMarkdown(builder, (m) =>
+                type.GetProperties(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
                 {
                     builder.AppendMarkdownHeader($"{m.PropertyType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
                     return Padding.NoPadding;
                 });
 
                 builder.AppendMarkdownHeader("Exported Events", HeaderVariant.H2);
-                model.Events.ToMarkdown(builder, (m) =>
+                type.GetEvents(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
                 {
                     builder.AppendMarkdownHeader($"{m.EventHandlerType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
                     return Padding.NoPadding;
@@ -116,9 +116,8 @@ namespace DotDocs.Markdown
         public static void ToMarkdown<T>(
             this IEnumerable<T> models,
             StringBuilder builder,
-            Func<T, Padding> render)
-            where T : MemberModel
-        {
+            Func<T, Padding> render
+            ) {
             foreach (var model in models)
             {
                 if (render(model) == Padding.Default)
@@ -126,8 +125,8 @@ namespace DotDocs.Markdown
             }
         }
 
-        public static string AsMarkdownParams(this ParamInfoModel[] _params)        
-            => $"({string.Join(", ", _params.Select(p => $"{p.ParamType.Name.AsCode()} {p.Name.AsItalic()}"))})";                                
+        public static string AsMarkdownParams(this IEnumerable<ParameterInfo> _params)        
+            => $"({string.Join(", ", _params.Select(p => $"{p.ParameterType.Name.AsCode()} {p.Name.AsItalic()}"))})";                                
 
         public static string AsItalic(this string str)
             => $"*{str}*";
@@ -141,12 +140,12 @@ namespace DotDocs.Markdown
         public static string AsCode(this string str)
             => $"`{str}`";        
 
-        public static string AsMaybeLink(this ITypeable model)
+        public static string AsMaybeLink(this Type model)
         {
-            if (model is TypeModel)
-                return model.Name
-                .AsCode()
-                .AsLink("./" + model.Name);
+            //if (model is TypeModel)
+            //    return model.Name
+            //    .AsCode()
+            //    .AsLink("./" + model.Name);
             return model.Name.AsCode();
         }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DotDocs.Models.Comments
 {
-    public class CommonComment : Model
+    public class CommonComment
     {
         public string Summary { get; set; }
         public string Example { get; set; }

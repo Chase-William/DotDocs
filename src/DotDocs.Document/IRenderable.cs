@@ -1,13 +1,6 @@
 ﻿using DotDocs.IO;
 using DotDocs.Models;
-using DotDocs.Models.Language;
-using DotDocs.Render.Args;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotDocs.Render
 {
@@ -30,10 +23,10 @@ namespace DotDocs.Render
         public void Render()
         {
             foreach (var proj in Projects.Values)
-                foreach (var type in proj.Assembly.Types)
+                foreach (var type in proj.Assembly.ExportedTypes)
                     RenderType(type);
         }
 
-        public void RenderType(TypeModel model);
+        public void RenderType(Type type);
     }
 }
