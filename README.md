@@ -6,7 +6,10 @@ Generate easy add hoc docs from your C# codebase in markdown format.
 
 ## How to Use
 
-Its simple, either provide a path to the location of the repository on your local machine or provide a url to the repository's github.
+![DotDocs_how_it_works](https://github.com/Chase-William/DotDocs/assets/46757278/337229ed-06f7-4d6d-ada0-9a8e11a026f0)
+
+
+Its simple, provide a path to the location of the repository containing your C# projects and specify how Dotdocs shall render them.
 
 ```cs
 // Initialize
