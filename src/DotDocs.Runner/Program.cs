@@ -1,4 +1,6 @@
 ﻿using DotDocs.Build.Exceptions;
+using DotDocs.IO;
+using DotDocs.IO.Routing;
 using DotDocs.Markdown;
 using System;
 using System.Threading.Tasks;
@@ -10,11 +12,14 @@ namespace DotDocs.Runner
         static void Main(string[] args)
         {
             // Test test library
-            // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));
+            // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));            
             using var builder = Builder.FromPath(
                 @"C:\Dev\ex\DotDocs.TestData",
-                "docs",
-                new MarkdownRenderer());
+                new MarkdownRenderer(
+                    new TextFileOutput(
+                        "docs",
+                        new FlatRouter(),
+                        ".md")));
             Run(builder);
         }
 

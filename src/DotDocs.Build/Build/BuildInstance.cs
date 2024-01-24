@@ -128,8 +128,13 @@ namespace DotDocs.Build.Build
             ) {
 
             build.InitMetadataLoadCtx(asmPaths);
+            
             // Create a blank instance providing a target for dependencies to add themselves to
-            var projModel = new ProjectModel(build.ProjectFileName, build.Assembly, build.MetadataLoadCtx);
+            var projModel = new ProjectModel(
+                build.ProjectFileName, 
+                build.Assembly,
+                build.DocumentationFilePath,
+                build.MetadataLoadCtx);
 
             // Process nodes starting at the highest level leaf (furtherest into the tree)
             foreach (var proj in build.DependencyBuilds)

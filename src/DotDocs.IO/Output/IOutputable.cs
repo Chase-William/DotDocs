@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 namespace DotDocs.IO
 {
     public interface IOutputable
-    {
-        public bool IsValid();
+    {        
+        public void Clean();
 
-        public void Prepare();
-
-        public string GetValue();
+        public void Write(Type type, in StringBuilder builder);
     }
 }

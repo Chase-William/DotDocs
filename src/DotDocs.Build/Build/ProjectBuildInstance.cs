@@ -1,5 +1,6 @@
 ﻿using DotDocs.Build.Util;
 using DotDocs.Models;
+using LoxSmoke.DocXml;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -85,7 +86,14 @@ namespace DotDocs.Build.Build
             };
         }
 
-        
+        //public void AddCommentsToDictionary(Dictionary<string, CommonComments> comments)
+        //{
+        //    // Load XML documentation file
+        //    DocXmlReader reader = new DocXmlReader(DocumentationFilePath);
+
+
+        //}
+
         public void InitMetadataLoadCtx(ImmutableArray<string> assemblies)
         {
             // if (MetadataLoadCtx != null)

@@ -1,73 +1,137 @@
-﻿using DotDocs.IO;
+﻿using DocXml.Reflection;
+using DotDocs.IO;
+using DotDocs.IO.Routing;
 using DotDocs.Models;
 using DotDocs.Render;
+using LoxSmoke.DocXml;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 
 namespace DotDocs.Markdown
-{
+{    
     public class MarkdownRenderer : IRenderable
     {
-        const int DEFAULT_STR_BUILDER_CAPACITY = 256;
-        const BindingFlags DEFAULT_SEARCH = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public;
+        const int DEFAULT_STR_BUILDER_CAPACITY = 256;        
 
         public RepositoryModel Model { get; set; }
 
         public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
 
-        public IOutputable Output { get; set; }
-         
+        public Dictionary<string, CommonComments> Comments { get; set; } = new();
 
-        public void RenderType(Type type)
+        public IOutputable Output { get; set; }
+
+        public MarkdownRenderer(IOutputable output)
+        {
+            Output = output;
+        }
+
+        public void Init(
+            RepositoryModel model,
+            ImmutableDictionary<string, ProjectModel> projects
+            ) {
+            Model = model;
+            Projects = projects;
+
+            RenderHelper.Output = Output;
+            RenderHelper.Builder = new StringBuilder(DEFAULT_STR_BUILDER_CAPACITY);
+            RenderHelper.Assemblies = Projects.ToImmutableDictionary(k => k.Value.Assembly.GetKey(), v => v.Value.Assembly);
+
+            // Loop to create all comments
+            foreach (var proj in Projects.Values)
+            {
+                // Load XML documentation file
+                var reader = new DocXmlReader(proj.DocumentationFilePath);
+                foreach (var type in proj.Assembly.ExportedTypes)
+                {
+                    // Create key/value for type comment and it's member comments
+                    Comments.Add(type.ToNameString(), reader.GetTypeComments(type));
+
+                    foreach (var field in type.GetFieldsForRendering())                    
+                        Comments.Add(field.FieldId(), reader.GetMemberComments(field));
+                    foreach (var method in type.GetMethodsForRendering())
+                        Comments.Add(method.MethodId(), reader.GetMethodComments(method));
+                    foreach (var prop in type.GetPropertiesForRendering())
+                        Comments.Add(prop.PropertyId(), reader.GetMemberComments(prop));
+                    foreach (var _event in type.GetEventsForRendering())
+                        Comments.Add(_event.EventId(), reader.GetMemberComments(_event));
+                }
+            }
+            Console.WriteLine();
+        }
+
+        public void Render()
+        {
+            foreach (var proj in Projects.Values)
+                foreach (var type in proj.Assembly.ExportedTypes)
+                {                    
+                    // Begin rendering to buffer
+                    RenderType(type, RenderHelper.Builder);
+                    // Write buffer into file
+                    Output.Write(type, RenderHelper.Builder);
+                    // Clear re-used string builder
+                    RenderHelper.Builder.Clear();
+                }
+        }
+
+        public void RenderType(Type type, StringBuilder builder)
         {
             try
             {
-                var builder = new StringBuilder(DEFAULT_STR_BUILDER_CAPACITY);
-                using var fstream = File.CreateText(Path.Combine(Output.GetValue(), type.Name + ".md"));
-
                 // Class Name
-                builder.AppendMarkdownHeader(type.Name, HeaderVariant.H1, false);
+                type.Name.PutMarkdownHeader(HeaderVariant.H1, false);
                 if (type.BaseType is not null)
                     builder.Append($" : {type.BaseType.AsMaybeLink()}");
-                builder.LinePadding();
+                Markdown.DEFAULT_SPACING.Put();                
 
-                builder.AppendMarkdownHeader("Exported Fields", HeaderVariant.H2);
-                type.GetFields(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
+                if (Comments.TryGetValue(type.ToNameString(), out CommonComments value))
                 {
-                    builder.AppendMarkdownHeader($"{m.FieldType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);                                          
+                    value.Summary.Put();
+                    Markdown.DEFAULT_SPACING.Put();
+                }
+
+                "Exported Fields".PutMarkdownHeader(HeaderVariant.H2);
+                type.GetFieldsForRendering().ToMarkdown(m =>
+                {
+                    $"{m.FieldType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);                                          
 
                     return Padding.NoPadding;
                 });
 
-                builder.AppendMarkdownHeader("Exported Methods", HeaderVariant.H2);
-                type.GetMethods(DEFAULT_SEARCH)
-                    .Where(m => !m.Attributes.HasFlag(MethodAttributes.SpecialName)).ToMarkdown(builder, (m) =>
+                "Exported Methods".PutMarkdownHeader(HeaderVariant.H2);
+                type.GetMethodsForRendering().ToMarkdown(m =>
                 {
-                    builder.AppendMarkdownHeader($"{m.ReturnType.AsMaybeLink()} {m.Name}", HeaderVariant.H3, false);
+                    $"{m.ReturnType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3, false);
                    
                     // Create parameter listing
-                    builder.Append(m.GetParameters().AsMarkdownParams());
-                    
-
+                    builder.Append(m.GetParameters().AsMarkdownParams());                    
                     return Padding.Default;
                 });
 
-                builder.AppendMarkdownHeader("Exported Propertes", HeaderVariant.H2);
-                type.GetProperties(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
+                "Exported Propertes".PutMarkdownHeader(HeaderVariant.H2);
+                type.GetPropertiesForRendering().ToMarkdown(m =>
                 {
-                    builder.AppendMarkdownHeader($"{m.PropertyType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
+                    $"{m.PropertyType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);
                     return Padding.NoPadding;
                 });
 
-                builder.AppendMarkdownHeader("Exported Events", HeaderVariant.H2);
-                type.GetEvents(DEFAULT_SEARCH).ToMarkdown(builder, (m) =>
+                "Exported Events".PutMarkdownHeader(HeaderVariant.H2);
+                type.GetEventsForRendering().ToMarkdown(m =>
                 {
-                    builder.AppendMarkdownHeader($"{m.EventHandlerType.AsMaybeLink()} {m.Name}", HeaderVariant.H3);
-                    return Padding.NoPadding;
-                });
+                    string typeStr;
 
-                fstream.Write(builder);
+                    if (m.EventHandlerType.GenericTypeArguments.Length != 0)
+                        typeStr = $"{m.EventHandlerType.ToNameString()}"
+                            .AsCode();
+                    else
+                        typeStr = m.EventHandlerType.Name
+                            .AsNameWithoutGenericInfo()
+                            .AsCode();
+
+                    $"{typeStr} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);
+                    return Padding.NoPadding;
+                });                
             }
             catch (Exception ex)
             {
@@ -75,128 +139,22 @@ namespace DotDocs.Markdown
                 throw;
             }
         }
-    }
-
-    public enum HeaderVariant : byte
+    }      
+    
+    public static class Filtering
     {
-        H1 = 1,
-        H2,
-        H3,
-        H4,
-        H5
+        const BindingFlags DEFAULT_SEARCH = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public;
+
+        public static IEnumerable<FieldInfo> GetFieldsForRendering(this Type type)
+            => type.GetFields(DEFAULT_SEARCH);
+
+        public static IEnumerable<MethodInfo> GetMethodsForRendering(this Type type)
+            => type.GetMethods(DEFAULT_SEARCH).Where(m => !m.Attributes.HasFlag(MethodAttributes.SpecialName));
+
+        public static IEnumerable<PropertyInfo> GetPropertiesForRendering(this Type type)
+            => type.GetProperties(DEFAULT_SEARCH);        
+
+        public static IEnumerable<EventInfo> GetEventsForRendering(this Type type)
+            => type.GetEvents(DEFAULT_SEARCH);
     }
-
-    /// <summary>
-    /// 
-    /// 
-    /// If output will be just a output file stream, then results should be written directly there
-    /// instead of new string instances.
-    /// 
-    /// 
-    /// </summary>
-
-    public enum Padding
-    {
-        Default,
-        NoPadding
-    }
-
-    public static class Extensions
-    {
-        const string DEFAULT_SPACING = "\n\n";
-
-        /// <summary>
-        /// Iterates over a collection of models calling the given render function on each one.
-        /// After each callback, default line padding is added to the provided <see cref="StringBuilder"/>.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="models"></param>
-        /// <param name="builder"></param>
-        /// <param name="render"></param>
-        public static void ToMarkdown<T>(
-            this IEnumerable<T> models,
-            StringBuilder builder,
-            Func<T, Padding> render
-            ) {
-            foreach (var model in models)
-            {
-                if (render(model) == Padding.Default)
-                    builder.LinePadding();
-            }
-        }
-
-        public static string AsMarkdownParams(this IEnumerable<ParameterInfo> _params)        
-            => $"({string.Join(", ", _params.Select(p => $"{p.ParameterType.Name.AsCode()} {p.Name.AsItalic()}"))})";                                
-
-        public static string AsItalic(this string str)
-            => $"*{str}*";
-
-        public static string AsBold(this string str)
-            => $"**{str}**";
-
-        public static string AsBoldItalic(this string str)
-            => $"***{str}***";
-
-        public static string AsCode(this string str)
-            => $"`{str}`";        
-
-        public static string AsMaybeLink(this Type model)
-        {
-            //if (model is TypeModel)
-            //    return model.Name
-            //    .AsCode()
-            //    .AsLink("./" + model.Name);
-            return model.Name.AsCode();
-        }
-
-        //public static string AsLink(this TypeModel model)
-        //    => model.Name
-        //        .AsCode()
-        //        .AsLink("./" + model.Name);
-
-        public static string AsLink(this string str, string href)
-            => $"[{str}]({href})";
-
-        public static void AppendMarkdownHeader(
-            this StringBuilder builder,
-            string str,
-            HeaderVariant variant,
-            bool padded = true
-            ) {            
-            // + 1 for space character
-            var temp = new char[(int)variant + 1];
-            byte i = 0;
-            for (; i < (byte)variant; i++)
-                temp[i] = '#';
-            temp[i++] = ' ';
-
-            builder.Append(temp);
-            builder.Append(str);
-            if (padded)
-                builder.LinePadding();
-        }
-
-        /// <summary>
-        /// Adds a line height padding using <see cref="DEFAULT_SPACING"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static void LinePadding(this StringBuilder builder)
-            => builder.Append(DEFAULT_SPACING);
-    }
-
-    //public static class Extensions
-    //{
-    //    public static void Render(this TypeModel model, IOutputable output)
-    //    {
-    //        string fullPath = model.FullName.Replace('.', '/');
-    //        try
-    //        {
-    //            // File.Create(Path.Combine(output. fullPath + ".md");
-    //        }
-    //        catch
-    //        {
-    //            throw;
-    //        }
-    //    }
-    //}
 }

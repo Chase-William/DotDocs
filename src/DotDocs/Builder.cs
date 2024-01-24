@@ -8,6 +8,8 @@ using DotDocs.IO;
 using System.Collections.Immutable;
 using System.Linq;
 
+using LoxSmoke.DocXml;
+
 namespace DotDocs
 {           
     /// <summary>
@@ -20,11 +22,6 @@ namespace DotDocs
         /// The location of repository.
         /// </summary>
         internal ISourceable Source { get; private set; }
-
-        /// <summary>
-        /// Output render results will be written to.
-        /// </summary>
-        internal IOutputable Output { get; private set; }
         #endregion
 
         #region Data
@@ -41,10 +38,9 @@ namespace DotDocs
         public IRenderable Renderer { get; init; }
                 
 
-        private Builder(ISourceable _src, string _output, IRenderable renderable)
+        private Builder(ISourceable _src, IRenderable renderable)
         {
             Source = _src;
-            Output = new FileOutput(_output); // Change when other outputs are available
             Renderer = renderable;
         }
 
@@ -54,8 +50,8 @@ namespace DotDocs
         /// <param name="url">Url to the github repository.</param>
         /// <param name="outDir">Location on disk to write render results to.</param>
         /// <returns></returns>
-        public static Builder FromUrl(string url, string outDir, IRenderable renderable)
-            => new(new GitCloneSource(url), outDir, renderable);
+        public static Builder FromUrl(string url, IRenderable renderable)
+            => new(new GitCloneSource(url), renderable);
 
         /// <summary>
         /// Service from a path.
@@ -63,8 +59,8 @@ namespace DotDocs
         /// <param name="path">Location of the repsitory root dir.</param>
         /// /// <param name="outDir">Location on disk to write render results to.</param>
         /// <returns></returns>
-        public static Builder FromPath(string path, string outDir, IRenderable renderable)
-            => new(new LocalSource(path), outDir, renderable);
+        public static Builder FromPath(string path, IRenderable renderable)
+            => new(new LocalSource(path), renderable);
 
 
         public void Prepare()
@@ -82,11 +78,11 @@ namespace DotDocs
                 // -- Prepare output
 
                 // Prepare output directory
-                Output.Prepare();
+                Renderer.Output.Clean();
 
                 // Ensure output direct is valid before proceeding
-                if (!Output.IsValid())                
-                    throw new Exception($"Invalid Output: {Output}");                
+                // if (!Output.IsValid())                
+                    // throw new Exception($"Invalid Output: {Output}");                
             }
             catch
             {
@@ -115,14 +111,14 @@ namespace DotDocs
                 // Apply built repository results to a model structure going top -> down
                 // Assign results to respective properties via destructure
                 var projects = new Dictionary<string, ProjectModel>();
-                var repoModel = new RepositoryModel().Apply(repo, projects);
+                var repoModel = new RepositoryModel().Apply(repo, projects);                         
+
                 // Use RepositoryModel & Projects as data source for rendering
                 // RepoModel & Projects dict share the same data,
                 // they both providea  different perspective
-                Renderer.Prepare(
+                Renderer.Init(
                     repoModel, 
-                    projects.ToImmutableDictionary(), 
-                    Output);
+                    projects.ToImmutableDictionary());
             }
             catch
             {

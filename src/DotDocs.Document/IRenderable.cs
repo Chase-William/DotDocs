@@ -1,6 +1,7 @@
 ﻿using DotDocs.IO;
 using DotDocs.Models;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace DotDocs.Render
 {
@@ -10,23 +11,12 @@ namespace DotDocs.Render
         public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
         public IOutputable Output { get; set; }
 
-        public void Prepare(
+        public void Init(
             RepositoryModel model,
-            ImmutableDictionary<string, ProjectModel> projects,
-            IOutputable output)
-        {
-            Model = model;
-            Projects = projects;
-            Output = output;
-        }
+            ImmutableDictionary<string, ProjectModel> projects);
 
-        public void Render()
-        {
-            foreach (var proj in Projects.Values)
-                foreach (var type in proj.Assembly.ExportedTypes)
-                    RenderType(type);
-        }
+        public void Render();    
 
-        public void RenderType(Type type);
+        public void RenderType(Type type, StringBuilder builder);
     }
 }

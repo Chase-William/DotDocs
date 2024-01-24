@@ -154,24 +154,6 @@ namespace DotDocs.Build
                 projects.Add(ProjectDocument.From(proj, projectFiles, projects));
             }
             return projects.Where(proj => proj.Parent == null).ToArray();
-        }
-
-        //public void Dispose()
-        //{
-        //    // Deleted cloned repo            
-        //    // Release metadataloadcontext'd assemblies
-        //    build?.Dispose();
-
-        //    // Delete repo from disk if it exists
-        //    //if (Directory.Exists(Dir))
-        //    //{
-        //    //    // Using powershell because Directory.Delete recursive cannot delete some files for some reason.
-        //    //    // .git's objects/pack/*.dix and *.pack files.. their not locked, just dont have access to the path
-        //    //    // This is my work around below:
-        //    //    using PowerShell powershell = PowerShell.Create();
-        //    //    powershell.AddScript($"rm -r -fo {Dir}");
-        //    //    powershell.Invoke(); // Run powershell            
-        //    //}
-        //}        
+        }    
     }
 }
