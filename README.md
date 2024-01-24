@@ -1,4 +1,8 @@
+![DotDocs_logo_150x150](https://github.com/Chase-William/DotDocs/assets/46757278/ca2b9be4-b1cf-4775-bb04-7a6e5ff7db82)
+
 # DotDocs
+
+Generate easy add hoc docs from your C# codebase in markdown format.
 
 ## How to Use
 
@@ -7,9 +11,9 @@ Its simple, either provide a path to the location of the repository on your loca
 ```cs
 // Initialize
 var builder = Builder.FromPath(
-    @"C:\Dev\ex\DotDocs.TestData",
+    "<repo root directory>",
     new MarkdownRenderer(
-        new TextFileOutput("docs", new FlatRouter(), ".md")
+        new TextFileOutput("<output dir>", new FlatRouter(), ".md")
         )
     );
 
