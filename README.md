@@ -1,15 +1,22 @@
+![DotDocs_logo_150x150](https://github.com/Chase-William/DotDocs/assets/46757278/ca2b9be4-b1cf-4775-bb04-7a6e5ff7db82)
+
 # DotDocs
+
+Generate easy add hoc docs from your C# codebase in markdown format.
 
 ## How to Use
 
-Its simple, either provide a path to the location of the repository on your local machine or provide a url to the repository's github.
+![DotDocs_how_it_works](https://github.com/Chase-William/DotDocs/assets/46757278/337229ed-06f7-4d6d-ada0-9a8e11a026f0)
+
+
+Its simple, provide a path to the location of the repository containing your C# projects and specify how Dotdocs shall render them.
 
 ```cs
 // Initialize
 var builder = Builder.FromPath(
-    @"C:\Dev\ex\DotDocs.TestData",
+    "<repo root directory>",
     new MarkdownRenderer(
-        new TextFileOutput("docs", new FlatRouter(), ".md")
+        new TextFileOutput("<output dir>", new FlatRouter(), ".md")
         )
     );
 
