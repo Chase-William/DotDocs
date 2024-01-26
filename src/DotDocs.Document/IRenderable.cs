@@ -18,5 +18,7 @@ namespace DotDocs.Render
         public void Render();    
 
         public void RenderType(Type type, StringBuilder builder);
+
+        public void RenderEnum(Type type, StringBuilder builder);
     }
 }
