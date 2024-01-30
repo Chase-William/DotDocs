@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DotDocs.Render
 {
-    public interface IRenderable
+    public interface IRenderer
     {
         public RepositoryModel Model { get; set; }
         public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
@@ -17,7 +17,13 @@ namespace DotDocs.Render
 
         public void Render();    
 
-        public void RenderType(Type type, StringBuilder builder);
+        public void RenderClass(Type type, StringBuilder builder);
+
+        public void RenderStruct(Type type, StringBuilder builder);
+
+        public void RenderInterface(Type type, StringBuilder builder);
+
+        public void RenderDelegate(Type type, StringBuilder builder);
 
         public void RenderEnum(Type type, StringBuilder builder);
     }

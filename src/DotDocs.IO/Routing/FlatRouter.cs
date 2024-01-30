@@ -11,10 +11,15 @@ namespace DotDocs.IO.Routing
     /// </summary>
     public class FlatRouter : IRouterable
     {       
-        public string GetFileName(Type type)
+        public string GetName(Type type)
             => type.FullName ?? throw new Exception($"Type {type} has null Fullname property.");
-
-        public string GetDir(Type type)
+        
+        public string GetLocation(Type type)
             => string.Empty;
+
+        public string GetRoute(Type from, Type to)
+        {
+            return $"./{GetName(to)}";
+        }
     }
 }

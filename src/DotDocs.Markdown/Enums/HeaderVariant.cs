@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown
+namespace DotDocs.Markdown.Enums
 {
     public enum HeaderVariant : byte
     {
@@ -13,18 +13,5 @@ namespace DotDocs.Markdown
         H3,
         H4,
         H5
-    }
-
-    public enum Padding
-    {
-        NewLine,
-        DoubleNewLine,
-        NoPadding
-    }
-
-    public enum ListStyle
-    {
-        Ordered,
-        Unordered
     }
 }

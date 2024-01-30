@@ -2,7 +2,7 @@
 
 # DotDocs
 
-Generate easy add hoc docs from your C# codebase in markdown format.
+Generate easy add hoc docs from your C# codebase in markdown.
 
 ## How to Use
 
@@ -37,6 +37,36 @@ Collects metadata, issues the MSBuild system to compile the root project and its
 ### Document();
 
 Uses models to generate markdown files for each corresponding type and its members.
+
+## Comment Rendering
+
+Render output from comments can vary depending on state of the comment itself and/or the entity it denotes. This section aims to provide clarity as to how rendering behavior varies depending on state.
+
+- If *Summary*, *Example*, or *Remarks* are empty, they'll just skip rendering.
+- A bullot listing of *Type Parameters*, *Type Arguments*, *Parameters*, and *Returns* will always be provided agnostic to the existance of associated comments.
+- By default exported properties must allow public access to either the *get* or *set* or both methods. Therefore, if a *get* or *set* is hidden otherwise, include it in the documentation. See examples in *formats*.
+
+***See Examples in [formats](./formats/) folder.***
+
+#### No Comments:
+```java
+// Remember this is not rendered into Markdown in the example...
+- *@typeparam* `T`
+- *@param* `string` ***str***
+- *@param* `T` ***_value***
+- *@returns* `ulong`
+```
+
+#### With Comments:
+
+```java
+- *@typeparam* `T`, Tempor incididunt ut labore et.
+- *@param* `string` ***str***, Consectetur adipiscing elit, sed eiusmod tempor incididunt ut labore et dolore magna aliqua.
+- *@param* `T` ***_value***, Elit, sed eiusmod tempor incididunt ut labore et dolore magna aliqua.
+- *@returns* `ulong`, Adipiscing elit, sed eiusmod tempor incididunt ut labore et dolore magna aliqua.
+```
+
+The bullet listing even without comments can assist in visually parsing complex delcarations.
 
 ## About Markdown Rendering
 

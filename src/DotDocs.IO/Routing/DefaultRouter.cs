@@ -11,11 +11,16 @@ namespace DotDocs.IO.Routing
     /// </summary>
     public class DefaultRouter : IRouterable
     {
-        public string GetFileName(Type type)
+        public string GetName(Type type)
              => type.Name;
 
-        public string GetDir(Type type)
+        public string GetLocation(Type type)
             // Join an array of strings taken from the splitting of the fullname where we took from 0 to len - 1 exclusive
-            => string.Join('/', (type.FullName ?? throw new Exception($"Type {type} has null Fullname property.")).Split('.')[..^1]);        
+            => string.Join('/', (type.FullName ?? throw new Exception($"Type {type} has null Fullname property.")).Split('.')[..^1]);
+
+        public string GetRoute(Type from, Type to)
+        {
+            return Path.GetRelativePath(GetLocation(from), GetLocation(to));
+        }
     }
 }

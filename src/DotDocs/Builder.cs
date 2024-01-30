@@ -35,10 +35,10 @@ namespace DotDocs
         internal Dictionary<string, ProjectModel> Projects { get; private set; }
         #endregion
 
-        public IRenderable Renderer { get; init; }
+        public IRenderer Renderer { get; init; }
                 
 
-        private Builder(ISourceable _src, IRenderable renderable)
+        private Builder(ISourceable _src, IRenderer renderable)
         {
             Source = _src;
             Renderer = renderable;
@@ -50,7 +50,7 @@ namespace DotDocs
         /// <param name="url">Url to the github repository.</param>
         /// <param name="outDir">Location on disk to write render results to.</param>
         /// <returns></returns>
-        public static Builder FromUrl(string url, IRenderable renderable)
+        public static Builder FromUrl(string url, IRenderer renderable)
             => new(new GitCloneSource(url), renderable);
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace DotDocs
         /// <param name="path">Location of the repsitory root dir.</param>
         /// /// <param name="outDir">Location on disk to write render results to.</param>
         /// <returns></returns>
-        public static Builder FromPath(string path, IRenderable renderable)
+        public static Builder FromPath(string path, IRenderer renderable)
             => new(new LocalSource(path), renderable);
 
 

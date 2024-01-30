@@ -8,7 +8,8 @@ namespace DotDocs.IO.Routing
 {
     public interface IRouterable
     {
-        public string GetFileName(Type type);
-        public string GetDir(Type type);
+        public string GetRoute(Type from, Type to);
+        public string GetName(Type type);
+        public string GetLocation(Type type);
     }
 }

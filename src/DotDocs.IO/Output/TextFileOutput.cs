@@ -60,10 +60,10 @@ namespace DotDocs.IO
         {
             try
             {
-                string folderPath = Path.Combine(OutDirBase, Router.GetDir(type));
+                string folderPath = Path.Combine(OutDirBase, Router.GetLocation(type));
                 if (!Directory.Exists(folderPath))
                     Directory.CreateDirectory(folderPath);
-                using var fstream = File.CreateText(Path.Combine(folderPath, Router.GetFileName(type)) + FileEx);
+                using var fstream = File.CreateText(Path.Combine(folderPath, Router.GetName(type)) + FileEx);
                 fstream.Write(builder);
             }
             catch

@@ -1,6 +1,9 @@
 ﻿using DocXml.Reflection;
 using DotDocs.IO;
 using DotDocs.IO.Routing;
+using DotDocs.Markdown.Components;
+using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.SubRenderers;
 using DotDocs.Models;
 using DotDocs.Render;
 using LoxSmoke.DocXml;
@@ -11,21 +14,30 @@ using System.Text;
 
 namespace DotDocs.Markdown
 {    
-    public class MarkdownRenderer : IRenderable
-    {
-        const int DEFAULT_STR_BUILDER_CAPACITY = 256;        
-
+    public class MarkdownRenderer : IRenderer
+    {        
+        #region Data Sources
         public RepositoryModel Model { get; set; }
 
         public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
 
         public Dictionary<string, CommonComments> Comments { get; set; } = new();
+        #endregion
 
         public IOutputable Output { get; set; }
+
+        public MethodRenderer MethodRenderer { get; init; }
+        public PropertyRenderer PropertyRenderer { get; init; }
+        public EventRenderer EventRenderer { get; init; }
+        public FieldRenderer FieldRenderer { get; init; }
 
         public MarkdownRenderer(IOutputable output)
         {
             Output = output;
+            MethodRenderer = new MethodRenderer(new MethodDeclaration());
+            PropertyRenderer = new PropertyRenderer(new PropertyDeclaration());
+            EventRenderer = new EventRenderer(new EventCodeBlockDeclaration());
+            FieldRenderer = new FieldRenderer(new FieldCodeBlockDeclaration());
         }
 
         public void Init(
@@ -69,8 +81,8 @@ namespace DotDocs.Markdown
                     // Load other comments too
                     foreach (var method in type.GetMethodsForRendering())
                         Comments.Add(method.MethodId(), reader.GetMethodComments(method));
-                    foreach (var prop in type.GetPropertiesForRendering())
-                        Comments.Add(prop.PropertyId(), reader.GetMemberComments(prop));
+                    foreach (var prop in type.GetPropertiesForRendering())                    
+                        Comments.Add(prop.PropertyId(), reader.GetMemberComments(prop));                    
                     foreach (var _event in type.GetEventsForRendering())
                         Comments.Add(_event.EventId(), reader.GetMemberComments(_event));
                 }
@@ -78,8 +90,7 @@ namespace DotDocs.Markdown
 
             // Update render state so rendering may occur
             RenderState.UpdateState(
-                new StringBuilder(DEFAULT_STR_BUILDER_CAPACITY),
-                Projects.ToImmutableDictionary(k => k.Value.Assembly.FullName, v => v.Value.Assembly),
+                Projects.ToImmutableDictionary(k => k.Value.Assembly.FullName!, v => v.Value.Assembly),
                 Comments.ToImmutableDictionary(),
                 Output);
         }
@@ -88,24 +99,92 @@ namespace DotDocs.Markdown
         {
             var builder = RenderState.Builder;
 
+            var multicastDel = typeof(MulticastDelegate);
+
             foreach (var proj in Projects.Values)
                 foreach (var type in proj.Assembly.ExportedTypes)
                 {
-                    if (type.IsEnum)
-                    { 
-                        // Render enums here
+                    if (type.IsClass)
+                        RenderClass(type, builder);
+                    else if (type.IsEnum)
                         RenderEnum(type, builder);
-                    }
+                    else if (type.IsInterface)
+                        RenderInterface(type, builder);
+                    else if (type.IsValueType)
+                        RenderStruct(type, builder);
+                    else if (type.BaseType?.Name.Equals(multicastDel.Name) ?? false)
+                        RenderDelegate(type, builder);
                     else
-                    {
-                        // Render other types here
-                        RenderType(type, builder);
-                    }                    
+                        throw new Exception($"The type {type.ToNameString()} did not match any known C# construct.");
                     // Write buffer into file
                     Output.Write(type, builder);
                     // Clear re-used string builder
                     builder.Clear();
                 }
+        }        
+
+        public void RenderClass(Type type, StringBuilder builder)
+        {
+            try
+            {
+#if DEBUG
+                if (type.IsEnum)
+                {
+                    throw new Exception($"Enum ${type.FullName} was attempted to be rendered by the {nameof(RenderClass)} method. It is required enumerations are rendered by {nameof(RenderEnum)} instead.");
+                }
+#endif                
+                RenderHeader(type, builder);
+
+                // Render Exported Fields
+                type.GetFieldsForTypeRendering().ToMarkdown(
+                    before: delegate {
+                        AsMarkdown.H2.Prefix("Public Fields", padding: Padding.DoubleNewLine);
+                    }, 
+                    each: FieldRenderer.Render);
+
+                // Render Exported Methods                
+                type.GetMethodsForRendering().ToMarkdown(
+                    before: delegate
+                    {
+                        AsMarkdown.H2.Prefix("Public Methods", padding: Padding.DoubleNewLine);
+                    },
+                    each: MethodRenderer.Render);
+
+                // Render Exported Properties
+                type.GetPropertiesForRendering().ToMarkdown(
+                    before: delegate
+                    {
+                        AsMarkdown.H2.Prefix("Public Properties", padding: Padding.DoubleNewLine);
+                    }, 
+                    each: PropertyRenderer.Render);
+
+                // Render Events                
+                type.GetEventsForRendering().ToMarkdown(
+                    before: delegate
+                    {
+                        AsMarkdown.H2.Prefix("Public Events", padding: Padding.DoubleNewLine);
+                    }, 
+                    each: EventRenderer.Render);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }        
+
+        public void RenderStruct(Type type, StringBuilder builder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RenderInterface(Type type, StringBuilder builder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RenderDelegate(Type type, StringBuilder builder)
+        {
+            throw new NotImplementedException();
         }
 
         public void RenderEnum(Type type, StringBuilder builder)
@@ -121,15 +200,12 @@ namespace DotDocs.Markdown
                 type.GetFieldsForEnumRendering().ToMarkdown(
                     before: delegate
                     {
-                        "Values:".PutMarkdownHeader(HeaderVariant.H2);
+                        AsMarkdown.H2.Prefix("Values", padding: Padding.DoubleNewLine);
                     },
                     each: m =>
                     {
-                        m.Name.AsListItem().Put();
-                        ", ".Put();
-                        m.PutComments(false);
-
-                        Markdown.NEW_LINE.Put();
+                        // m.Name.AsListItem().Put();                        
+                        // m.PutComments(", ", LinePadding.NewLine);                        
                     });
             }
             catch
@@ -138,124 +214,28 @@ namespace DotDocs.Markdown
             }
         }
 
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //  -- FIGUREOUT HOW WE ARE GOING TO RE-USE LARGER RENDER METHODS WHEN DEALING WITH
-        //      CLASSES, ENUMS, STRUCTS, and INTERFACES
-        //
-        //
-        //
-        //
-        //  -- Devise a better system tha Markdown.****.Put(); for putting padding..
-        //      Maybe use an enum so we can standarize with parameter types elsewhere
-        //
-        //  -- PutComments() needs options for following newlines or not
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
         void RenderHeader(Type type, StringBuilder builder)
         {
             // Class Name
-            type.Name.PutMarkdownHeader(HeaderVariant.H1, false);
+            AsMarkdown.H1.Prefix(type.Name);
             // Render the base type of the class when it's nearest parent is not System.Object
             if (type.BaseType is not null && type.BaseType?.BaseType is not null)
-                builder.Append($" {"extends".AsItalic()} {type.BaseType.AsMaybeLink()}");
-            Markdown.DOUBLE_NEW_LINE.Put();
-
-            // Render Type's Comment
-            type.PutComments();
-        }
-
-        public void RenderType(Type type, StringBuilder builder)
-        {
-            try
             {
-#if DEBUG
-                if (type.IsEnum)
-                {
-                    throw new Exception($"Enum ${type.FullName} was attempted to be rendered by the {nameof(RenderType)} method. It is required enumerations are rendered by {nameof(RenderEnum)} instead.");
-                }
-#endif
-                RenderHeader(type, builder);
-
-                // Render Exported Fields
-                type.GetFieldsForTypeRendering().ToMarkdown(
-                    before: delegate {
-                        "Exported Fields".PutMarkdownHeader(HeaderVariant.H2);
-                    }, 
-                    each: m => {
-                        $"{m.FieldType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);
-
-                        m.PutComments();
-                    });
-
-                // Render Exported Methods                
-                type.GetMethodsForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        "Exported Methods".PutMarkdownHeader(HeaderVariant.H2);
-                    },
-                    each: m =>
-                    {
-                        $"{m.ReturnType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3, false);
-
-                        // Create parameter listing
-                        builder.Append(m.GetParameters().AsMarkdownParams());
-                        Markdown.DOUBLE_NEW_LINE.Put();
-
-                        m.PutComments();
-                    });
-
-                // Render Exported Propertie                
-                type.GetPropertiesForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        "Exported Propertes".PutMarkdownHeader(HeaderVariant.H2);
-                    }, 
-                    each: m =>
-                    {
-                        $"{m.PropertyType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);
-                        m.PutComments();
-                    });
-
-                // Render Events                
-                type.GetEventsForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        "Exported Events".PutMarkdownHeader(HeaderVariant.H2);
-                    }, 
-                    each: m =>
-                    {
-                        $"{m.EventHandlerType.AsMaybeLink()} {m.Name}".PutMarkdownHeader(HeaderVariant.H3);
-
-                        m.PutComments();
-                    });
+                Padding.Space.Put();
+                AsMarkdown.Italic.Wrap("extends", Padding.Space);
+                type.BaseType.ToNameString().Put();
+                // builder.Append($" {"extends".AsItalic()} {type.BaseType.AsMaybeLink()}");
             }
-            catch (Exception ex)
+            Padding.DoubleNewLine.Put();
+
+            // Put comments for type if they exist
+            if (type.TryGetComments(out TypeComments? comments))
             {
-                throw;
+                ArgumentNullException.ThrowIfNull(comments);
+
+                type.PutSummary(comments);
+                type.PutExample(comments);
+                type.PutRemarks(comments);
             }
         }
     }      
@@ -292,7 +272,10 @@ namespace DotDocs.Markdown
             => type.GetMethods(DEFAULT_SEARCH).Where(m => !m.Attributes.HasFlag(MethodAttributes.SpecialName));
 
         public static IEnumerable<PropertyInfo> GetPropertiesForRendering(this Type type)
-            => type.GetProperties(DEFAULT_SEARCH);        
+        {
+            // Using GetRuntimeProperties as properties with *private get* and *public set* are deemed private even though one could set the value from a another assembly (sound public enough to me)
+            return type.GetRuntimeProperties();
+        }  
 
         public static IEnumerable<EventInfo> GetEventsForRendering(this Type type)
             => type.GetEvents(DEFAULT_SEARCH);
