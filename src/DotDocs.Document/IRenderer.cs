@@ -5,6 +5,8 @@ using System.Text;
 
 namespace DotDocs.Render
 {
+    public delegate void RenderType(Type type);
+
     public interface IRenderer
     {
         public RepositoryModel Model { get; set; }
@@ -15,16 +17,12 @@ namespace DotDocs.Render
             RepositoryModel model,
             ImmutableDictionary<string, ProjectModel> projects);
 
-        public void Render();    
+        public event RenderType RenderClass;
+        public event RenderType RenderStruct;
+        public event RenderType RenderInterface;
+        public event RenderType RenderDelegate;
+        public event RenderType RenderEnum;
 
-        public void RenderClass(Type type, StringBuilder builder);
-
-        public void RenderStruct(Type type, StringBuilder builder);
-
-        public void RenderInterface(Type type, StringBuilder builder);
-
-        public void RenderDelegate(Type type, StringBuilder builder);
-
-        public void RenderEnum(Type type, StringBuilder builder);
+        public void Render();            
     }
 }

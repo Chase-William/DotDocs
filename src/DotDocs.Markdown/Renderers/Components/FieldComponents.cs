@@ -7,13 +7,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown.Components
+namespace DotDocs.Markdown.Renderers.Components
 {
     public class FieldDeclaration : IComponentRenderer<FieldInfo>
     {
         public void Render(FieldInfo info, Padding padding)
         {
-            info.FieldType.MaybeLink(info.DeclaringType!, Padding.Space);
+            info.FieldType.PutTypeName(info.DeclaringType!, Padding.Space);
             info.Name.Put(Padding.NewLine);
         }
     }

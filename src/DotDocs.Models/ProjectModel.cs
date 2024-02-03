@@ -3,7 +3,9 @@
 namespace DotDocs.Models
 {
     public class ProjectModel : IDisposable
-    {        
+    {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         public string Name { get; set; }
         
         public string SDK { get; set; } = string.Empty;
@@ -20,6 +22,11 @@ namespace DotDocs.Models
 
         public ProjectModel(string name, Assembly assembly, string docPath, IDisposable mlc)
         {
+            Logger.Debug("Params: [{nameLbl}: {nameValue}, {asmLbl}: {asmValue}, {docPathLbl}: {docPathValue}, {mlcLbl}: {mlcValue}]", 
+                nameof(name), name,
+                nameof(assembly), assembly.FullName,
+                nameof(docPath), docPath,
+                nameof(mlc), mlc);
             Name = name;
             Assembly = assembly;
             DocumentationFilePath = docPath;
@@ -28,6 +35,7 @@ namespace DotDocs.Models
 
         public void Dispose()
         {
+            Logger.Trace("Cleaning up unmanaged {mlc}", _mlc.ToString());
             _mlc.Dispose();
         }
     }

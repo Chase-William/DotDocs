@@ -13,4 +13,9 @@
     <ProjectReference Include="..\DotDocs.IO\DotDocs.IO.csproj" />
     <ProjectReference Include="..\DotDocs.Markdown\DotDocs.Markdown.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

@@ -8,13 +8,16 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown.Components
+namespace DotDocs.Markdown.Renderers.Components
 {
+    /// <summary>
+    /// Displays the property like C# source code.
+    /// </summary>
     public class PropertyDeclaration : IComponentRenderer<PropertyInfo>
     {
         public void Render(PropertyInfo info, Padding padding)
         {
-            info.PropertyType.MaybeLink(info.DeclaringType!, Padding.Space);
+            info.PropertyType.PutTypeName(info.DeclaringType!, Padding.Space);
             info.Name.Put(Padding.Space);
 
             AsGeneral.OpeningCurly.Put(Padding.Space);
@@ -23,31 +26,24 @@ namespace DotDocs.Markdown.Components
             {
                 if (!info.GetMethod!.Attributes.HasFlag(MethodAttributes.Public))
                     AsMarkdown.BoldItalic.Wrap(info.GetMethod!.Attributes.GetAccessibilityString(), Padding.Space);
-                "get;".Put(Padding.Space);
+                AsMarkdown.Italic.Wrap("get");
+                AsGeneral.SemiColon.Put(Padding.Space);
             }
             // Render Set
             if (info.CanWrite)
             {
                 if (!info.SetMethod!.Attributes.HasFlag(MethodAttributes.Public))
                     AsMarkdown.BoldItalic.Wrap(info.SetMethod!.Attributes.GetAccessibilityString(), Padding.Space);
-                "set;".Put(Padding.Space);
+                AsMarkdown.Italic.Wrap("set");
+                AsGeneral.SemiColon.Put(Padding.Space);
             }
             AsGeneral.ClosingCurly.Put(Padding.DoubleNewLine);
         }
     }
 
-    public class MultilinePropertyDeclaration : IComponentRenderer<PropertyInfo>
-    {
-        public void Render(PropertyInfo info, Padding padding)
-        {
-            // Before making below:
-            //  `String` PubProperty04
-            //  - *get *;
-            //  -***private**** set*;
-            // Make common logic re-useable between the components somehow.
-        }
-    }
-
+    /// <summary>
+    /// Displays the property like C# source code inside a C# code block.
+    /// </summary>
     public class PropertyCodeBlockDeclaration : IComponentRenderer<PropertyInfo>
     {
         public void Render(PropertyInfo info, Padding padding)

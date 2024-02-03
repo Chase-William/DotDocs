@@ -16,7 +16,7 @@ namespace DotDocs.IO.Routing
 
         public string GetLocation(Type type)
             // Join an array of strings taken from the splitting of the fullname where we took from 0 to len - 1 exclusive
-            => string.Join('/', (type.FullName ?? throw new Exception($"Type {type} has null Fullname property.")).Split('.')[..^1]);
+            => string.Join('/', type.Namespace.Split('.'));
 
         public string GetRoute(Type from, Type to)
         {

@@ -5,20 +5,36 @@ namespace DotDocs.Build
 {
     public class ProjectDocument
     {
-        public ProjectDocument? Parent { get; set; }
-        public List<ProjectDocument> Dependencies { get; set; } = new();
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The possible parent for this <see cref="ProjectDocument"/> instance.
+        /// </summary>
+        public ProjectDocument? Parent { get; private set; }
+        /// <summary>
+        /// A collection of <see cref="ProjectDocument"/> instances representing the projects this project depends on.
+        /// </summary>
+        public List<ProjectDocument> Dependencies { get; private set; } = new();
+        /// <summary>
+        /// A filepath to the actualy .csproj file.
+        /// </summary>
         public string ProjectFilePath { get; init; }
 
         XDocument xDoc;
 
         private ProjectDocument(string projectFile)
         {
+            Logger.Debug("Params: [{projectFileLbl}: {projectFileValue}]", nameof(projectFile), projectFile);   
             ProjectFilePath = projectFile;
             xDoc = XDocument.Parse(File.ReadAllText(projectFile));            
         }
 
-        public void EnableDocumentationGeneration(bool recursive = true)
+        /// <summary>
+        /// Mutates this project and its dependency projects recursively so that documentation files are generated during compilation.
+        /// </summary>        
+        public void EnableDocumentationGeneration()
         {
+            Logger.Trace("Enabling documentation generation for project file: {projectfile}", ProjectFilePath);
             // Enable documenation generation on current project
             var propertyGroup = xDoc.XPathSelectElement("//PropertyGroup");
             var docGenProp = propertyGroup.Descendants().SingleOrDefault(prop => prop.Name.LocalName == "GenerateDocumentationFile");
@@ -35,23 +51,26 @@ namespace DotDocs.Build
             using (var writer = new StreamWriter(ProjectFilePath))
             {
                 xDoc.Save(writer);
-            }
+            } // Close writer before processing child nodes
                         
 
-            if (recursive)
-                foreach (var dependency in Dependencies)
-                    dependency.EnableDocumentationGeneration();
+            foreach (var dependency in Dependencies)
+                dependency.EnableDocumentationGeneration();
         }
 
         /// <summary>
-        /// Creates a project document with all referenced local projects created as well.
+        /// Creates a <see cref="ProjectDocument"/> and all dependency documents as well recursively.
         /// </summary>
-        /// <param name="projectFile"></param>
-        /// <param name="projectFiles"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <param name="projectFile">The current project file.</param>
+        /// <param name="projectFiles">A list of project files remaining.</param>
+        /// <returns>A <see cref="ProjectDocument"/> instance.</returns>
         public static ProjectDocument From(string projectFile, List<string> projectFiles, List<ProjectDocument> projects)
         {
+            Logger.Trace("Params: [{projectFileLbl}: {projectFileValue}, {projectFilesLbl}, {projectFilesValue}: {projectFilesValue}, {projectsLbl}: {projectsValue}]",
+                nameof(projectFile), projectFile,
+                nameof(projectFiles), string.Join(',', projectFiles),
+                nameof(projects), string.Join(',', projects.Select(p => p.ProjectFilePath)));
+
             ProjectDocument proj = new(projectFile);
             projectFiles.Remove(projectFile);
             // Get local project references
@@ -61,7 +80,13 @@ namespace DotDocs.Build
                 foreach (var item in itemGroup)
                     if (item.Name.LocalName == "ProjectReference")
                     {
-                        string includePath = (item.Attribute(XName.Get("Include"))?.Value) ?? throw new Exception($"No 'Include' attribute was found for the 'ProjectReference' in the .csproj file at: {projectFile}");
+                        string? includePath = item.Attribute(XName.Get("Include"))?.Value;
+                        if (includePath is null)
+                        {
+                            var ex = new Exception($"No 'Include' attribute was found for the 'ProjectReference' in the .csproj file at: {projectFile}");
+                            Logger.Fatal(ex);
+                            throw ex;
+                        }
                         // Calculate relative path from this .csproj to the included one
                         string absolutePath = Path.GetFullPath(Path.Combine(projectFile[..projectFile.LastIndexOf('\\')], includePath));
                         var dependencyProj = projects.SingleOrDefault(p => p.ProjectFilePath == absolutePath);

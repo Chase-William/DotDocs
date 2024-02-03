@@ -2,6 +2,7 @@
 using DotDocs.Models;
 using LoxSmoke.DocXml;
 using Microsoft.Build.Logging.StructuredLogger;
+using Microsoft.Build.Utilities;
 using System.Collections.Immutable;
 using System.Reflection;
 
@@ -12,6 +13,8 @@ namespace DotDocs.Build.Build
     /// </summary>
     public class ProjectBuildInstance
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         #region Binlog Variables
         const string PROJECT_NAME = "ProjectName";
         const string PROJECT_DIR = "ProjectDir";
@@ -26,7 +29,7 @@ namespace DotDocs.Build.Build
         /// <summary>
         /// The context used for loading in an assembly in a reflection-only manner.
         /// </summary>
-        public MetadataLoadContext MetadataLoadCtx { get; private set; }
+        public MetadataLoadContext? MetadataLoadCtx { get; private set; }
         /// <summary>
         /// Name of the project file.
         /// </summary>
@@ -48,6 +51,8 @@ namespace DotDocs.Build.Build
         /// </summary>
         public ImmutableArray<ProjectBuildInstance> DependencyBuilds { get; set; }
 
+        private ProjectBuildInstance() => Logger.Debug("Initializing");
+
         /// <summary>
         /// Create a new <see cref="ProjectBuildInstance"/> from the provided build evaluation
         /// and it's dependent builds.
@@ -57,6 +62,8 @@ namespace DotDocs.Build.Build
         /// <returns></returns>
         public static ProjectBuildInstance From(ProjectEvaluation buildEval, List<ProjectBuildInstance> projects)
         {
+            Logger.Trace("Creating a {projBuildInstance} from the given build evaluation of this project file: {buildEval}", typeof(ProjectBuildInstance).FullName, buildEval.ProjectFile);
+
             var props = buildEval.FindChild<Folder>("Properties");
             var properties = props.Children.Cast<NameValueNode>().Where(p =>
             {
@@ -82,61 +89,34 @@ namespace DotDocs.Build.Build
                 ProjectFileName = properties[PROJECT_FILE_NAME].Value,
                 AssemblyFilePath = properties[TARGET_PATH].Value,
                 DocumentationFilePath = Path.Combine(projDir, properties[DOCUMENTATION_FILE].Value),
-                DependencyBuilds = GetDependentBuilds(buildEval, projects)
+                DependencyBuilds = GetDependencyBuilds(buildEval, projects)
             };
         }
 
-        //public void AddCommentsToDictionary(Dictionary<string, CommonComments> comments)
-        //{
-        //    // Load XML documentation file
-        //    DocXmlReader reader = new DocXmlReader(DocumentationFilePath);
-
-
-        //}
-
+        /// <summary>
+        /// Initializes a new <see cref="MetadataLoadContext"/> instance for the current <see cref="ProjectBuildInstance"/> instance.
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="MetadataLoadContext"/> created will be used to inspect the assembly and its contents created from the build.
+        /// </remarks>
+        /// <param name="assemblies">Supporting assemblies that may be needed.</param>
         public void InitMetadataLoadCtx(ImmutableArray<string> assemblies)
         {
-            // if (MetadataLoadCtx != null)
-                // Dispose();
+            Logger.Debug("Initializing a new {mlc} for this: {assembly}.", typeof(MetadataLoadContext).FullName, AssemblyFilePath);
+
             MetadataLoadCtx = new MetadataLoadContext(new PathAssemblyResolver(assemblies));
             Assembly = MetadataLoadCtx.LoadFromAssemblyPath(AssemblyFilePath);
-            
-
-            /*
-             * Do not add all types unless they are relevant to the custom types created by the developer(s)
-             * or if they are public. All types used in some way by the developer(s')('s) types will be added
-             * to the type list. That said, if a type is public and available to be used by external libraries,
-             * ensure that type is accounted for regardless if it's compiler generated.
-             */
-            // var userTypes = Assembly.DefinedTypes.ToList();
-            //.Where(type => !type
-            //    .CustomAttributes
-            //    .Any(attr => attr.AttributeType.Name == typeof(CompilerGeneratedAttribute).Name) ||
-            //        type.IsPublic && !type.IsNestedFamORAssem);
-
-            // return new ProjectModel();//, this);
-            // return new ProjectModel().Apply(this);
-
-            //var models = new List<UserTypeModel>();
-            //foreach (var type in userTypes)
-            //    models.Add(new UserTypeModel(type));
-            //Models = models.ToImmutableArray();
         }
 
         /// <summary>
-        /// Disposes of unmanaged resources for this build.
-        /// </summary>
-        //public void Dispose()
-        //    => mlc?.Dispose();
-
-        /// <summary>
-        /// Gets all dependencies of the given project evaluation;
-        /// operates in a depth-first-search mode.
+        /// Gets all dependencies of the given project evaluation; operates in a depth-first-search mode.
         /// </summary>
         /// <param name="projectEval">Current project.</param>
-        /// <returns>All <see cref="LocalProjectModel"/> dependencies of the current.</returns>
-        static ImmutableArray<ProjectBuildInstance> GetDependentBuilds(ProjectEvaluation projectEval, List<ProjectBuildInstance> allProjects)
+        /// <returns>All <see cref="ProjectModel"/> dependencies of the current.</returns>
+        static ImmutableArray<ProjectBuildInstance> GetDependencyBuilds(ProjectEvaluation projectEval, List<ProjectBuildInstance> allProjects)
         {
+            Logger.Trace("Getting all dependency builds for eval of project file: {projectFile}", projectEval.ProjectFile);
+
             var items = projectEval.FindChild<Folder>("Items");
             var addItems = items.FindChild<AddItem>("ProjectReference");
             if (addItems == null || addItems.Children.Count == 0)

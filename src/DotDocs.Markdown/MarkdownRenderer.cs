@@ -1,21 +1,25 @@
 ﻿using DocXml.Reflection;
 using DotDocs.IO;
-using DotDocs.IO.Routing;
-using DotDocs.Markdown.Components;
 using DotDocs.Markdown.Enums;
-using DotDocs.Markdown.SubRenderers;
+using DotDocs.Markdown.Renderers.Aggregators;
+using DotDocs.Markdown.Renderers.Components;
+using DotDocs.Markdown.Renderers.Members;
+using DotDocs.Markdown.Renderers.Sections;
+using DotDocs.Markdown.Renderers.Sections.Header;
+using DotDocs.Markdown.Renderers.Types;
 using DotDocs.Models;
 using DotDocs.Render;
 using LoxSmoke.DocXml;
 using System.Collections.Immutable;
 using System.Reflection;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace DotDocs.Markdown
-{    
+{
     public class MarkdownRenderer : IRenderer
-    {        
+    {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         #region Data Sources
         public RepositoryModel Model { get; set; }
 
@@ -24,26 +28,83 @@ namespace DotDocs.Markdown
         public Dictionary<string, CommonComments> Comments { get; set; } = new();
         #endregion
 
+        public event RenderType RenderClass;
+
+        public event RenderType RenderStruct;
+
+        public event RenderType RenderInterface;
+
+        public event RenderType RenderDelegate;
+
+        public event RenderType RenderEnum;
+
         public IOutputable Output { get; set; }
 
-        public MethodRenderer MethodRenderer { get; init; }
-        public PropertyRenderer PropertyRenderer { get; init; }
-        public EventRenderer EventRenderer { get; init; }
-        public FieldRenderer FieldRenderer { get; init; }
+        #region Type Renderers
+        public ITypeRenderer ClassRenderer { get; init; }
+        public ITypeRenderer InterfaceRenderer { get; init; }
+        public ITypeRenderer StructRenderer { get; init; }
+        public ITypeRenderer EnumRenderer { get; init; }
+        public ITypeRenderer DelegateRenderer { get; init; }
+        #endregion
 
         public MarkdownRenderer(IOutputable output)
         {
-            Output = output;
-            MethodRenderer = new MethodRenderer(new MethodDeclaration());
-            PropertyRenderer = new PropertyRenderer(new PropertyDeclaration());
-            EventRenderer = new EventRenderer(new EventCodeBlockDeclaration());
-            FieldRenderer = new FieldRenderer(new FieldCodeBlockDeclaration());
-        }
+            Logger.Trace("Creating an instance of {renderer} with {output}", ToString(), output.ToString());
+            Output = output;           
+
+            // How do we know if we can share an instance of a renderer or if it contains state that we don't want to share...?
+
+            // Create re-useable member aggregators, member renderers, and their compontent renderers
+            var fields = new MemberAggregator(
+                new FieldRenderer(new FieldDeclaration()),
+                t => t.GetFieldsForTypeRendering(),
+                headerRenderer: new StaticTitle("Public Fields", AsMarkdown.H2));
+            
+            var methods = new MemberAggregator(
+                new MethodRenderer(new MethodDeclaration()), 
+                t => t.GetMethodsForRendering(),
+                headerRenderer: new StaticTitle("Public Methods", AsMarkdown.H2));
+
+            var properties = new MemberAggregator(
+                new PropertyRenderer(new PropertyDeclaration(), true),
+                t => t.GetPropertiesForRendering(),
+                headerRenderer: new StaticTitle("Public Properties", AsMarkdown.H2));
+
+            var events = new MemberAggregator(
+                new EventRenderer(new EventDeclaration()),
+                t => t.GetEventsForRendering(),
+                headerRenderer: new StaticTitle("Public Events", AsMarkdown.H2));
+
+            var typeHeader = new TypeHeader();
+
+            // Create type renderers
+            // order of given params determines render order
+            ClassRenderer = new ClassRenderer(typeHeader, fields, methods, properties, events);
+            InterfaceRenderer = new InterfaceRenderer(typeHeader, methods, properties, events); // Don't render interface fields (cannot exist)
+            StructRenderer = new StructRenderer(typeHeader, fields, methods, properties, events);
+            EnumRenderer = new EnumRenderer(
+                typeHeader,
+                new MemberAggregator(
+                    new EnumValueRenderer(), 
+                    t => t.GetFieldsForEnumRendering(), 
+                    headerRenderer: new StaticTitle("Values", AsMarkdown.H2))
+                );
+            DelegateRenderer = new DelegateRenderer(typeHeader);
+
+            // Wire up handlers for rendering request
+            RenderClass += ClassRenderer.Render;
+            RenderInterface += InterfaceRenderer.Render;
+            RenderStruct += StructRenderer.Render;
+            RenderEnum += EnumRenderer.Render;
+            RenderDelegate += DelegateRenderer.Render;
+        }        
 
         public void Init(
             RepositoryModel model,
             ImmutableDictionary<string, ProjectModel> projects
             ) {
+            Logger.Trace("Initializing the {renderer}.", ToString());
             Model = model;
             Projects = projects;
 
@@ -104,16 +165,16 @@ namespace DotDocs.Markdown
             foreach (var proj in Projects.Values)
                 foreach (var type in proj.Assembly.ExportedTypes)
                 {
-                    if (type.IsClass)
-                        RenderClass(type, builder);
+                    if (type.BaseType?.Name.Equals(multicastDel.Name) ?? false)
+                        RenderDelegate?.Invoke(type);
                     else if (type.IsEnum)
-                        RenderEnum(type, builder);
+                        RenderEnum?.Invoke(type);
+                    else if (type.IsClass)
+                        RenderClass?.Invoke(type);
                     else if (type.IsInterface)
-                        RenderInterface(type, builder);
+                        RenderInterface?.Invoke(type);
                     else if (type.IsValueType)
-                        RenderStruct(type, builder);
-                    else if (type.BaseType?.Name.Equals(multicastDel.Name) ?? false)
-                        RenderDelegate(type, builder);
+                        RenderStruct?.Invoke(type);
                     else
                         throw new Exception($"The type {type.ToNameString()} did not match any known C# construct.");
                     // Write buffer into file
@@ -121,122 +182,6 @@ namespace DotDocs.Markdown
                     // Clear re-used string builder
                     builder.Clear();
                 }
-        }        
-
-        public void RenderClass(Type type, StringBuilder builder)
-        {
-            try
-            {
-#if DEBUG
-                if (type.IsEnum)
-                {
-                    throw new Exception($"Enum ${type.FullName} was attempted to be rendered by the {nameof(RenderClass)} method. It is required enumerations are rendered by {nameof(RenderEnum)} instead.");
-                }
-#endif                
-                RenderHeader(type, builder);
-
-                // Render Exported Fields
-                type.GetFieldsForTypeRendering().ToMarkdown(
-                    before: delegate {
-                        AsMarkdown.H2.Prefix("Public Fields", padding: Padding.DoubleNewLine);
-                    }, 
-                    each: FieldRenderer.Render);
-
-                // Render Exported Methods                
-                type.GetMethodsForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        AsMarkdown.H2.Prefix("Public Methods", padding: Padding.DoubleNewLine);
-                    },
-                    each: MethodRenderer.Render);
-
-                // Render Exported Properties
-                type.GetPropertiesForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        AsMarkdown.H2.Prefix("Public Properties", padding: Padding.DoubleNewLine);
-                    }, 
-                    each: PropertyRenderer.Render);
-
-                // Render Events                
-                type.GetEventsForRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        AsMarkdown.H2.Prefix("Public Events", padding: Padding.DoubleNewLine);
-                    }, 
-                    each: EventRenderer.Render);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }        
-
-        public void RenderStruct(Type type, StringBuilder builder)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RenderInterface(Type type, StringBuilder builder)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RenderDelegate(Type type, StringBuilder builder)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RenderEnum(Type type, StringBuilder builder)
-        {
-            try
-            {
-#if DEBUG
-                if (!type.IsEnum)
-                    throw new Exception($"Type ${type.FullName} is not an enum and shouldn't be rendered by {nameof(RenderEnum)}.");
-#endif
-                RenderHeader(type, builder);
-
-                type.GetFieldsForEnumRendering().ToMarkdown(
-                    before: delegate
-                    {
-                        AsMarkdown.H2.Prefix("Values", padding: Padding.DoubleNewLine);
-                    },
-                    each: m =>
-                    {
-                        // m.Name.AsListItem().Put();                        
-                        // m.PutComments(", ", LinePadding.NewLine);                        
-                    });
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        void RenderHeader(Type type, StringBuilder builder)
-        {
-            // Class Name
-            AsMarkdown.H1.Prefix(type.Name);
-            // Render the base type of the class when it's nearest parent is not System.Object
-            if (type.BaseType is not null && type.BaseType?.BaseType is not null)
-            {
-                Padding.Space.Put();
-                AsMarkdown.Italic.Wrap("extends", Padding.Space);
-                type.BaseType.ToNameString().Put();
-                // builder.Append($" {"extends".AsItalic()} {type.BaseType.AsMaybeLink()}");
-            }
-            Padding.DoubleNewLine.Put();
-
-            // Put comments for type if they exist
-            if (type.TryGetComments(out TypeComments? comments))
-            {
-                ArgumentNullException.ThrowIfNull(comments);
-
-                type.PutSummary(comments);
-                type.PutExample(comments);
-                type.PutRemarks(comments);
-            }
         }
     }      
     

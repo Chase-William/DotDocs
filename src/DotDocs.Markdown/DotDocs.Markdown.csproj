@@ -10,4 +10,8 @@
     <ProjectReference Include="..\DotDocs.Document\DotDocs.Render.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Renderers\Sections\Footer\" />
+  </ItemGroup>
+
 </Project>

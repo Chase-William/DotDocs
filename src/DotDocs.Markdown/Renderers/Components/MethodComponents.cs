@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown.Components
+namespace DotDocs.Markdown.Renderers.Components
 {
     /// <summary>
     /// Format the method declaration into output normally.
@@ -19,18 +19,18 @@ namespace DotDocs.Markdown.Components
         {
             AsMarkdown.HorizonalLine.Put(Padding.DoubleNewLine);
 
-            info.ReturnType.MaybeLink(info.DeclaringType!, Padding.Space);
+            info.ReturnType.PutTypeName(info.DeclaringType!, Padding.Space);
             info.Name.Put();
 
             // Put generic type arguments if they exists
-            info.GetGenericArguments().PutTypeArguments((t) => t.MaybeLink(info.DeclaringType!));
+            info.PutTypeArgs();            
 
             AsGeneral.OpeningParenthese.Put();
-            info.GetParameters().ToMarkdown(each: static (parameter, index) =>
+            info.GetParameters().ToMarkdown(each: (parameter, index) =>
             {
                 if (index != 0)
-                    AsGeneral.Comma.Put();
-                parameter.ParameterType.MaybeLink(parameter.ParameterType.DeclaringType!, Padding.Space);
+                    AsGeneral.Comma.Put(Padding.Space);
+                parameter.ParameterType.PutTypeName(info.DeclaringType!, Padding.Space);
                 AsMarkdown.Italic.Wrap(parameter.Name!);
             });
             AsGeneral.ClosingParenthese.Put();
@@ -52,14 +52,15 @@ namespace DotDocs.Markdown.Components
             Padding.Space.Put();
             info.Name.Put();
 
-            // Put generic type arguments if they exists
-            info.GetGenericArguments().PutTypeArguments(static (t) => t.Name.Put());
 
+            // Put generic type arguments if they exists
+            info.PutTypeArgs();
+            
             AsGeneral.OpeningParenthese.Put();
             info.GetParameters().ToMarkdown(each: (parameter, index) =>
             {
                 if (index != 0)
-                    AsGeneral.Comma.Put();
+                    AsGeneral.Comma.Put(Padding.Space);
                 parameter.ParameterType.Name.Put(Padding.Space);
                 parameter.Name!.Put();
             });

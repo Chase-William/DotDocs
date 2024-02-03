@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Linq;
 
 using LoxSmoke.DocXml;
+using System.Runtime.CompilerServices;
 
 namespace DotDocs
 {           
@@ -17,6 +18,8 @@ namespace DotDocs
     /// </summary>
     public class Builder : IDisposable
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         #region IO
         /// <summary>
         /// The location of repository.
@@ -62,7 +65,6 @@ namespace DotDocs
         public static Builder FromPath(string path, IRenderer renderable)
             => new(new LocalSource(path), renderable);
 
-
         public void Prepare()
         {
             try
@@ -71,34 +73,36 @@ namespace DotDocs
 
                 // Prepare git source
                 if (Source is GitCloneSource)
-                    Source = Source.Prepare(); // Returns a new local source
-                                               // Prepare local source
+                {
+                    Logger.Trace("Preparing {source}.", Source.ToString());
+                    Source = Source.Prepare(); // Returns a new local source                                               
+                }
+                // Prepare local source
+                Logger.Trace("Preparing {source}.", Source.ToString());
                 _ = Source.Prepare();
 
                 // -- Prepare output
 
                 // Prepare output directory
+                Logger.Trace("Cleaning output directory.");
                 Renderer.Output.Clean();
 
                 // Ensure output direct is valid before proceeding
                 // if (!Output.IsValid())                
                     // throw new Exception($"Invalid Output: {Output}");                
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Fatal(ex);
                 throw;
             }
-            finally
-            {
-                //if (Directory.Exists("downloads"))
-                //    Utility.CleanDirectory("downloads");
-            }            
         }
 
         public void Build()
         {
             try
             {
+                
                 // Process repository files and build
                 // Must close unmanaged MetadataLoadContext
                 var repo = new Repository(Source.Src)                    
@@ -110,18 +114,20 @@ namespace DotDocs
 
                 // Apply built repository results to a model structure going top -> down
                 // Assign results to respective properties via destructure
-                var projects = new Dictionary<string, ProjectModel>();
-                var repoModel = new RepositoryModel().Apply(repo, projects);                         
+                var projects = new Dictionary<string, ProjectModel>();                
+                var repoModel = new RepositoryModel().Apply(repo, projects);
 
                 // Use RepositoryModel & Projects as data source for rendering
                 // RepoModel & Projects dict share the same data,
                 // they both providea  different perspective
+                
                 Renderer.Init(
                     repoModel, 
                     projects.ToImmutableDictionary());
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Fatal(ex);
                 throw;
             }            
         }
@@ -132,19 +138,16 @@ namespace DotDocs
             {
                 Renderer.Render();               
             }
-            catch
+            catch (Exception ex)
             {
-                
-            }
-            finally
-            {
-                //if (Directory.Exists("downloads"))
-                //    Utility.CleanDirectory("downloads");
-            }                       
+                Logger.Fatal(ex);
+                throw;
+            }              
         }
 
         public void Dispose()
         {
+            Logger.Trace("Cleaning up all unused resources by projects.");
             if (Projects is not null)            
                 foreach (var proj in Projects.Values)
                     proj.Dispose();            

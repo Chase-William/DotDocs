@@ -1,7 +1,7 @@
 ﻿using DocXml.Reflection;
 using DotDocs.Markdown;
-using DotDocs.Markdown.Components;
 using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Renderers.Components;
 using LoxSmoke.DocXml;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 using State = DotDocs.Markdown.RenderState;
 
-namespace DotDocs.Markdown.SubRenderers
+namespace DotDocs.Markdown.Renderers.Members
 {    
-    public class MethodRenderer
+    public class MethodRenderer : IMemberRenderer
     {
         public IComponentRenderer<MethodInfo> DeclarationRenderer { get; init; }
 
@@ -23,35 +23,25 @@ namespace DotDocs.Markdown.SubRenderers
             DeclarationRenderer = declarationRenderer;
         }
 
-        public void Render(MethodInfo info)
+        public void Render<T>(T info) where T : MemberInfo
         {
+            if (!info.Check(out ArgumentException ex, out MethodInfo method))
+            {
+                IMemberRenderer.Logger.Fatal(ex);
+                throw ex;
+            }
+
             // Method Header
-            AsMarkdown.H3.Prefix(info.Name, padding: Padding.DoubleNewLine);
-            
-
-            // Smaller method declaration
-            // $"{info.ReturnType.AsMaybeLink()} {info.Name}".Put();
-            // Create parameter listing
-            // info.GetParameters().PutParameters();            
-
-            DeclarationRenderer.Render(info, Padding.DoubleNewLine);
-
-            //AsStyled.CodeBlock.OpenCodeBlock();
-            
-            //info.ReturnType.ToNameString().Put();
-            //" ".Put();
-            //info.Name.Put();
-            //" ".Put();
-            //info.GetParameters().PutParameters(LinePadding.NewLine);
-
-            //AsStyled.CodeBlock.CloseCodeBlock();
+            AsMarkdown.H3.Prefix(method.Name, padding: Padding.DoubleNewLine);
+                        
+            DeclarationRenderer.Render(method, Padding.DoubleNewLine);
 
             MethodComments? comments = info.GetComments<MethodComments>();
 
             // Put the list of type args, parameters, and return all with comments
-            var argsPut = info.PutTypeArgsWithComments(comments);            
-            var paramsPut = info.PutParametersWithComments(comments);
-            var returnPut = info.PutReturnWithComments(comments);
+            var argsPut = method.PutTypeArgsWithComments(comments);            
+            var paramsPut = method.PutParametersWithComments(comments);
+            var returnPut = method.PutReturnWithComments(comments);
 
             // Put a newline if any of the args, params, or return rendered          
             if (argsPut || paramsPut || returnPut)

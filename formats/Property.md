@@ -11,13 +11,16 @@ char PubProperty01 { get; set; }
 
 ### PubProperty02
 
-`String` PubProperty02 { *get*; **private** *set*; }
+`String` PubProperty02 { *get*; ***private*** *set*; }
 
 Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
 ### PubProperty03
 
-`String` PubProperty02 { *get*; **internal** *set*; }
+`String` PubProperty02
+
+- *@get*
+
 
 Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 

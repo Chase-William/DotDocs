@@ -17,30 +17,33 @@ namespace DotDocs.Markdown.Enums
         SmallerThanArrow,
         LargerThanArrow,
         OpeningCurly,
-        ClosingCurly
+        ClosingCurly,
+        SemiColon
     }
 
     public static class AsGeneralEx
     {
-        const string COMMA = ", ";
-        const string OPENING_PARENTHESE = "(";
-        const string CLOSING_PARENTHESE = ")";
-        const string SMALLER_THAN_ARROW = "<";
-        const string LARGER_THAN_ARROW = ">";
-        const string OPENING_CURLY = "{";
-        const string CLOSING_CURLY = "}";
-
+        const char COMMA = ',';
+        const char OPENING_PARENTHESE = '(';
+        const char CLOSING_PARENTHESE = ')';
+        const char SMALLER_THAN_ARROW = '<';
+        const char LARGER_THAN_ARROW = '>';
+        const char OPENING_CURLY = '{';
+        const char CLOSING_CURLY = '}';
+        const char SEMI_COLON = ';';
         public static void Put(this AsGeneral style, Padding padding = Padding.None)
-            => GetAsString(style).Put(padding);
+            => GetAsChar(style).Put(padding);
 
-        public static void Prefix(this AsGeneral style, string str, Padding padding = Padding.None)
+        public static void Prefix(this AsGeneral style, string str, bool includeSpaceBetween = false, Padding padding = Padding.None)
         {
             style.Put();
+            if (includeSpaceBetween)
+                Padding.Space.Put();
             str.Put(padding);
         }
 
         #region Internal Helper Functions
-        private static string GetAsString(this AsGeneral style)
+        private static char GetAsChar(this AsGeneral style)
         {
             return style switch
             {
@@ -51,6 +54,7 @@ namespace DotDocs.Markdown.Enums
                 AsGeneral.LargerThanArrow => LARGER_THAN_ARROW,
                 AsGeneral.OpeningCurly => OPENING_CURLY,
                 AsGeneral.ClosingCurly => CLOSING_CURLY,
+                AsGeneral.SemiColon => SEMI_COLON,
                 _ => throw new InvalidEnumArgumentException()
             };
         }

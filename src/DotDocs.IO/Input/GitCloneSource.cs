@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
@@ -22,7 +23,7 @@ namespace DotDocs.IO
             string downloadRepoLocation = Path.Combine(directory, "downloads");
             // Ensure download location exists
             if (!Directory.Exists(downloadRepoLocation))
-                Directory.CreateDirectory(downloadRepoLocation);
+                Directory.CreateDirectory(downloadRepoLocation);            
 
             using PowerShell powershell = PowerShell.Create();
             // this changes from the user folder that PowerShell starts up with to your git repository

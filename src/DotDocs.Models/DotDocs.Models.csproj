@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="LoxSmoke.DocXml" Version="3.6.0" />
+    <PackageReference Include="NLog" Version="5.2.8" />
   </ItemGroup>
 
 </Project>

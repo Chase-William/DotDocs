@@ -6,9 +6,11 @@ namespace DotDocs.Build
 {
     public class Repository // : IDisposable
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         internal BuildInstance build;
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
         /// <summary>
         /// The current commit hash of the repository.
         /// </summary>
@@ -38,6 +40,7 @@ namespace DotDocs.Build
 
         public Repository(string path)
         {
+            Logger.Debug("Params: [{pathLbl}: {pathValue}]", nameof(path), path);
             Dir = path;                    
         }        
 
@@ -49,6 +52,8 @@ namespace DotDocs.Build
         /// <exception cref="FileNotFoundException"></exception>
         public Repository GetCommitInfo()
         {
+            Logger.Trace("Fetching Commit Info");
+
             string gitHeadFile = Path.Combine(Dir, @".git\HEAD");
             if (!File.Exists(gitHeadFile))
                 throw new FileNotFoundException($"File 'HEAD' was not found at: {gitHeadFile}. Has the repository been downloaded using 'git clone <repo-url>' yet?");
@@ -61,7 +66,11 @@ namespace DotDocs.Build
                 .Trim());
 
             if (!File.Exists(commitHashFilePath))
-                throw new FileNotFoundException($"The file containing the current HEAD file hash was not found at: {commitHashFilePath}");
+            {
+                var ex = new FileNotFoundException($"The file containing the current HEAD file hash was not found at: {commitHashFilePath}");
+                Logger.Fatal(ex);
+                throw ex;
+            }
 
             Commit = File.ReadAllText(commitHashFilePath)
                 .Replace("\n", "")
@@ -75,10 +84,20 @@ namespace DotDocs.Build
         /// <returns></returns>
         public Repository MakeProjectGraph()
         {
-            // Locate all solution and project files            
-            var projectFiles = Directory.GetFiles(Dir, "*.csproj", SearchOption.AllDirectories);
-            ProjectGraphs = FindRootProjects(projectFiles.ToList())
-                .ToImmutableArray();
+            Logger.Trace("Making the project dependency graph.");
+
+            try
+            {
+                // Locate all solution and project files            
+                var projectFiles = Directory.GetFiles(Dir, "*.csproj", SearchOption.AllDirectories);
+                ProjectGraphs = FindRootProjects(projectFiles.ToList())
+                    .ToImmutableArray();
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal(ex);
+                throw;
+            }
             return this;
         }
 
@@ -88,6 +107,8 @@ namespace DotDocs.Build
         /// <returns></returns>
         public Repository EnableDocumentationGeneration()
         {
+            Logger.Trace("Beginning recursive loop to enable documentation generation on all projects.");
+
             ActiveProject.EnableDocumentationGeneration();
             return this;
         }
@@ -96,7 +117,6 @@ namespace DotDocs.Build
         /// Builds active project via the property <see cref="ActiveProject"/>.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="BuildException"></exception>
         public Repository Build()
         {
             build = new BuildInstance(ActiveProject)
@@ -106,13 +126,14 @@ namespace DotDocs.Build
         }
 
         /// <summary>
-        /// Sets the active project to build.
+        /// Sets the active project to build. ------------------------------- Subject to change.
         /// </summary>
         /// <returns></returns>
         public Repository SetActiveProject()
         {
             if (ProjectGraphs.Length > 1)
             {
+                Logger.Trace("More than one root project was found, user is being prompted.");
                 while (true)
                 {
                     Console.WriteLine("Multiple related project groups detected. Please choose one:");
@@ -149,7 +170,11 @@ namespace DotDocs.Build
                 var proj = projectFiles.First();
 
                 if (!File.Exists(projectFiles.First()))
-                    throw new FileNotFoundException($"The following project file path does not exist: {proj}");
+                {
+                    var ex = new FileNotFoundException($"The following project file path does not exist: {proj}");
+                    Logger.Fatal(ex);
+                    throw ex;
+                }
 
                 projects.Add(ProjectDocument.From(proj, projectFiles, projects));
             }

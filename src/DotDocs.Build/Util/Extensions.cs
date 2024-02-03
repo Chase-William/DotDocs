@@ -7,12 +7,16 @@ namespace DotDocs.Build.Util
     /// A static class that exists purely to contain extension methods.
     /// </summary>
     public static class Extensions
-    {        
+    {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static RepositoryModel Apply(
             this RepositoryModel model, 
             Repository repo,
             Dictionary<string, ProjectModel> projects
             ) {
+            Logger.Trace("Applying updates to {repoModelType} from {repo}", typeof(RepositoryModel).FullName, typeof(Repository).FullName);
+
             model.Name = repo.Name;
             model.Url = repo.Url;
             model.Commit = repo.Commit;

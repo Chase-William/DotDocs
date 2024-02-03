@@ -44,7 +44,7 @@ namespace DotDocs.Markdown.Enums
             if (style == AsMarkdown.CodeBlock)
                 throw new InvalidEnumArgumentException(string.Format(ENUM_EXCEPTION_MSG, style, nameof(Put)));
 
-            GetAsString(style).Put(padding);
+            GetAsString(style)?.Put(padding);
 
             // Some styles need a space after to work
             style.PutDependentSpace();
@@ -55,10 +55,7 @@ namespace DotDocs.Markdown.Enums
             if (style == AsMarkdown.CodeBlock || style == AsMarkdown.HorizonalLine)
                 throw new InvalidEnumArgumentException(string.Format(ENUM_EXCEPTION_MSG, style, nameof(Prefix)));
             
-            style.Put();
-
-            // Some styles need a space after to work
-            style.PutDependentSpace();
+            style.Put();            
 
             wrapStyle.Wrap(str, padding);                     
         }

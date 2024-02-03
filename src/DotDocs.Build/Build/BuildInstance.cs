@@ -12,7 +12,9 @@ namespace DotDocs.Build.Build
     /// A class containing a build attempt's information.
     /// </summary>
     public class BuildInstance //: IDisposable
-    {        
+    {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         ProjectDocument rootProject;
 
         public ProjectBuildInstance RootProjectBuildInstance { get; private set; }
@@ -24,7 +26,10 @@ namespace DotDocs.Build.Build
             => allProjectBuildInstances.ToImmutableArray();
 
         public BuildInstance(ProjectDocument rootProject)
-            => this.rootProject = rootProject;
+        {
+            Logger.Debug("Params: [{rootProjectLbl}: {rootProjectValue}]", nameof(rootProject), rootProject);
+            this.rootProject = rootProject;
+        }
 
         /// <summary>
         /// Builds the root project via the <see cref="rootProject"/> property.
@@ -33,6 +38,8 @@ namespace DotDocs.Build.Build
         /// <exception cref="BuildException"></exception>
         public BuildInstance Build()
         {
+            Logger.Trace("Building the solution.");
+
             var csProjPath = rootProject.ProjectFilePath;
 
             var cmd = new Process
@@ -48,6 +55,7 @@ namespace DotDocs.Build.Build
 
             try
             {
+                Logger.Debug("Launching a {process} process.", cmd.StartInfo.FileName);
                 cmd.Start();
 
                 // Wait for files to finish being written & process close
@@ -80,7 +88,8 @@ namespace DotDocs.Build.Build
             }            
             catch (Exception ex)
             {
-                Console.WriteLine();
+                Logger.Fatal(ex);
+                throw;
             }
 
             return this;
@@ -93,15 +102,8 @@ namespace DotDocs.Build.Build
         public ProjectModel GetRootProject(
             Dictionary<string, ProjectModel> projects
             ) {
-            // 
-            //
-            //  You remember ref assemblies? We need that for types so we can
-            //  reference `int` later on as the return type of some method. This
-            //  map should also probably hold user defined types as well. Therefore,
-            //  it holds all types used *to an extent*.
-            //
-            //
-            //
+            Logger.Trace("Getting the root project by recursively building up each project from the farthest leaf inward.");
+
             var rootProject = Load(RootProjectBuildInstance, allAssemblyPaths, projects);
             // The root is not added until here
             projects.Add(rootProject.Name, rootProject);
@@ -127,6 +129,8 @@ namespace DotDocs.Build.Build
             Dictionary<string, ProjectModel> projects
             ) {
 
+            Logger.Trace("Processing project build: {buildProjectFile} with a project model count of {count}", build.ProjectFileName, projects.Count);
+            
             build.InitMetadataLoadCtx(asmPaths);
             
             // Create a blank instance providing a target for dependencies to add themselves to

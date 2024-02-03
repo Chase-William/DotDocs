@@ -7,14 +7,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown.Components
+namespace DotDocs.Markdown.Renderers.Components
 {
     public class EventDeclaration: IComponentRenderer<EventInfo>
     {
         public void Render(EventInfo info, Padding padding)
         {
-            info.EventHandlerType!.MaybeLink(info.DeclaringType!, Padding.Space);
-            info.Name.Put(Padding.NewLine);
+            info.EventHandlerType!.PutTypeName(info.DeclaringType!, Padding.NewLine);
+            // info.EventHandlerType!.MaybeLink(info.DeclaringType!, Padding.Space);
+            // info.Name.Put(Padding.NewLine);
         }
     }
 

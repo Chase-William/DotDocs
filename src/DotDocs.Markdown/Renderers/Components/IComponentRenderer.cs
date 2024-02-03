@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotDocs.Markdown.Components
+namespace DotDocs.Markdown.Renderers.Components
 {
     public interface IComponentRenderer<T>
         where T : MemberInfo

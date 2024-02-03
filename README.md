@@ -126,3 +126,7 @@ This setup has proven to be flexible, yet provides appropriate structure and cod
 3. *after* `Action`, runs once after all other callbacks completed
 
 > If the query result return an empty collection, rendering is skipped *i.e. (before, each, and after callbacks).*
+
+### Tasks
+
+- Should we use inheritance to remove redundent logic for handling optional params in *Member* based renderers?

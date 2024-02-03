@@ -14,20 +14,20 @@ using State = DotDocs.Markdown.RenderState;
 
 namespace DotDocs.Markdown
 {
-    public static class CommentExtensions
+    public static class CommentsExtensions
     {
         /// <summary>
         /// Renders the summary block to the output stream if it is valid.
         /// </summary>
         /// <param name="_"></param>
         /// <param name="comments"></param>
-        public static void PutSummary(this MemberInfo _, CommonComments comments)
+        public static void PutSummary(this MemberInfo _, CommonComments comments, Padding padding = Padding.DoubleNewLine)
         {
             if (!string.IsNullOrWhiteSpace(comments.Summary))
             {
                 AsMarkdown.H4.Prefix("Summary", padding: Padding.DoubleNewLine);
                 comments.Summary.Put();
-                Padding.DoubleNewLine.Put();
+                padding.Put();
             }
         }
 
@@ -72,23 +72,22 @@ namespace DotDocs.Markdown
             if (!info.ContainsGenericParameters)
                 return false;
 
-            // Render each argment seperately
-            foreach (var arg in info.GetGenericArguments())
+            info.GetGenericArguments().ToMarkdown(each: (arg, _) =>
             {
                 // Render the type info
                 AsMarkdown.UnorderedListItem.Prefix("@typeparam", AsMarkdown.Italic, Padding.Space);
-                AsMarkdown.Code.Wrap(arg.Name);               
-                
+                AsMarkdown.Code.Wrap(arg.Name);
+
                 // Get the comment text for the type arg if it exists
                 string? text = comments?.TypeParameters.SingleOrDefault(p => p.Name.Equals(arg.Name)).Text;
                 // Render the type arg if valid
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    AsGeneral.Comma.Prefix(text);
+                    AsGeneral.Comma.Prefix(text, true);
                 }
                 // Next iteration on a new line
                 Padding.NewLine.Put();
-            }
+            });
             return true;
         }
 
@@ -109,7 +108,7 @@ namespace DotDocs.Markdown
             {
                 AsMarkdown.UnorderedListItem.Prefix("@param", AsMarkdown.Italic, Padding.Space);
 
-                parameter.ParameterType.MaybeLink(parameter.ParameterType.DeclaringType!, Padding.Space);
+                parameter.ParameterType.PutTypeName(info.DeclaringType, Padding.Space);
 
                 AsMarkdown.BoldItalic.Wrap(parameter.Name);
 
@@ -117,8 +116,7 @@ namespace DotDocs.Markdown
 
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    AsGeneral.Comma.Put();
-                    text.Put();
+                    AsGeneral.Comma.Prefix(text, true);
                 }
 
                 Padding.NewLine.Put();
@@ -139,13 +137,13 @@ namespace DotDocs.Markdown
                 return false;
 
             AsMarkdown.UnorderedListItem.Prefix("@returns", AsMarkdown.Italic, Padding.Space);
-            info.ReturnType.MaybeLink(info.ReturnType.DeclaringType);
+            info.ReturnType.PutTypeName(info.DeclaringType);
 
             string? text = comments?.Returns;
 
             if (!string.IsNullOrWhiteSpace(text))
             {
-                AsGeneral.Comma.Prefix(text);
+                AsGeneral.Comma.Prefix(text, true);
             }
 
             Padding.NewLine.Put();

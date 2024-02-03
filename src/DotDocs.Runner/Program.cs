@@ -3,6 +3,9 @@ using DotDocs.IO;
 using DotDocs.IO.Routing;
 using DotDocs.Markdown;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DotDocs.Runner
@@ -39,6 +42,6 @@ namespace DotDocs.Runner
             {
                 Console.WriteLine(ex.Message);
             }
-        }
+        } 
     }
 }

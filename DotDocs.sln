@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Models", "src\DotDo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Render", "src\DotDocs.Document\DotDocs.Render.csproj", "{420304AA-FF90-425D-A9A7-31DF3B7A3FFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotDocs.IO", "src\DotDocs.IO\DotDocs.IO.csproj", "{6F411A23-1F31-4DAE-8550-62DB6316485D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.IO", "src\DotDocs.IO\DotDocs.IO.csproj", "{6F411A23-1F31-4DAE-8550-62DB6316485D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotDocs.Markdown", "src\DotDocs.Markdown\DotDocs.Markdown.csproj", "{E5FA2E29-6812-4990-A764-3C54186A5C38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotDocs.Markdown", "src\DotDocs.Markdown\DotDocs.Markdown.csproj", "{E5FA2E29-6812-4990-A764-3C54186A5C38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

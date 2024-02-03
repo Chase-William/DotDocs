@@ -10,9 +10,9 @@ namespace DotDocs.IO.Routing
     /// Output all types within the same folder.
     /// </summary>
     public class FlatRouter : IRouterable
-    {       
+    {
         public string GetName(Type type)
-            => type.FullName ?? throw new Exception($"Type {type} has null Fullname property.");
+            => $"{type.Namespace}.{type.Name}";
         
         public string GetLocation(Type type)
             => string.Empty;
