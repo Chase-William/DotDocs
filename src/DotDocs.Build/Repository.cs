@@ -10,16 +10,6 @@ namespace DotDocs.Build
 
         internal BuildInstance build;
 
-        public string Name { get; private set; }
-        /// <summary>
-        /// The current commit hash of the repository.
-        /// </summary>
-        public string Commit { get; private set; }
-        /// <summary>
-        /// The url of the repository.
-        /// </summary>
-        public string Url { get; init; }
-
         /// <summary>
         /// The directory of the repository.
         /// </summary>
@@ -42,40 +32,6 @@ namespace DotDocs.Build
         {
             Logger.Debug("Params: [{pathLbl}: {pathValue}]", nameof(path), path);
             Dir = path;                    
-        }        
-
-        /// <summary>
-        /// Retrieves the current hash for the HEAD commit of the downloaded repository.
-        /// </summary>
-        /// <param name="repoDir">Base directory of the repo.</param>
-        /// <returns>Commit HEAD Hash</returns>
-        /// <exception cref="FileNotFoundException"></exception>
-        public Repository GetCommitInfo()
-        {
-            Logger.Trace("Fetching Commit Info");
-
-            string gitHeadFile = Path.Combine(Dir, @".git\HEAD");
-            if (!File.Exists(gitHeadFile))
-                throw new FileNotFoundException($"File 'HEAD' was not found at: {gitHeadFile}. Has the repository been downloaded using 'git clone <repo-url>' yet?");
-
-            string commitHashFilePath = File.ReadAllText(gitHeadFile);
-            // 'ref: ' <- skip these characters and get file dir that follows
-            commitHashFilePath = Path.Combine(Dir, ".git", commitHashFilePath[5..]
-                .Replace("\n", "")
-                .Replace("/", "\\")
-                .Trim());
-
-            if (!File.Exists(commitHashFilePath))
-            {
-                var ex = new FileNotFoundException($"The file containing the current HEAD file hash was not found at: {commitHashFilePath}");
-                Logger.Fatal(ex);
-                throw ex;
-            }
-
-            Commit = File.ReadAllText(commitHashFilePath)
-                .Replace("\n", "")
-                .Trim();
-            return this;
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using DotDocs.Markdown;
 using DotDocs.Markdown.Enums;
 using LoxSmoke.DocXml;
-using Microsoft.Management.Infrastructure.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

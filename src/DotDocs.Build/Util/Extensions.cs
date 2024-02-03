@@ -17,9 +17,6 @@ namespace DotDocs.Build.Util
             ) {
             Logger.Trace("Applying updates to {repoModelType} from {repo}", typeof(RepositoryModel).FullName, typeof(Repository).FullName);
 
-            model.Name = repo.Name;
-            model.Url = repo.Url;
-            model.Commit = repo.Commit;
             // Handles creation of the project and all down stream entities
             var rootProject = repo.build.GetRootProject(projects);
             model.Projects.Add(rootProject);

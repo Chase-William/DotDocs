@@ -38,58 +38,41 @@ namespace DotDocs
         internal Dictionary<string, ProjectModel> Projects { get; private set; }
         #endregion
 
+        /// <summary>
+        /// The renderer used to render all output.
+        /// </summary>
         public IRenderer Renderer { get; init; }
                 
-
         private Builder(ISourceable _src, IRenderer renderable)
         {
             Source = _src;
             Renderer = renderable;
-        }
+        }       
 
         /// <summary>
-        /// Service from a url.
+        /// Initializes a new instance of the <see cref="Builder"/> class using the <paramref name="path"/> and <paramref name="renderable"/>.
         /// </summary>
-        /// <param name="url">Url to the github repository.</param>
-        /// <param name="outDir">Location on disk to write render results to.</param>
-        /// <returns></returns>
-        public static Builder FromUrl(string url, IRenderer renderable)
-            => new(new GitCloneSource(url), renderable);
-
-        /// <summary>
-        /// Service from a path.
-        /// </summary>
-        /// <param name="path">Location of the repsitory root dir.</param>
-        /// /// <param name="outDir">Location on disk to write render results to.</param>
+        /// <param name="path">Path to the root directory of the repository.</param>
+        /// <param name="renderable">Takes an implementation of <see cref="IRenderer"/> used as the <see cref="Renderer"/>.</param>
         /// <returns></returns>
         public static Builder FromPath(string path, IRenderer renderable)
             => new(new LocalSource(path), renderable);
 
+        /// <summary>
+        /// Prepares the source material by ensuring validity of directories and that results from the last build are cleaned up.
+        /// </summary>
         public void Prepare()
         {
             try
             {
-                // -- Prepare source
-
-                // Prepare git source
-                if (Source is GitCloneSource)
-                {
-                    Logger.Trace("Preparing {source}.", Source.ToString());
-                    Source = Source.Prepare(); // Returns a new local source                                               
-                }
                 // Prepare local source
                 Logger.Trace("Preparing {source}.", Source.ToString());
                 _ = Source.Prepare();
 
                 // -- Prepare output
-
                 // Prepare output directory
                 Logger.Trace("Cleaning output directory.");
-                Renderer.Output.Clean();
-
-                // Ensure output direct is valid before proceeding
-                // if (!Output.IsValid())                
-                    // throw new Exception($"Invalid Output: {Output}");                
+                Renderer.Output.Clean();              
             }
             catch (Exception ex)
             {
@@ -98,15 +81,15 @@ namespace DotDocs
             }
         }
 
+        /// <summary>
+        /// Starts build process and hands results to the renderer.
+        /// </summary>
         public void Build()
         {
             try
-            {
-                
+            {               
                 // Process repository files and build
-                // Must close unmanaged MetadataLoadContext
-                var repo = new Repository(Source.Src)                    
-                    .GetCommitInfo()
+                var repo = new Repository(Source.Src)
                     .MakeProjectGraph()
                     .SetActiveProject()
                     .EnableDocumentationGeneration()
@@ -118,9 +101,7 @@ namespace DotDocs
                 var repoModel = new RepositoryModel().Apply(repo, projects);
 
                 // Use RepositoryModel & Projects as data source for rendering
-                // RepoModel & Projects dict share the same data,
-                // they both providea  different perspective
-                
+                // RepoModel & Projects dict share the same data, but they both provide a different perspective                
                 Renderer.Init(
                     repoModel, 
                     projects.ToImmutableDictionary());
@@ -132,7 +113,10 @@ namespace DotDocs
             }            
         }
 
-        public void Document()
+        /// <summary>
+        /// Invokes the <see cref="Renderer"/> to begin rendering.
+        /// </summary>
+        public void Render()
         {
             try
             {
@@ -145,6 +129,9 @@ namespace DotDocs
             }              
         }
 
+        /// <summary>
+        /// Cleans up unmanaged resources once this <see cref="Builder"/> instance is no longer needed.
+        /// </summary>
         public void Dispose()
         {
             Logger.Trace("Cleaning up all unused resources by projects.");

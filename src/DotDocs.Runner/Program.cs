@@ -32,7 +32,7 @@ namespace DotDocs.Runner
             {                              
                 builder.Prepare(); // Performs downloads if nessessary/checks directory validity
                 builder.Build(); // Compiles project(s) and creates models using results
-                builder.Document(); // Creates documentation from models
+                builder.Render(); // Creates documentation from models
             }
             catch (BuildException ex)
             {
