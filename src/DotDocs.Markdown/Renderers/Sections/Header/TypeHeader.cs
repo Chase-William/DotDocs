@@ -13,7 +13,7 @@ namespace DotDocs.Markdown.Renderers.Sections.Header
             Logger.Trace("Rendering header for {type}", type.FullName);
 
             AsMarkdown.H1.Put(Padding.Space);
-            type.PutTypeName(Padding.DoubleNewLine);
+            type.PutTypeName(null, Padding.DoubleNewLine);
 
             // Put comments for the given type
             if (type.TryGetComments(out TypeComments? comments))

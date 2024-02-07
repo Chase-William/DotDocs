@@ -1,0 +1,1 @@
+`ValueTuple`<`T`, `Int32`> MyMethod06`T`(`T` *obj*, `Int32` *index*)

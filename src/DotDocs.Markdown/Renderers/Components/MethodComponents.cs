@@ -16,14 +16,12 @@ namespace DotDocs.Markdown.Renderers.Components
     public class MethodDeclaration : IComponentRenderer<MethodInfo>
     {
         public void Render(MethodInfo info, Padding padding = Padding.DoubleNewLine)
-        {
-            AsMarkdown.HorizonalLine.Put(Padding.DoubleNewLine);
-
+        {            
             info.ReturnType.PutTypeName(info.DeclaringType!, Padding.Space);
             info.Name.Put();
 
             // Put generic type arguments if they exists
-            info.PutTypeArgs();            
+            info.PutTypeArgs();
 
             AsGeneral.OpeningParenthese.Put();
             info.GetParameters().ToMarkdown(each: (parameter, index) =>
@@ -33,9 +31,7 @@ namespace DotDocs.Markdown.Renderers.Components
                 parameter.ParameterType.PutTypeName(info.DeclaringType!, Padding.Space);
                 AsMarkdown.Italic.Wrap(parameter.Name!);
             });
-            AsGeneral.ClosingParenthese.Put();
-
-            padding.Put();
+            AsGeneral.ClosingParenthese.Put(padding);
         }
     }
 

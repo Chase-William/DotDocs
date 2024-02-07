@@ -18,8 +18,8 @@ namespace DotDocs.Markdown.Enums
 
     public static class PaddingEx
     {
-        const char NEW_LINE = '\n';
-        const string DOUBLE_NEW_LINE = "\n\n";
+        const string NEW_LINE = "\r\n";
+        const string DOUBLE_NEW_LINE = "\r\n\r\n";
         const char SPACE = ' ';
 
         public static void Put(this Padding padding)

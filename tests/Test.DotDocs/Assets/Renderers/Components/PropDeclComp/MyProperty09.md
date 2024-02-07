@@ -1,0 +1,1 @@
+`Int32` MyProperty09 { ***internal*** *get*; *set*; }

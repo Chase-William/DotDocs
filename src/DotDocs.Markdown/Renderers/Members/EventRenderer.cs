@@ -27,7 +27,7 @@ namespace DotDocs.Markdown.Renderers.Members
 
             AsMarkdown.H3.Prefix(_event.Name, padding: Padding.DoubleNewLine);
 
-            DeclarationRenderer.Render(_event, Padding.None);
+            DeclarationRenderer.Render(_event, Padding.DoubleNewLine);
 
             if (_event.TryGetComments(out CommonComments? comments))
             {

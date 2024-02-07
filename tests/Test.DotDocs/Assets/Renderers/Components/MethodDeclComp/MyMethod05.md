@@ -1,0 +1,1 @@
+`T` MyMethod05`T`(`T` *obj*)

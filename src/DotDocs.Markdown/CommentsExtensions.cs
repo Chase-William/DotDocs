@@ -1,13 +1,8 @@
 ﻿using DotDocs.Markdown;
 using DotDocs.Markdown.Enums;
 using LoxSmoke.DocXml;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 using State = DotDocs.Markdown.RenderState;
 

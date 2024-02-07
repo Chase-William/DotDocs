@@ -17,7 +17,8 @@ namespace DotDocs.Runner
             // Test test library
             // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));            
             using var builder = Builder.FromPath(
-                @"C:\Dev\ex\DotDocs.TestData",
+                //@"C:\Dev\ex\DotDocs.TestData",
+                @"C:\Dev\DotDocs\tests\data\TestData",
                 new MarkdownRenderer(
                     new TextFileOutput(
                         "docs",

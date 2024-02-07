@@ -51,9 +51,9 @@ namespace DotDocs.Markdown
         public MarkdownRenderer(IOutputable output)
         {
             Logger.Trace("Creating an instance of {renderer} with {output}", ToString(), output.ToString());
-            Output = output;           
+            Output = output;
 
-            // How do we know if we can share an instance of a renderer or if it contains state that we don't want to share...?
+            // How do we know if we can share an instance of a renderer or if it contains state that we don't want to share...?           
 
             // Create re-useable member aggregators, member renderers, and their compontent renderers
             var fields = new MemberAggregator(

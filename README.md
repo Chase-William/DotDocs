@@ -43,8 +43,8 @@ Uses models to generate markdown files for each corresponding type and its membe
 Render output from comments can vary depending on state of the comment itself and/or the entity it denotes. This section aims to provide clarity as to how rendering behavior varies depending on state.
 
 - If *Summary*, *Example*, or *Remarks* are empty, they'll just skip rendering.
-- A bullot listing of *Type Parameters*, *Type Arguments*, *Parameters*, and *Returns* will always be provided agnostic to the existance of associated comments.
-- By default exported properties must allow public access to either the *get* or *set* or both methods. Therefore, if a *get* or *set* is hidden otherwise, include it in the documentation. See examples in *formats*.
+- A listing of *Type Parameters*, *Type Arguments*, *Parameters*, and *Returns* will always be provided agnostic to the existance of associated comments if appropriate.
+- Property *get* and *set* functions are documentation similarly to *Visual Studio*'s style.
 
 ***See Examples in [formats](./formats/) folder.***
 

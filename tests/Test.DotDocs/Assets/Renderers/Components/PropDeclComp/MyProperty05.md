@@ -1,0 +1,1 @@
+`Int32` MyProperty05 { *get*; ***protected*** *set*; }

@@ -1,0 +1,1 @@
+`Int32` MyMethod04(`Int32` *index*)

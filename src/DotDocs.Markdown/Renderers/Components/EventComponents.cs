@@ -13,9 +13,9 @@ namespace DotDocs.Markdown.Renderers.Components
     {
         public void Render(EventInfo info, Padding padding)
         {
-            info.EventHandlerType!.PutTypeName(info.DeclaringType!, Padding.NewLine);
+            info.EventHandlerType!.PutTypeName(info.DeclaringType!, Padding.Space);
             // info.EventHandlerType!.MaybeLink(info.DeclaringType!, Padding.Space);
-            // info.Name.Put(Padding.NewLine);
+            info.Name.Put(padding);
         }
     }
 

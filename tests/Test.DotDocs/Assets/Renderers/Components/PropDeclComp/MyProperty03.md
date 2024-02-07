@@ -1,0 +1,1 @@
+`Int32` MyProperty03 { *set*; }

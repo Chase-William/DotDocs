@@ -37,7 +37,7 @@ namespace DotDocs.Markdown.Renderers.Components
                 AsMarkdown.Italic.Wrap("set");
                 AsGeneral.SemiColon.Put(Padding.Space);
             }
-            AsGeneral.ClosingCurly.Put(Padding.DoubleNewLine);
+            AsGeneral.ClosingCurly.Put(padding);
         }
     }
 

@@ -29,7 +29,7 @@ namespace DotDocs.Markdown.Renderers.Members
 
             AsMarkdown.H3.Prefix(field.Name, padding: Padding.DoubleNewLine);
 
-            DeclarationRenderer.Render(field, Padding.None);
+            DeclarationRenderer.Render(field, Padding.DoubleNewLine);
 
             if (field.TryGetComments(out CommonComments? comments))
             {

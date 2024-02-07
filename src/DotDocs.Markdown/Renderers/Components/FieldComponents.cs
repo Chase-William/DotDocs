@@ -14,7 +14,7 @@ namespace DotDocs.Markdown.Renderers.Components
         public void Render(FieldInfo info, Padding padding)
         {
             info.FieldType.PutTypeName(info.DeclaringType!, Padding.Space);
-            info.Name.Put(Padding.NewLine);
+            info.Name.Put(padding);
         }
     }
 

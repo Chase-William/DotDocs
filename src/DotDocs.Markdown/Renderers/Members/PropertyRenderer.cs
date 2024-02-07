@@ -39,7 +39,7 @@ namespace DotDocs.Markdown.Renderers.Members
             if (style.HasFlag(AsMarkdown.HorizonalLine))
                 AsMarkdown.HorizonalLine.Put(Padding.DoubleNewLine);
 
-            DeclarationRenderer.Render(property, Padding.None);    
+            DeclarationRenderer.Render(property, Padding.DoubleNewLine);    
 
             if (property.TryGetComments(out CommonComments? comments))
             {
