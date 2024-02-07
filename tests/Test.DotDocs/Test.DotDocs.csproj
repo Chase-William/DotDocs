@@ -17,12 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DotDocs\DotDocs.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Test.Source.One">
-      <HintPath>..\data\TestData\Test.Source.One\bin\Debug\net7.0\Test.Source.One.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\data\TestData\Test.Source.One\Test.Source.One.csproj" />
   </ItemGroup>
 
   <ItemGroup>
