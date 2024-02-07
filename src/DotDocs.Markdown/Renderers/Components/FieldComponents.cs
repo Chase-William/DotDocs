@@ -1,5 +1,6 @@
 ﻿using DocXml.Reflection;
 using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

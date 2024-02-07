@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace DotDocs.IO
 {
+    /// <summary>
+    /// An interface that is responsible for writing <see cref="StringBuilder"/> content to file using an <see cref="IRouterable"/>.
+    /// </summary>
     public interface IOutputable
     {
         public IRouterable Router { get;}

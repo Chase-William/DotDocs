@@ -1,6 +1,7 @@
 ﻿using DocXml.Reflection;
 using DotDocs.Markdown;
 using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using DotDocs.Markdown.Renderers.Components;
 using LoxSmoke.DocXml;
 using System;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 using State = DotDocs.Markdown.RenderState;
 
 namespace DotDocs.Markdown.Renderers.Members
-{    
+{
     public class MethodRenderer : IMemberRenderer
     {
         public IComponentRenderer<MethodInfo> DeclarationRenderer { get; init; }

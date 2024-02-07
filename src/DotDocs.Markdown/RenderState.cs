@@ -18,13 +18,13 @@ namespace DotDocs.Markdown
         // The following state makes this class operate as a state machine reducing the times we must reference the StringBuilder when rendering
         #region State
         public static StringBuilder Builder { get; private set; } = new(DEFAULT_STR_BUILDER_CAPACITY);
-        public static ImmutableDictionary<string, Assembly>? Assemblies { get; private set; }
+        public static ImmutableDictionary<string, (string docs, Assembly asm)>? Assemblies { get; private set; }
         public static ImmutableDictionary<string, CommonComments>? Comments { get; private set; }
         public static IOutputable? Output { get; private set; }
         #endregion
 
         public static void UpdateState(
-            ImmutableDictionary<string, Assembly> assemblies, 
+            ImmutableDictionary<string, (string, Assembly)> assemblies, 
             ImmutableDictionary<string, CommonComments> comments,
             IOutputable output)
         {

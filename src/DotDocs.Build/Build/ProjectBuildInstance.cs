@@ -1,5 +1,4 @@
-﻿using DotDocs.Build.Util;
-using DotDocs.Models;
+﻿using DotDocs.Models;
 using LoxSmoke.DocXml;
 using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.Build.Utilities;

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using DotDocs.Markdown.Extensions;
 using State = DotDocs.Markdown.RenderState;
 
 namespace DotDocs.Markdown.Enums
@@ -31,6 +31,7 @@ namespace DotDocs.Markdown.Enums
         const char OPENING_CURLY = '{';
         const char CLOSING_CURLY = '}';
         const char SEMI_COLON = ';';
+        
         public static void Put(this AsGeneral style, Padding padding = Padding.None)
             => GetAsChar(style).Put(padding);
 

@@ -1,4 +1,5 @@
 ﻿using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using DotDocs.Markdown.Renderers.Components;
 using LoxSmoke.DocXml;
 using System;

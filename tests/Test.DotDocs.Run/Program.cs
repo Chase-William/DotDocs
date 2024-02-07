@@ -5,24 +5,14 @@ using DotDocs.Markdown;
 using DotDocs;
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Test.DotDocs.Run
 {
     internal class Program
     {        
         static void Main(string[] args)
-        {            
-            using var builder = Builder.FromPath(
-                "../../../../../tests/Data",
-                new MarkdownRenderer(
-                    new TextFileOutput(
-                        "docs",
-                        new FlatRouter(),
-                        ".md")));
+        {
+            using var builder = Builder.FromPath("../../../../../tests/Data", "docs");                    
             Run(builder);
         }
 

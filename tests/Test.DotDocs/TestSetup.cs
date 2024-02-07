@@ -13,21 +13,14 @@ namespace Test.DotDocs
     [TestClass]
     public static class TestSetup
     {
-        public static Builder? Builder { get; private set; }
-
-        // public static MarkdownRenderer Renderer { get; private set; }       
+        public static Builder? Builder { get; private set; }      
 
         public static Builder GetBuilder()
         {
-            var builder = Builder.FromPath(
-                "../../../../Data",
-                new MarkdownRenderer(
-                    new TextFileOutput(
-                        "docs",
-                        new FlatRouter(),
-                        ".md")));
+            var builder = Builder.FromPath("../../../../Data", "docs");
             builder.Prepare();
             builder.Build();
+
             return builder;
         }        
 

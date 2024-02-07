@@ -4,14 +4,23 @@ using System.Text;
 namespace DotDocs.IO
 {
     /// <summary>
-    /// Perform output to the file system.
+    /// The <c>TextFileOutput</c> class performs file output operations.
     /// </summary>
     public class TextFileOutput : IOutputable
     {
+        /// <summary>
+        /// The output directory all routing extends from.
+        /// </summary>
         public string OutDirBase { get; private set; }
 
+        /// <summary>
+        /// The router to be used determining the naming/location of files relative to the provided <see cref="OutDirBase"/>.
+        /// </summary>
         public IRouterable Router { get; private set; }
 
+        /// <summary>
+        /// The file extension.
+        /// </summary>
         public string FileEx { get; private set; }
 
         public TextFileOutput(string outDir, IRouterable router, string fileEx)
@@ -39,37 +48,17 @@ namespace DotDocs.IO
         }
 
         /// <summary>
-        /// Checks
+        /// Writes contents of the <see cref="StringBuilder"/> to file.
         /// </summary>
-        /// <returns></returns>
-        //public bool IsValid()
-        //    => Directory.Exists(OutDirBase);
-
-        //public string GetValue()
-        //    => OutDirBase;
-
-        //public string GetValue(Type type)
-        //    => Path.Combine(OutDirBase, Router.GetDir(type), Router.GetFileName(type));
-
-        public override string ToString()
-        {
-            return $"{typeof(TextFileOutput)} | OutDir: {OutDirBase}";
-        }
-
+        /// <param name="type">The type the file represents.</param>
+        /// <param name="builder">A reference to the builder containing the text.</param>
         public void Write(Type type, in StringBuilder builder)
-        {
-            try
-            {
-                string folderPath = Path.Combine(OutDirBase, Router.GetLocation(type));
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-                using var fstream = File.CreateText(Path.Combine(folderPath, Router.GetName(type)) + FileEx);
-                fstream.Write(builder);
-            }
-            catch
-            {
-                throw;
-            }                     
+        {            
+            string folderPath = Path.Combine(OutDirBase, Router.GetLocation(type));
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+            using var fstream = File.CreateText(Path.Combine(folderPath, Router.GetName(type)) + FileEx);
+            fstream.Write(builder);                               
         }
     }
 }

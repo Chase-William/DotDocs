@@ -1,5 +1,6 @@
 ﻿using DocXml.Reflection;
 using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace DotDocs.Markdown.Renderers.Components
         public void Render(EventInfo info, Padding padding)
         {
             info.EventHandlerType!.PutTypeName(info.DeclaringType!, Padding.Space);
-            // info.EventHandlerType!.MaybeLink(info.DeclaringType!, Padding.Space);
             info.Name.Put(padding);
         }
     }

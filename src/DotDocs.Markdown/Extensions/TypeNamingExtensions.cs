@@ -1,4 +1,5 @@
 ﻿using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,24 +9,33 @@ using System.Threading.Tasks;
 
 using State = DotDocs.Markdown.RenderState;
 
-namespace DotDocs.Markdown
+namespace DotDocs.Markdown.Extensions
 {
-    public static class TypeNaming
+    /// <summary>
+    /// A static class containing methods for acquiring type names that match the names within source code.
+    /// </summary>
+    public static class TypeNamingExtensions
     {
         const int RANK_STARTING_INDEX = 1;
 
         static Type? origin;
 
+        /// <summary>
+        /// A stack of each array's rank when returning from recursive functions below to be rendered at the appropriate time.
+        /// </summary>
         static Stack<int> arrRanks = new();
 
+        /// <summary>
+        /// A stack of each type as we visit it used to check the parent type when determining if the <see cref="arrRanks"/> stack needs to be rendered.
+        /// </summary>
         static Stack<Type> types = new();
 
         /// <summary>
-        /// Puts a given <see cref="Type"/>'s complete type to output.
+        /// Renders a given <see cref="Type"/>'s name with generic type params, generic type args, and array information if present.
         /// </summary>
-        /// <param name="to"></param>
-        /// <param name="from"></param>
-        /// <param name="padding"></param>
+        /// <param name="to">The type of interest to be rendered.</param>
+        /// <param name="from">An optional declaring type allowing types found when applicable to be rendered as links from the current location to their location if it exists.</param>
+        /// <param name="padding">Optional padding.</param>
         public static void PutTypeName(this Type to, Type? from = null, Padding padding = Padding.None)
         {
             origin = from; // Store origin state for routing
@@ -34,6 +44,11 @@ namespace DotDocs.Markdown
             origin = null;
         }
 
+        /// <summary>
+        /// Renders type arguments for a given method.
+        /// </summary>
+        /// <param name="method">Method of interest for rendering.</param>
+        /// <param name="padding">Optional padding.</param>
         public static void PutTypeArgs(this MethodInfo method, Padding padding = Padding.None)
         {
             origin = method.DeclaringType;
@@ -44,6 +59,10 @@ namespace DotDocs.Markdown
         }
 
         #region Private Implem
+        /// <summary>
+        /// The main recursive method to be called whenever visiting a new type in the tree. This methods renders the current type to output.
+        /// </summary>
+        /// <param name="to">The current <see cref="Type"/> instance node.</param>
         static void PutTypeName(this Type to)
         {
             types.Push(to);
@@ -56,7 +75,7 @@ namespace DotDocs.Markdown
                 to.GetElementType()!.PutTypeName();
             }
             else // Not array, put root name
-            { 
+            {
                 to.PutMaybeLink();
             }
 
@@ -82,7 +101,7 @@ namespace DotDocs.Markdown
             {
                 if (!next.IsArray) // If the next element is NOT an array, make sure previous array suffix get rendered
                     PutMaybeArraySuffix();
-            }           
+            }
             else // If stack is empty, ensure that if the root type was an array itself, it's suffix gets rendered
                 PutMaybeArraySuffix();
         }
@@ -91,7 +110,7 @@ namespace DotDocs.Markdown
         /// Renders the array suffix by clearing the <see cref="arrRanks"/> <see cref="Stack{T}"/> as it iterates.
         /// </summary>
         static void PutMaybeArraySuffix()
-        {           
+        {
             int i = RANK_STARTING_INDEX;
             while (arrRanks.TryPop(out int rank))
             {
@@ -100,9 +119,13 @@ namespace DotDocs.Markdown
                     AsGeneral.Comma.Put(Padding.Space);
                 "]".Put();
                 i = RANK_STARTING_INDEX;
-            }            
+            }
         }
 
+        /// <summary>
+        /// Handles any type arguments present when traversing the type tree.
+        /// </summary>
+        /// <param name="args"></param>
         static void PutTypeArgs(this IEnumerable<Type> args)
         {
             // - Type args can take type arguments
@@ -126,6 +149,10 @@ namespace DotDocs.Markdown
                 });
         }
 
+        /// <summary>
+        /// Handles any type parameters present when traversing the type tree.
+        /// </summary>
+        /// <param name="_params"></param>
         static void PutTypeParams(this IEnumerable<Type> _params)
         {
             // - Type Params cannot take type arguments
@@ -149,6 +176,10 @@ namespace DotDocs.Markdown
                 });
         }
 
+        /// <summary>
+        /// Renders a link to output if applicable, otherwise, renders type name as a markdown code block.
+        /// </summary>
+        /// <param name="to"></param>
         static void PutMaybeLink(this Type to)
         {
             string name = to.Name;
@@ -160,9 +191,8 @@ namespace DotDocs.Markdown
             // Check other states of "to" and "origin" for linking validity      
             if (origin is not null &&
                 !to.IsGenericParameter && // Cannot be a generic type parameter (dest wont exists)
-                // !origin.IsGenericParameter && // ^
                 to.Name != origin.Name && // Do not link to one's self
-                State.Assemblies!.ContainsKey(to.Assembly.FullName!)) // Ensure this type was defined in the user's projects otherwise a destination won't exist
+                State.Assemblies.ContainsKey(to.Assembly.Location)) // Ensure this type was defined in the user's projects otherwise a destination won't exist
             {
                 // Render link
                 var path = State.Output.Router.GetRoute(origin, to);

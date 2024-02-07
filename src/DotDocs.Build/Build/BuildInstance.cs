@@ -1,5 +1,4 @@
 ﻿using DotDocs.Build.Exceptions;
-using DotDocs.Build.Util;
 using DotDocs.Models;
 using Microsoft.Build.Logging.StructuredLogger;
 using System.Collections.Immutable;
@@ -15,16 +14,28 @@ namespace DotDocs.Build.Build
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        ProjectDocument rootProject;
+        /// <summary>
+        /// The root project's document file i.e. (.csproj file).
+        /// </summary>
+        private readonly ProjectDocument rootProject;
 
-        public ProjectBuildInstance RootProjectBuildInstance { get; private set; }
+        /// <summary>
+        /// The root project i.e. (.csproj file) that all other projects support.
+        /// </summary>
+        public ProjectBuildInstance? RootProjectBuildInstance { get; private set; }
+        /// <summary>
+        /// All the assemblies used to support the compilation of this project.
+        /// </summary>
+        ImmutableArray<string> AllAssemblyPaths { get; set; } = new();
+        /// <summary>
+        /// All projects' build instances.
+        /// </summary>
+        List<ProjectBuildInstance> AllProjectBuildInstances { get; set; } = new();
 
-        ImmutableArray<string> allAssemblyPaths;
-
-        List<ProjectBuildInstance> allProjectBuildInstances = new();
-        public ImmutableArray<ProjectBuildInstance> AllProjectBuildInstances 
-            => allProjectBuildInstances.ToImmutableArray();
-
+        /// <summary>
+        /// Creates an 
+        /// </summary>
+        /// <param name="rootProject"></param>
         public BuildInstance(ProjectDocument rootProject)
         {
             Logger.Debug("Params: [{rootProjectLbl}: {rootProjectValue}]", nameof(rootProject), rootProject);
@@ -70,7 +81,7 @@ namespace DotDocs.Build.Build
                 var mainBuild = build.FindLastChild<Project>();
                 var target = mainBuild
                     .FindFirstChild<Target>(c => c.Name == "FindReferenceAssembliesForReferences");
-                allAssemblyPaths = target.Children
+                AllAssemblyPaths = target.Children
                     .Select(item => ((Item)((AddItem)item).FirstChild).Text)
                     .ToImmutableArray();
 
@@ -81,10 +92,10 @@ namespace DotDocs.Build.Build
                     .FindLastChild<ProjectEvaluation>(p => p.Name.Equals(projectName));
 
                 RootProjectBuildInstance = ProjectBuildInstance
-                    .From(projectEval, allProjectBuildInstances);
+                    .From(projectEval, AllProjectBuildInstances);
 
                 // Add the root node as it will never be added otherwise
-                allProjectBuildInstances.Add(RootProjectBuildInstance);
+                AllProjectBuildInstances.Add(RootProjectBuildInstance);
             }            
             catch (Exception ex)
             {
@@ -99,22 +110,26 @@ namespace DotDocs.Build.Build
         /// Generates models for all of the projects, assemblies, and types.
         /// </summary>
         /// <returns>The root project.</returns>
-        public ProjectModel GetRootProject(
-            Dictionary<string, ProjectModel> projects
-            ) {
-            Logger.Trace("Getting the root project by recursively building up each project from the farthest leaf inward.");
+        public ImmutableArray<(string docs, Assembly binary)> GetAssemblies() {
+            Logger.Trace("Getting the root project by recursively building up each project from the farthest leaf inward.");            
 
-            var rootProject = Load(RootProjectBuildInstance, allAssemblyPaths, projects);
-            // The root is not added until here
-            projects.Add(rootProject.Name, rootProject);
-            return rootProject;
-        }           
+            var projects = new Dictionary<string, ProjectModel>();
 
-        //public void Dispose()
-        //{
-        //    foreach (var build in allProjectBuildInstances)
-        //        build.Dispose();
-        //}
+            var rootProject = Load(
+                RootProjectBuildInstance, 
+                AllAssemblyPaths,
+                projects);
+
+            int index = 0;
+            var assemblies = new (string docs, Assembly asm)[projects.Values.Count + 1]; // Leave room for the root project
+
+            // Gather all assembles into collection
+            foreach (var proj in projects.Values)
+                assemblies[index++] = new(proj.DocumentationFilePath, proj.Assembly);
+            assemblies[index] = new(rootProject.DocumentationFilePath, rootProject.Assembly);
+
+            return assemblies.ToImmutableArray();
+        }
 
         /// <summary>
         /// Recursive function that creates the project tree recursively in a BDF fashion.
@@ -164,8 +179,7 @@ namespace DotDocs.Build.Build
             // Initialize the MetadataLoadContext for reflection only introspection
             // Call the Apply method to apply assembmly info/build results to the model
             // Return to caller
-            return projModel;                
-                //.Apply(build.InitMetadataLoadCtx(asmPaths));
+            return projModel;
         }
     }
 }

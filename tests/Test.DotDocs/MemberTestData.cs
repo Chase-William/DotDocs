@@ -1,4 +1,5 @@
 ﻿using DotDocs.Markdown;
+using DotDocs.Markdown.Extensions;
 using System.Reflection;
 using Test.DotDocs.Source.One;
 using Test.DotDocs.Source.One.TypeNames;

@@ -1,9 +1,8 @@
-﻿using DotDocs.Markdown;
-
+﻿using DotDocs.Markdown.Extensions;
 using State = DotDocs.Markdown.RenderState;
 
 namespace Test.DotDocs.Tests
-{        
+{
     [TestClass]
     public class TestTypeNaming : TypeNamingTestSource
     {

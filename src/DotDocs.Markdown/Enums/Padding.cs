@@ -1,18 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using State = DotDocs.Markdown.RenderState;
+﻿using State = DotDocs.Markdown.RenderState;
 
 namespace DotDocs.Markdown.Enums
 {
+    /// <summary>
+    /// Padding values often used when rendering Markdown.
+    /// </summary>
     public enum Padding
     {
+        /// <summary>
+        /// No padding.
+        /// </summary>
         None,
+        /// <summary>
+        /// One new line character.
+        /// </summary>
         NewLine,
+        /// <summary>
+        /// Two new line characters; often used when starting a new section.
+        /// </summary>
         DoubleNewLine,
+        /// <summary>
+        /// A single space character.
+        /// </summary>
         Space
     }
 

@@ -1,6 +1,7 @@
 ﻿using DotDocs.IO;
 using DotDocs.Models;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Text;
 
 namespace DotDocs.Render
@@ -9,13 +10,10 @@ namespace DotDocs.Render
 
     public interface IRenderer
     {
-        public RepositoryModel Model { get; set; }
-        public ImmutableDictionary<string, ProjectModel> Projects { get; set; }
+        public ImmutableArray<(string docs, Assembly binary)> Assemblies { get; set; }
         public IOutputable Output { get; set; }
 
-        public void Init(
-            RepositoryModel model,
-            ImmutableDictionary<string, ProjectModel> projects);
+        public void Init(ImmutableArray<(string docs, Assembly binary)> assemblies);
 
         public event RenderType RenderClass;
         public event RenderType RenderStruct;

@@ -32,7 +32,7 @@ namespace DotDocs.Build
         /// <summary>
         /// Mutates this project and its dependency projects recursively so that documentation files are generated during compilation.
         /// </summary>        
-        public void EnableDocumentationGeneration()
+        public void EnableAllDocumentationGeneration()
         {
             Logger.Trace("Enabling documentation generation for project file: {projectfile}", ProjectFilePath);
             // Enable documenation generation on current project
@@ -55,7 +55,7 @@ namespace DotDocs.Build
                         
 
             foreach (var dependency in Dependencies)
-                dependency.EnableDocumentationGeneration();
+                dependency.EnableAllDocumentationGeneration();
         }
 
         /// <summary>

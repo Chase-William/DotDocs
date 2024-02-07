@@ -1,13 +1,16 @@
-﻿using DotDocs.Markdown;
-using DotDocs.Markdown.Enums;
+﻿using DotDocs.Markdown.Enums;
+using DotDocs.Markdown.Extensions;
 using LoxSmoke.DocXml;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 using State = DotDocs.Markdown.RenderState;
 
-namespace DotDocs.Markdown
+namespace DotDocs.Markdown.Extensions
 {
+    /// <summary>
+    /// A static class containing extensions for fetching comment information for a given <see cref="MemberInfo"/> instance.
+    /// </summary>
     public static class CommentsExtensions
     {
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using DotDocs.Markdown.Extensions;
 
 namespace DotDocs.Markdown.Enums
 {
@@ -38,7 +39,7 @@ namespace DotDocs.Markdown.Enums
         const string H4 = "####";
         const string H5 = "#####";
         const string HORIZONTAL_LINE = "---";
-
+        
         public static void Put(this AsMarkdown style, Padding padding = Padding.None)
         {
             if (style == AsMarkdown.CodeBlock)

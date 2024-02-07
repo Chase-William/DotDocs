@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DotDocs.Build;
-using DotDocs.Build.Util;
 using DotDocs.Render;
 using DotDocs.Models;
 using DotDocs.IO;
@@ -10,6 +9,10 @@ using System.Linq;
 
 using LoxSmoke.DocXml;
 using System.Runtime.CompilerServices;
+using DotDocs.Markdown;
+using DotDocs.IO.Routing;
+using Microsoft.Build.Logging.StructuredLogger;
+using System.Reflection;
 
 namespace DotDocs
 {           
@@ -47,16 +50,33 @@ namespace DotDocs
         {
             Source = _src;
             Renderer = renderable;
-        }       
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Builder"/> class using the <paramref name="path"/> and <paramref name="renderable"/>.
+        /// Creates a new <see cref="Builder"/> using the provided <see cref="IRenderer"/>.
         /// </summary>
-        /// <param name="path">Path to the root directory of the repository.</param>
-        /// <param name="renderable">Takes an implementation of <see cref="IRenderer"/> used as the <see cref="Renderer"/>.</param>
+        /// <param name="solutionPath">A path containing the solution file i.e. (.sln).</param>
+        /// <param name="renderable">An implementation for rendering.</param>
         /// <returns></returns>
-        public static Builder FromPath(string path, IRenderer renderable)
-            => new(new LocalSource(path), renderable);
+        public static Builder FromPath(string solutionPath, IRenderer renderable)
+            => new(new LocalSource(solutionPath), renderable);
+
+        /// <summary>
+        /// Creates a new <see cref="Builder"/> using the default render options.
+        /// </summary>
+        /// <param name="solutionPath">A path containing the solution file i.e. (.sln).</param>
+        /// <param name="outputPath">A path where render results shall be stored.</param>
+        /// <returns></returns>
+        public static Builder FromPath(string solutionPath, string outputPath)
+        {
+            var output = new LocalSource(solutionPath);
+            var renderer = new MarkdownRenderer(
+                new TextFileOutput(
+                    outputPath, 
+                    new FlatRouter(), 
+                    ".md"));
+            return new(output, renderer);
+        }           
 
         /// <summary>
         /// Prepares the source material by ensuring validity of directories and that results from the last build are cleaned up.
@@ -87,24 +107,19 @@ namespace DotDocs
         public void Build()
         {
             try
-            {               
-                // Process repository files and build
-                var repo = new Repository(Source.Src)
-                    .MakeProjectGraph()
-                    .SetActiveProject()
-                    .EnableDocumentationGeneration()
-                    .Build();
-
-                // Apply built repository results to a model structure going top -> down
-                // Assign results to respective properties via destructure
-                var projects = new Dictionary<string, ProjectModel>();                
-                var repoModel = new RepositoryModel().Apply(repo, projects);
-
-                // Use RepositoryModel & Projects as data source for rendering
-                // RepoModel & Projects dict share the same data, but they both provide a different perspective                
-                Renderer.Init(
-                    repoModel, 
-                    projects.ToImmutableDictionary());
+            {
+                // Build a solution from file complete with dependency graph
+                var solution = Solution.From(Source.Src);
+                // Prompt the user if nessessary for the root project if multiple clusters exist
+                var root = PromptProjectSelection(solution.DependencyGraph);
+                // Enable documentation generation on all project recursively
+                root.EnableAllDocumentationGeneration();
+                // Build the solution
+                var build = Solution.Build(root);
+                // Get the assemblies created
+                var assemblies = build.GetAssemblies();                
+                // Provide them to the renderer
+                Renderer.Init(assemblies);
             }
             catch (Exception ex)
             {
@@ -138,6 +153,32 @@ namespace DotDocs
             if (Projects is not null)            
                 foreach (var proj in Projects.Values)
                     proj.Dispose();            
+        }
+
+        private static ProjectDocument PromptProjectSelection(ImmutableArray<ProjectDocument> projects)
+        {
+            if (projects.Length > 1)
+            {
+                Logger.Trace("More than one root project was found, user is being prompted.");
+                while (true)
+                {
+                    Console.WriteLine("Multiple related project groups detected. Please choose one:");
+                    for (int i = 0; i < projects.Length; i++)
+                        Console.WriteLine($"{i + 1} - {projects[i].ProjectFilePath}");
+                    Console.Write(": ");
+                    // Valid input
+                    if (int.TryParse(Console.ReadLine(), out int index))
+                    {
+                        index--;
+                        // Valid index range
+                        if (index < projects.Length && index > -1)
+                        {
+                            return projects[index];
+                        }
+                    }
+                }
+            }
+            return projects.First();
         }
     }
 }
