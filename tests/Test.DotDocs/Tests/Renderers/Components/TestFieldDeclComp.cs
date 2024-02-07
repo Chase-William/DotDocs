@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Test.Source.One;
 
 namespace Test.DotDocs.Tests.Renderers.Components
 {

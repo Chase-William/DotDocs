@@ -1,1 +1,1 @@
-[`MyGenericClassRef`](./Test.Source.One.MyGenericClassRef`2)<`Int32`[ ], [`MyStructRef`](./Test.Source.One.Supporting.MyStructRef)>[ ]
+[`MyGenericClassRef`](./Test.DotDocs.Source.One.MyGenericClassRef`2)<`Int32`[ ], [`MyStructRef`](./Test.DotDocs.Source.One.Supporting.MyStructRef)>[ ]

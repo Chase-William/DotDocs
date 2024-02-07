@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test.Source.One
+namespace Test.DotDocs.Source.One
 {
     public class MyMethods
     {

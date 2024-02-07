@@ -4,7 +4,6 @@ using DotDocs.Markdown;
 using DotDocs;
 using DotDocs.Models;
 using System.Text;
-using Test.Source.One;
 
 namespace Test.DotDocs
 {
@@ -21,7 +20,7 @@ namespace Test.DotDocs
         public static Builder GetBuilder()
         {
             var builder = Builder.FromPath(
-                "../../../../data/TestData",
+                "../../../../Data",
                 new MarkdownRenderer(
                     new TextFileOutput(
                         "docs",

@@ -1,1 +1,1 @@
-`EventHandler`<[`MyGenericClassRef`](./Test.Source.One.MyGenericClassRef`2)<`Int32`, `String`>> MyEvent05
+`EventHandler`<[`MyGenericClassRef`](./Test.DotDocs.Source.One.MyGenericClassRef`2)<`Int32`, `String`>> MyEvent05

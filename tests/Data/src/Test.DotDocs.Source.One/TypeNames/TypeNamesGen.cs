@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Test.Source.One.Supporting;
+using Test.DotDocs.Source.One.Supporting;
 
-namespace Test.Source.One.TypeNames
+namespace Test.DotDocs.Source.One.TypeNames
 {
     public class TypeNames<T, K>
     {

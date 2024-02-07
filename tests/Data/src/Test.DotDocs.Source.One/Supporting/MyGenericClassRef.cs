@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test.Source.One.Supporting
+namespace Test.DotDocs.Source.One
 {
-    public struct MyStructRef
+    public class MyGenericClassRef<T, K>
     {
     }
 }

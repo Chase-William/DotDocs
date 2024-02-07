@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Test.Source.One.Supporting;
-
-namespace Test.Source.One
+﻿namespace Test.DotDocs.Source.One
 {
     public class MyEvents
     {

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotDocs\DotDocs.csproj" />
+    <ProjectReference Include="..\..\src\DotDocs\DotDocs.csproj" />
   </ItemGroup>
 
 </Project>

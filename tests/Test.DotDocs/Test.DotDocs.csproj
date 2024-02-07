@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DotDocs\DotDocs.csproj" />
-    <ProjectReference Include="..\data\TestData\Test.Source.One\Test.Source.One.csproj" />
+    <ProjectReference Include="..\Data\src\Test.DotDocs.Source.One\Test.DotDocs.Source.One.csproj" />
   </ItemGroup>
 
   <ItemGroup>

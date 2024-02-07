@@ -1,24 +1,23 @@
-﻿using DotDocs.Build.Exceptions;
+﻿using DotDocs.IO.Routing;
 using DotDocs.IO;
-using DotDocs.IO.Routing;
+using DotDocs.Build.Exceptions;
 using DotDocs.Markdown;
+using DotDocs;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace DotDocs.Runner
+namespace Test.DotDocs.Run
 {
     internal class Program
     {        
         static void Main(string[] args)
-        {
-            // Test test library
-            // Run(Builder.FromUrl("https://github.com/Chase-William/Custom2DArray"));            
+        {            
             using var builder = Builder.FromPath(
-                //@"C:\Dev\ex\DotDocs.TestData",
-                @"C:\Dev\DotDocs\tests\data\TestData",
+                "../../../../../tests/Data",
                 new MarkdownRenderer(
                     new TextFileOutput(
                         "docs",

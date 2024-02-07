@@ -1,14 +1,7 @@
 ﻿using DotDocs.Markdown;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using Test.Source.One;
-using Test.Source.One.TypeNames;
-using State = DotDocs.Markdown.RenderState;
+using Test.DotDocs.Source.One;
+using Test.DotDocs.Source.One.TypeNames;
 
 namespace Test.DotDocs
 {
