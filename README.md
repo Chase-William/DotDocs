@@ -1,13 +1,12 @@
 ![DotDocs_logo_150x150](https://github.com/Chase-William/DotDocs/assets/46757278/ca2b9be4-b1cf-4775-bb04-7a6e5ff7db82)
 
-# DotDocs
+# DotDocs [![Build](https://github.com/Chase-William/DotDocs/actions/workflows/build.yml/badge.svg)](https://github.com/Chase-William/DotDocs/actions/workflows/build.yml) [![Tests](https://github.com/Chase-William/DotDocs/actions/workflows/tests.yml/badge.svg)](https://github.com/Chase-William/DotDocs/actions/workflows/tests.yml)
 
 Generate easy add hoc docs from your C# codebase in markdown.
 
 ## How to Use
 
 ![DotDocs_how_it_works](https://github.com/Chase-William/DotDocs/assets/46757278/337229ed-06f7-4d6d-ada0-9a8e11a026f0)
-
 
 Its simple, provide a path to the location of the repository containing your C# projects and specify how Dotdocs shall render them.
 
