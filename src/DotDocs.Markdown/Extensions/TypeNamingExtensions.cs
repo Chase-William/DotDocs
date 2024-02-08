@@ -2,6 +2,7 @@
 using DotDocs.Markdown.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -182,6 +183,9 @@ namespace DotDocs.Markdown.Extensions
         /// <param name="to"></param>
         static void PutMaybeLink(this Type to)
         {
+            Debug.Assert(State.Assemblies is not null);
+            Debug.Assert(State.Output is not null);
+
             string name = to.Name;
 
             // Remove arg/param count label from type's name if generic

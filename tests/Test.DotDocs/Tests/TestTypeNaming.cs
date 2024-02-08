@@ -49,7 +49,7 @@ namespace Test.DotDocs.Tests
             Assert.AreEqual($"`{type.Name}`", State.Builder.ToString());
         }
 
-        [TestMethod("Type names without links.")]
+        [TestMethod()]
         [DynamicData(
             nameof(GetNames),
             typeof(TypeNamingTestSource),
@@ -73,7 +73,7 @@ namespace Test.DotDocs.Tests
         {
             var type = Get(name);
             // Provide a declaring type which is the source where all these types were pulled from
-            type.PutTypeName(Src);
+            type.PutTypeName(Source);
 
             Assert.AreEqual(
                 GetExpectedTypeNamingMarkdown(name, true), 

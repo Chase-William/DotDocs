@@ -9,9 +9,12 @@ namespace Test.DotDocs
     public abstract class MemberTestSource<TMember>
         where TMember : MemberInfo
     {
-        public Type Src { get; private set; }
+        public Type Source { get; init; }
 
-        protected MemberTestSource(Type type) => Src = type;
+        protected MemberTestSource(Type srcType)
+        {
+            Source = TestState.GetECMADefinitionTypeFromRuntimeType(srcType);
+        }
 
         protected abstract IEnumerable<string[]> YieldNames();
 
@@ -20,18 +23,22 @@ namespace Test.DotDocs
 
     public class PropertyTestSource : MemberTestSource<PropertyInfo>
     {
-        public PropertyTestSource() : base(typeof(MyProperties<,>)) { }
+        readonly static Type SRC_TYPE = typeof(MyProperties<,>);
+
+        public PropertyTestSource() : base(SRC_TYPE) { }
 
         protected override IEnumerable<string[]> YieldNames()
         {
-            var members = Src.GetPropertiesForRendering();
+            var members = Source.GetPropertiesForRendering();
             foreach (var mem in members)
                 yield return new[] { mem.Name };
         }
 
         public override PropertyInfo Get(string name)
         {
-            return Src.GetProperty(name);
+            // Cannot use Source.GetRuntimeProperty or GetProperty.. for some reason it will not return the prop, but the following does
+            var props = Source.GetPropertiesForRendering();
+            return props.Single(p => p.Name == name);
         }
 
         public static IEnumerable<string[]> GetNames()
@@ -43,18 +50,20 @@ namespace Test.DotDocs
 
     public class FieldTestSource : MemberTestSource<FieldInfo>
     {
-        public FieldTestSource() : base(typeof(MyFields)) { }
+        readonly static Type SRC_TYPE = typeof(MyFields);
+
+        public FieldTestSource() : base(SRC_TYPE) { }
 
         protected override IEnumerable<string[]> YieldNames()
         {
-            var members = Src.GetFieldsForTypeRendering();
+            var members = Source.GetFieldsForTypeRendering();
             foreach (var mem in members)
                 yield return new[] { mem.Name };
         }
 
         public override FieldInfo Get(string name)
         {
-            return Src.GetField(name);
+            return Source.GetField(name);
         }
 
         public static IEnumerable<string[]> GetNames()
@@ -66,18 +75,20 @@ namespace Test.DotDocs
 
     public class MethodTestSource : MemberTestSource<MethodInfo>
     {
-        public MethodTestSource() : base(typeof(MyMethods)) { }
+        readonly static Type SRC_TYPE = typeof(MyMethods);
+
+        public MethodTestSource() : base(SRC_TYPE) { }
 
         protected override IEnumerable<string[]> YieldNames()
         {
-            var members = Src.GetMethodsForRendering();
+            var members = Source.GetMethodsForRendering();
             foreach (var mem in members)
                 yield return new[] { mem.Name };
         }
 
         public override MethodInfo Get(string name)
         {
-            return Src.GetMethod(name);
+            return Source.GetMethod(name);
         }
 
         public static IEnumerable<string[]> GetNames()
@@ -89,18 +100,20 @@ namespace Test.DotDocs
 
     public class EventTestSource : MemberTestSource<EventInfo>
     {
-        public EventTestSource() : base(typeof(MyEvents)) { }
+        readonly static Type SRC_TYPE = typeof(MyEvents);
+
+        public EventTestSource() : base(SRC_TYPE) { }
 
         protected override IEnumerable<string[]> YieldNames()
         {
-            var members = Src.GetEventsForRendering();
+            var members = Source.GetEventsForRendering();
             foreach (var mem in members)
                 yield return new[] { mem.Name };
         }
 
         public override EventInfo Get(string name)
         {
-            return Src.GetEvent(name);
+            return Source.GetEvent(name);
         }
 
         public static IEnumerable<string[]> GetNames()
@@ -112,18 +125,20 @@ namespace Test.DotDocs
 
     public class TypeNamingTestSource : MemberTestSource<Type>
     {
-        public TypeNamingTestSource() : base(typeof(TypeNames<,>)) { }
+        readonly static Type SRC_TYPE = typeof(TypeNames<,>);
+
+        public TypeNamingTestSource() : base(SRC_TYPE) { }
 
         protected override IEnumerable<string[]> YieldNames()
         {
-            var members = Src.GetFieldsForTypeRendering();
+            var members = Source.GetFieldsForTypeRendering();
             foreach (var mem in members)
                 yield return new[] { mem.Name };
         }
 
         public override Type Get(string name)
         {
-            return Src.GetField(name).FieldType;
+            return Source.GetField(name).FieldType;
         }
 
         public static IEnumerable<string[]> GetNames()

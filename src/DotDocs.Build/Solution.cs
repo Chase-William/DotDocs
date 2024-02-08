@@ -1,5 +1,6 @@
 ﻿using DotDocs.Build.Build;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace DotDocs.Build
@@ -67,25 +68,16 @@ namespace DotDocs.Build
         }
 
         /// <summary>
-        /// Ensures each project file has documentation generation enabled in the .csproj file.
-        /// </summary>
-        /// <returns></returns>
-        public static void EnableDocumentationGeneration(ProjectDocument project)
-        {
-            Logger.Trace("Beginning recursive loop to enable documentation generation on all projects.");
-
-            ArgumentNullException.ThrowIfNull(project);
-
-            project.EnableAllDocumentationGeneration();
-        }
-
-        /// <summary>
         /// Builds active project via the property <see cref="SelectedRootProject"/>.
         /// </summary>
         /// <returns></returns>
         public static BuildInstance Build(ProjectDocument project)
         {
-            ArgumentNullException.ThrowIfNull(project);
+            Debug.Assert(project is not null);
+            // Enable documentation generation on all project recursively
+            Logger.Trace("Beginning recursive loop to enable documentation generation on all projects.");
+            project.EnableAllDocumentationGeneration();
+
             return new BuildInstance(project)
                 .Build();
         }        

@@ -13,7 +13,7 @@ using DotDocs.Markdown.Enums;
 using System.Reflection;
 
 namespace Test.DotDocs.Tests.Renderers.Components
-{    
+{
     [TestClass]
     public class TestPropDeclComp : Component<PropertyDeclaration, PropertyInfo, PropertyTestSource>
     {

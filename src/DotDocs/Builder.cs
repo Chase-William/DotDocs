@@ -111,9 +111,7 @@ namespace DotDocs
                 // Build a solution from file complete with dependency graph
                 var solution = Solution.From(Source.Src);
                 // Prompt the user if nessessary for the root project if multiple clusters exist
-                var root = PromptProjectSelection(solution.DependencyGraph);
-                // Enable documentation generation on all project recursively
-                root.EnableAllDocumentationGeneration();
+                var root = PromptProjectSelection(solution.DependencyGraph);                
                 // Build the solution
                 var build = Solution.Build(root);
                 // Get the assemblies created
