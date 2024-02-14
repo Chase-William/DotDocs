@@ -1,54 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using DotDocs.Build;
-using DotDocs.Render;
-using DotDocs.Models;
+﻿using DotDocs.Build;
+using DotDocs.Build.Exceptions;
 using DotDocs.IO;
+using DotDocs.IO.Routing;
+using DotDocs.Markdown;
+using DotDocs.Models;
+using DotDocs.Rendering;
+using Microsoft.Build.Construction;
+using Microsoft.Build.Logging.StructuredLogger;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 
-using LoxSmoke.DocXml;
-using System.Runtime.CompilerServices;
-using DotDocs.Markdown;
-using DotDocs.IO.Routing;
-using Microsoft.Build.Logging.StructuredLogger;
-using System.Reflection;
-
 namespace DotDocs
-{           
+{
     /// <summary>
     /// The main class for using DotDoc's services.
     /// </summary>
     public class Builder : IDisposable
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-
-        #region IO
-        /// <summary>
-        /// The location of repository.
-        /// </summary>
-        internal ISourceable Source { get; private set; }
-        #endregion
-
-        #region Data
-        /// <summary>
-        /// Repository model structure that mimics the real programmical structure.
-        /// </summary>
-        internal RepositoryModel RepoModel { get; private set; }
-        /// <summary>
-        /// A flat map containing all locally defined projects used.
-        /// </summary>
-        internal Dictionary<string, ProjectModel> Projects { get; private set; }
-        #endregion
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();               
 
         /// <summary>
         /// The renderer used to render all output.
         /// </summary>
         public IRenderer Renderer { get; init; }
-                
-        private Builder(ISourceable _src, IRenderer renderable)
+
+        public string AbsoluteSolutionPath { get; init; }
+
+        public string ProjectFileName { get; init; }
+
+        ImmutableArray<AssemblyReflectInfo> assemblies = new();
+
+        private Builder(
+            string solutionPath,
+            string projectFileName,
+            IRenderer renderable)
         {
-            Source = _src;
+            AbsoluteSolutionPath = Path.GetFullPath(solutionPath);
+            ProjectFileName = projectFileName;
             Renderer = renderable;
         }
 
@@ -58,8 +49,11 @@ namespace DotDocs
         /// <param name="solutionPath">A path containing the solution file i.e. (.sln).</param>
         /// <param name="renderable">An implementation for rendering.</param>
         /// <returns></returns>
-        public static Builder FromPath(string solutionPath, IRenderer renderable)
-            => new(new LocalSource(solutionPath), renderable);
+        public static Builder FromPath(
+            string solutionPath,
+            string projectFileName,
+            IRenderer renderable)
+            => new(solutionPath, projectFileName, renderable);
 
         /// <summary>
         /// Creates a new <see cref="Builder"/> using the default render options.
@@ -67,38 +61,15 @@ namespace DotDocs
         /// <param name="solutionPath">A path containing the solution file i.e. (.sln).</param>
         /// <param name="outputPath">A path where render results shall be stored.</param>
         /// <returns></returns>
-        public static Builder FromPath(string solutionPath, string outputPath)
+        public static Builder FromPath(string solutionPath, string projectFileName, string outputPath)
         {
-            var output = new LocalSource(solutionPath);
+            // var output = new LocalSource(solutionPath);
             var renderer = new MarkdownRenderer(
                 new TextFileOutput(
                     outputPath, 
                     new FlatRouter(), 
                     ".md"));
-            return new(output, renderer);
-        }           
-
-        /// <summary>
-        /// Prepares the source material by ensuring validity of directories and that results from the last build are cleaned up.
-        /// </summary>
-        public void Prepare()
-        {
-            try
-            {
-                // Prepare local source
-                Logger.Trace("Preparing {source}.", Source.ToString());
-                _ = Source.Prepare();
-
-                // -- Prepare output
-                // Prepare output directory
-                Logger.Trace("Cleaning output directory.");
-                Renderer.Output.Clean();              
-            }
-            catch (Exception ex)
-            {
-                Logger.Fatal(ex);
-                throw;
-            }
+            return new(solutionPath, projectFileName, renderer);
         }
 
         /// <summary>
@@ -108,15 +79,23 @@ namespace DotDocs
         {
             try
             {
-                // Build a solution from file complete with dependency graph
-                var solution = Solution.From(Source.Src);
-                // Prompt the user if nessessary for the root project if multiple clusters exist
-                var root = PromptProjectSelection(solution.DependencyGraph);                
-                // Build the solution
-                var build = Solution.Build(root);
-                // Get the assemblies created
-                var assemblies = build.GetAssemblies();                
-                // Provide them to the renderer
+                var path = Path.GetFullPath(AbsoluteSolutionPath);
+                // Parse solution
+                var solution = SolutionFile.Parse(path);
+                
+                // Enable doc generation on all projects
+                foreach (var proj in solution.ProjectsInOrder)
+                    proj.EnableDocGen();
+
+                // Get the specified project to build
+                var source = solution.ProjectsInOrder.Single(p => ProjectFileName.StartsWith(p.ProjectName));
+                // Build the project
+                var build = source.Build();
+                // If it didn't succeed, throw an error back indicating it was an issue with the project's content itself
+                if (!build.Succeeded) // Throw build error exception              
+                    throw new BuildException(build);                
+                // Get all assemblies
+                assemblies = build.GetAssemblies();
                 Renderer.Init(assemblies);
             }
             catch (Exception ex)
@@ -148,35 +127,8 @@ namespace DotDocs
         public void Dispose()
         {
             Logger.Trace("Cleaning up all unused resources by projects.");
-            if (Projects is not null)            
-                foreach (var proj in Projects.Values)
-                    proj.Dispose();            
-        }
-
-        private static ProjectDocument PromptProjectSelection(ImmutableArray<ProjectDocument> projects)
-        {
-            if (projects.Length > 1)
-            {
-                Logger.Trace("More than one root project was found, user is being prompted.");
-                while (true)
-                {
-                    Console.WriteLine("Multiple related project groups detected. Please choose one:");
-                    for (int i = 0; i < projects.Length; i++)
-                        Console.WriteLine($"{i + 1} - {projects[i].ProjectFilePath}");
-                    Console.Write(": ");
-                    // Valid input
-                    if (int.TryParse(Console.ReadLine(), out int index))
-                    {
-                        index--;
-                        // Valid index range
-                        if (index < projects.Length && index > -1)
-                        {
-                            return projects[index];
-                        }
-                    }
-                }
-            }
-            return projects.First();
+            foreach (var info in assemblies)            
+                info.Dispose();            
         }
     }
 }

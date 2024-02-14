@@ -126,6 +126,60 @@ This setup has proven to be flexible, yet provides appropriate structure and cod
 
 > If the query result return an empty collection, rendering is skipped *i.e. (before, each, and after callbacks).*
 
-### Tasks
+## Creating Project Dependency Graph
 
-- Should we use inheritance to remove redundent logic for handling optional params in *Member* based renderers?
+- The starting project can be anywhere in the graph
+- The graph can contain multiple isolated clusters
+- There can be multiple parent project nodes
+- There can be multiple child project nodes
+- Each project file is represented by a single shared instance of a node
+- Friendly API method must take a collection *(data set)* of project file paths assuming each item is unique
+- Friendly API method must return a collection of root project files nodes
+
+### Impl
+
+- Use a dictionary to keep track of all `ProjectDocument`
+
+
+
+- Iterate over *projectFiles*
+- Check if current project file has children, if so process them and adjust, otherwise next
+- When a new project adds another project as a dep, ensure the dep has that project added as a parent
+
+```cs
+// Public API
+public static IEnumerable<ProjectDocument> GetProjects(IEnumerable<string> projectFiles) {
+  var projects = new Dictionary<string, ProjectDocument>();
+  var roots = new List<ProjectDocument>();
+  foreach (var location in projectFiles) {
+    // If a ProjectDocument and it's dependency tree hasnt been created, create it
+    if (!projects.ContainsKey(location)) {
+      // Add each level 0 node returned to the list as a possible root project
+      roots.Add(CreateProjectAndDependencies(location, projects));
+    }
+  }
+  // Return all the root projects
+  return roots;
+}
+
+static CreateProjectAndDependencies(string location, Dictionary<string, ProjectDocument> projects) {
+  // If a ProjectDocument already exists for the current project, return it, otherwise create it and return it
+  // When called recursively, this allows us to add an existing dependency tree to a newly created root node
+  if (projects.TryGetValue(location, out ProjectDocument proj)) {
+    return proj;
+  }
+  // Create ProjectDocument
+
+  // ..
+
+  // If this project has project dependencies, iterate over them and call this function recursively to handle them
+  foreach (var depLocation in @dependencies) {
+    // Get the dependency project tree using this function
+    var dep = CreateProjectAndDependencies(depLocation, projects);
+    // Add it to the current project's deps
+    proj.Dependencies.Add(dep);    
+  } // Do this for all of this projects deps
+
+  return proj; // Return once this project tree and it's dependency tree is created
+}
+```

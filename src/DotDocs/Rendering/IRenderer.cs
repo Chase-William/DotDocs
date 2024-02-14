@@ -1,10 +1,11 @@
 ﻿using DotDocs.IO;
 using DotDocs.Models;
+using System;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 
-namespace DotDocs.Render
+namespace DotDocs.Rendering
 {
     public delegate void RenderType(Type type);
 
@@ -21,6 +22,6 @@ namespace DotDocs.Render
         public event RenderType RenderDelegate;
         public event RenderType RenderEnum;
 
-        public void Render();            
+        public void Render();
     }
 }

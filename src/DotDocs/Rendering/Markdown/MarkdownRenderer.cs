@@ -9,8 +9,10 @@ using DotDocs.Markdown.Renderers.Sections;
 using DotDocs.Markdown.Renderers.Sections.Header;
 using DotDocs.Markdown.Renderers.Types;
 using DotDocs.Models;
-using DotDocs.Render;
+using DotDocs.Rendering;
 using LoxSmoke.DocXml;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Build.Logging.StructuredLogger;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DotDocs.Build.Exceptions

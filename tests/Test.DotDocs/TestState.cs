@@ -32,10 +32,10 @@ namespace Test.DotDocs
             if (type.IsGenericParameter)
                 throw new ArgumentException($"Invalid {type} given, cannot be a generic parameter.");
             // Get ref to matching assembly but loaded by MetadataLoadContext
-            var reflectionAssembly = Builder.Renderer.Assemblies.FirstOrDefault(asm => asm.binary.FullName == type.Assembly.FullName);
-            Debug.Assert(reflectionAssembly.binary is not null, $"Could not locate a matching assembly for {type.FullName} within renderer's assemblies.");
+            var info = Builder.Renderer.Assemblies.FirstOrDefault(info => info.Binary.FullName == type.Assembly.FullName);
+            Debug.Assert(info.Binary is not null, $"Could not locate a matching assembly for {type.FullName} within renderer's assemblies.");
             // Get matching type that resides within reflection only assembly
-            var ecmaType = reflectionAssembly.binary.ExportedTypes.FirstOrDefault(t => t.FullName == type.FullName);
+            var ecmaType = info.Binary.ExportedTypes.FirstOrDefault(t => t.FullName == type.FullName);
             Debug.Assert(ecmaType is not null, $"Type {type.FullName ?? type.Name} should exist within the renderer's assemlbies.");
 
             return ecmaType;
@@ -43,8 +43,10 @@ namespace Test.DotDocs
 
         public static Builder GetBuilder()
         {
-            var builder = Builder.FromPath("../../../../Data", "docs");
-            builder.Prepare();
+            var builder = Builder.FromPath(
+                "../../../../Data/Test.DotDocs.Source.sln", 
+                "Test.DotDocs.Source.One.csproj", 
+                "docs");
             builder.Build();
 
             return builder;
